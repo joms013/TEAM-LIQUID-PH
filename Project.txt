@@ -1,0 +1,7 @@
+Main Landing page with:
+		a. Login - Working Connected to supabase
+		b. Register/ Create User
+		c. Reset password
+		d. Redirect to app main page.
+		e. Github repository with registered collaborators
+		f. Pull requets closed history by collaborator
