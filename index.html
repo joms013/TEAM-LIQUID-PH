@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Hope, Inc. ERP</title>
+
+  <!-- External Fonts & Scripts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Public+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+
+  <style>
+    /* ==========================================
+       1. Design Tokens & Themes
+       ========================================== */
+    :root {
+      --bg: #f3f7f4;
+      --panel: #ffffff;
+      --ink: #14231c;
+      --mute: #5a6d63;
+      --line: #d3e0d8;
+      --accent: #0f6b4f;
+      --accent-ink: #ffffff;
+      --warn: #b3361f;
+      --ok: #0f6b4f;
+      --sun: #e8b83a;
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0e1814;
+        --panel: #15241d;
+        --ink: #e6f0ea;
+        --mute: #8fa59a;
+        --line: #25382f;
+        --accent: #5fd2a3;
+        --accent-ink: #06261a;
+        --warn: #ff8c75;
+        --ok: #5fd2a3;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0e1814;
+      --panel: #15241d;
+      --ink: #e6f0ea;
+      --mute: #8fa59a;
+      --line: #25382f;
+      --accent: #5fd2a3;
+      --accent-ink: #06261a;
+      --warn: #ff8c75;
+      --ok: #5fd2a3;
+    }
+
+    /* ==========================================
+       2. Base & Reset Styles
+       ========================================== */
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 400 16px/1.6 "Public Sans", system-ui, sans-serif;
+    }
+
+    h1, h2, h3 {
+      font-family: Fraunces, Georgia, serif;
+      line-height: 1.1;
+      margin: 0;
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--sun);
+      outline-offset: 2px;
+    }
+
+    /* ==========================================
+       3. Layout Components
+       ========================================== */
+    .wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 0;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    section.block {
+      padding: 56px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    section.block h2 {
+      font-size: clamp(28px, 4vw, 40px);
+    }
+
+    section.block > .wrap > p {
+      color: var(--mute);
+      max-width: 60ch;
+      margin: 12px 0 28px;
+    }
+
+    footer {
+      padding: 32px 0 calc(32px + env(safe-area-inset-bottom, 0px));
+      color: var(--mute);
+      font-size: 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    /* ==========================================
+       4. Navigation & Hero Section
+       ========================================== */
+    .brand {
+      font: 700 22px Fraunces, Georgia, serif;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--ink);
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--sun);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--sun) 30%, transparent);
+    }
+
+    nav a {
+      margin-left: 20px;
+      text-decoration: none;
+      color: var(--mute);
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      color: var(--ink);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 48px;
+      align-items: start;
+      padding: 40px 0 64px;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 64px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .hero p.lead {
+      font-size: 18px;
+      color: var(--mute);
+      max-width: 46ch;
+      margin: 20px 0 0;
+    }
+
+    .mods {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 28px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .mods li {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* ==========================================
+       5. Cards, Forms & Inputs
+       ========================================== */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 26px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tabs button {
+      background: none;
+      border: 0;
+      border-bottom: 3px solid transparent;
+      padding: 8px 12px;
+      font: 600 15px "Public Sans", sans-serif;
+      color: var(--mute);
+      cursor: pointer;
+      margin-bottom: -1px;
+    }
+
+    .tabs button[aria-selected="true"] {
+      color: var(--ink);
+      border-bottom-color: var(--accent);
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      font-size: 14px;
+      margin: 14px 0 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--bg);
+      color: var(--ink);
+      font: inherit;
+    }
+
+    .btn {
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--accent);
+      color: var(--accent-ink);
+      font: 600 16px "Public Sans", sans-serif;
+      cursor: pointer;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .link {
+      background: none;
+      border: 0;
+      color: var(--accent);
+      padding: 0;
+      font: inherit;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-top: 14px;
+    }
+
+    .msg {
+      min-height: 22px;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+
+    .msg.err { color: var(--warn); }
+    .msg.ok { color: var(--ok); }
+
+    .cfg {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border: 1px dashed var(--warn);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--warn);
+    }
+
+    /* ==========================================
+       6. Dynamic Content Displays
+       ========================================== */
+    .people {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .people li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .people li:last-child {
+      border: 0;
+    }
+
+    .people img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--line);
+    }
+
+    .people small {
+      margin-left: auto;
+      color: var(--mute);
+    }
+
+    details {
+      border-bottom: 1px solid var(--line);
+      padding: 10px 0;
+    }
+
+    details:last-child {
+      border: 0;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    summary .n {
+      margin-left: auto;
+      font-weight: 500;
+      color: var(--mute);
+      font-size: 14px;
+    }
+
+    .pr {
+      display: flex;
+      gap: 10px;
+      padding: 8px 0 8px 8px;
+      font-size: 14px;
+    }
+
+    .pr a {
+      flex: 1;
+    }
+
+    .tag {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 1px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      white-space: nowrap;
+      align-self: flex-start;
+    }
+
+    .tag.merged {
+      color: var(--ok);
+      border-color: var(--ok);
+    }
+
+    .empty {
+      color: var(--mute);
+      font-size: 14px;
+    }
+
+    /* ==========================================
+       7. Media Queries
+       ========================================== */
+    @media (max-width: 820px) {
+      .hero, .grid {
+        grid-template-columns: 1fr;
+      }
+      nav a {
+        margin-left: 14px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <!-- Navigation Header -->
+    <header>
+      <a class="brand" href="#top"><span class="dot"></span>Hope, Inc.</a>
+      <nav aria-label="Main">
+        <a href="#signin">Sign in</a>
+        <a href="#team">Team</a>
+        <a href="#history">Pull requests</a>
+      </nav>
+    </header>
+
+    <!-- Main Content Body -->
+    <main id="top">
+      <!-- Hero & Auth Section -->
+      <div class="hero" id="signin">
+        <div>
+          <h1>One system for everything Hope, Inc. runs on.</h1>
+          <p class="lead">Sign in to manage finance, inventory, people and projects in one place. New here? Create your account in under a minute.</p>
+          <ul class="mods" aria-label="Modules">
+            <li>Finance</li>
+            <li>Inventory</li>
+            <li>Procurement</li>
+            <li>HR</li>
+            <li>Projects</li>
+            <li>Reports</li>
+          </ul>
+        </div>
+
+        <div class="card" id="auth">
+          <div class="tabs" role="tablist" aria-label="Account">
+            <button role="tab" id="t-login" aria-selected="true" data-view="login">Sign in</button>
+            <button role="tab" id="t-register" aria-selected="false" data-view="register">Create account</button>
+          </div>
+
+          <!-- Sign In Form -->
+          <form id="f-login" novalidate>
+            <label for="l-email">Email</label>
+            <input id="l-email" type="email" autocomplete="email" required>
+            
+            <label for="l-pass">Password</label>
+            <input id="l-pass" type="password" autocomplete="current-password" required>
+            
+            <button class="btn" type="submit">Sign in</button>
+            <button class="link" type="button" data-view="reset">Forgot your password?</button>
+          </form>
+
+          <!-- Register Form -->
+          <form id="f-register" hidden novalidate>
+            <label for="r-name">Full name</label>
+            <input id="r-name" autocomplete="name" required>
+            
+            <label for="r-email">Work email</label>
+            <input id="r-email" type="email" autocomplete="email" required>
+            
+            <label for="r-pass">Password (8+ characters)</label>
+            <input id="r-pass" type="password" autocomplete="new-password" minlength="8" required>
+            
+            <button class="btn" type="submit">Create account</button>
+          </form>
+
+          <!-- Password Reset Form -->
+          <form id="f-reset" hidden novalidate>
+            <label for="p-email">Account email</label>
+            <input id="p-email" type="email" autocomplete="email" required>
+            
+            <button class="btn" type="submit">Send reset link</button>
+            <button class="link" type="button" data-view="login">Back to sign in</button>
+          </form>
+
+          <!-- New Password Form -->
+          <form id="f-newpass" hidden novalidate>
+            <label for="n-pass">New password (8+ characters)</label>
+            <input id="n-pass" type="password" autocomplete="new-password" minlength="8" required>
+            
+            <button class="btn" type="submit">Save new password</button>
+          </form>
+
+          <div class="msg" id="msg" role="status" aria-live="polite"></div>
+          <div class="cfg" id="cfg" hidden>Add your Supabase URL and anon key in the CONFIG block at the top of the page script to turn on sign in.</div>
+        </div>
+      </div>
+
+      <!-- Collaborators Section -->
+      <section class="block" id="team">
+        <div class="wrap">
+          <h2>Registered collaborators</h2>
+          <p>People with access to the Hope, Inc. ERP repository on GitHub.</p>
+          <ul class="people card" id="people">
+            <li class="empty">Loading collaborators…</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- Pull Requests History Section -->
+      <section class="block" id="history">
+        <div class="wrap">
+          <h2>Closed pull requests by collaborator</h2>
+          <p>Every closed pull request, grouped by who opened it. Merged work is marked.</p>
+          <div class="card" id="prs">
+            <span class="empty">Loading pull requests…</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="wrap">
+        © <span id="yr"></span> Hope, Inc. · Repository: <a id="repo-link" href="#">GitHub</a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Application Logic -->
+  <script>
+    /* ==========================================
+       Config Block
+       ========================================== */
+    const CONFIG = {
+      SUPABASE_URL: "",         // e.g. https://xxxx.supabase.co
+      SUPABASE_ANON_KEY: "",    // public anon key (never the service_role key)
+      APP_URL: "/app.html",     // main page of the ERP after login
+      GITHUB_OWNER: "hope-inc", // org or user
+      GITHUB_REPO: "erp"        // repository name
+    };
+
+    /* ==========================================
+       Helpers & Initialization
+       ========================================== */
+    const $ = id => document.getElementById(id);
+
+    const msg = (text, kind) => { 
+      const m = $("msg"); 
+      m.textContent = text || ""; 
+      m.className = "msg " + (kind || ""); 
+    };
+
+    const esc = str => String(str).replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[char]));
+
+    $("yr").textContent = new Date().getFullYear();
+    $("repo-link").href = `https://github.com/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}`;
+
+    /* ==========================================
+       View Management
+       ========================================== */
+    const forms = { 
+      login: "f-login", 
+      register: "f-register", 
+      reset: "f-reset", 
+      newpass: "f-newpass" 
+    };
+
+    function show(view) {
+      Object.entries(forms).forEach(([key, id]) => {
+        $(id).hidden = (key !== view);
+      });
+      $("t-login").setAttribute("aria-selected", view === "login");
+      $("t-register").setAttribute("aria-selected", view === "register");
+      document.querySelector(".tabs").hidden = (view === "newpass");
+      msg("");
+    }
+
+    document.querySelectorAll("[data-view]").forEach(button => {
+      button.addEventListener("click", () => show(button.dataset.view));
+    });
+
+    /* ==========================================
+       Supabase Authentication
+       ========================================== */
+    const ready = CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY && window.supabase;
+    let sb = null;
+
+    if (ready) {
+      sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    } else {
+      $("cfg").hidden = false;
+    }
+
+    const goToApp = () => { window.location.href = CONFIG.APP_URL; };
+    const busy = (form, isBusy) => { form.querySelector(".btn").disabled = isBusy; };
+
+    function guard(handler) {
+      return async event => {
+        event.preventDefault();
+        if (!sb) { 
+          msg("Sign in is not configured yet.", "err"); 
+          return; 
+        }
+        if (!event.target.checkValidity()) { 
+          event.target.reportValidity(); 
+          return; 
+        }
+
+        busy(event.target, true); 
+        msg("");
+        try { 
+          await handler(); 
+        } catch (err) { 
+          msg(err.message || "Something went wrong. Try again.", "err"); 
+        }
+        busy(event.target, false);
+      };
+    }
+
+    // Login Form Handler
+    $("f-login").addEventListener("submit", guard(async () => {
+      const { error } = await sb.auth.signInWithPassword({ 
+        email: $("l-email").value.trim(), 
+        password: $("l-pass").value 
+      });
+      if (error) throw error;
+      msg("Signed in. Opening the app…", "ok"); 
+      goToApp();
+    }));
+
+    // Registration Form Handler
+    $("f-register").addEventListener("submit", guard(async () => {
+      const { data, error } = await sb.auth.signUp({
+        email: $("r-email").value.trim(), 
+        password: $("r-pass").value,
+        options: { 
+          data: { full_name: $("r-name").value.trim() }, 
+          emailRedirectTo: window.location.href.split("#")[0] 
+        }
+      });
+      if (error) throw error;
+      if (data.session) { 
+        msg("Account created. Opening the app…", "ok"); 
+        goToApp(); 
+      } else { 
+        msg("Account created. Check your email and confirm your address, then sign in.", "ok"); 
+        show("login"); 
+        msg("Check your email to confirm your address, then sign in.", "ok"); 
+      }
+    }));
+
+    // Password Reset Handler
+    $("f-reset").addEventListener("submit", guard(async () => {
+      const { error } = await sb.auth.resetPasswordForEmail($("p-email").value.trim(), { 
+        redirectTo: window.location.href.split("#")[0] 
+      });
+      if (error) throw error;
+      msg("If that email has an account, a reset link is on its way.", "ok");
+    }));
+
+    // New Password Handler
+    $("f-newpass").addEventListener("submit", guard(async () => {
+      const { error } = await sb.auth.updateUser({ password: $("n-pass").value });
+      if (error) throw error;
+      msg("Password updated. Opening the app…", "ok"); 
+      setTimeout(goToApp, 800);
+    }));
+
+    // Session Recovery & Check
+    if (sb) {
+      let recovering = /type=recovery/.test(location.hash);
+      sb.auth.onAuthStateChange((event) => {
+        if (event === "PASSWORD_RECOVERY") { 
+          recovering = true; 
+          show("newpass"); 
+        }
+      });
+      sb.auth.getSession().then(({ data }) => {
+        if (recovering) show("newpass");
+        else if (data.session) goToApp();
+      });
+    }
+
+    /* ==========================================
+       GitHub API Integrations
+       ========================================== */
+    const GH = `https://api.github.com/repos/${CONFIG.GITHUB_OWNER}/${CONFIG.GITHUB_REPO}`;
+
+    async function gh(path) {
+      const response = await fetch(GH + path, { 
+        headers: { Accept: "application/vnd.github+json" } 
+      });
+      if (!response.ok) {
+        throw new Error(
+          response.status === 403 
+            ? "GitHub rate limit reached. Try again later." 
+            : "Could not load " + path.split("?")[0] + " (" + response.status + ")."
+        );
+      }
+      return response.json();
+    }
+
+    async function loadPeople() {
+      const ul = $("people");
+      try {
+        const list = await gh("/contributors?per_page=100");
+        if (!list.length) { 
+          ul.innerHTML = '<li class="empty">No collaborators found yet.</li>'; 
+          return; 
+        }
+        ul.innerHTML = list.map(user => 
+          `<li>` +
+            `<img src="${esc(user.avatar_url)}&s=72" alt="" width="36" height="36">` +
+            `<a href="${esc(user.html_url)}" rel="noopener">${esc(user.login)}</a>` +
+            `<small>${user.contributions} commits</small>` +
+          `</li>`
+        ).join("");
+      } catch (err) { 
+        ul.innerHTML = `<li class="empty">${esc(err.message)}</li>`; 
+      }
+    }
+
+    async function loadPRs() {
+      const box = $("prs");
+      try {
+        const prs = await gh("/pulls?state=closed&per_page=100&sort=updated&direction=desc");
+        if (!prs.length) { 
+          box.innerHTML = '<span class="empty">No closed pull requests yet.</span>'; 
+          return; 
+        }
+        const groupedByAuthor = {};
+        prs.forEach(pr => (groupedByAuthor[pr.user.login] ||= []).push(pr));
+
+        const formatDate = dateStr => new Date(dateStr).toLocaleDateString(undefined, { 
+          year: "numeric", 
+          month: "short", 
+          day: "numeric" 
+        });
+
+        box.innerHTML = Object.entries(groupedByAuthor)
+          .sort((a, b) => b[1].length - a[1].length)
+          .map(([user, items], index) =>
+            `<details${index === 0 ? " open" : ""}>` +
+              `<summary>${esc(user)}<span class="n">${items.length} closed</span></summary>` +
+              items.map(pr => 
+                `<div class="pr">` +
+                  `<a href="${esc(pr.html_url)}" rel="noopener">#${pr.number} ${esc(pr.title)}</a>` +
+                  `<span class="tag ${pr.merged_at ? "merged" : ""}">` +
+                    `${pr.merged_at ? "Merged " + formatDate(pr.merged_at) : "Closed " + formatDate(pr.closed_at)}` +
+                  `</span>` +
+                `</div>`
+              ).join("") +
+            `</details>`
+          ).join("");
+      } catch (err) { 
+        box.innerHTML = `<span class="empty">${esc(err.message)}</span>`; 
+      }
+    }
+
+    // Load initial remote dynamic data
+    loadPeople(); 
+    loadPRs();
+  </script>
+</body>
+</html>
