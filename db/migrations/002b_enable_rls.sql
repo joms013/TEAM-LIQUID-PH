@@ -1,0 +1,22 @@
+alter table employee enable row level security;
+alter table department enable row level security;
+alter table job enable row level security;
+alter table jobhistory enable row level security;
+alter table customer enable row level security;
+alter table sales enable row level security;
+alter table salesdetail enable row level security;
+alter table product enable row level security;
+alter table payment enable row level security;
+alter table pricehist enable row level security;
+alter table audit_log enable row level security;
+
+alter view employee_active set (security_invoker = true);
+alter view department_active set (security_invoker = true);
+alter view job_active set (security_invoker = true);
+alter view jobhistory_active set (security_invoker = true);
+alter view customer_active set (security_invoker = true);
+alter view sales_active set (security_invoker = true);
+alter view salesdetail_active set (security_invoker = true);
+alter view product_active set (security_invoker = true);
+alter view payment_active set (security_invoker = true);
+alter view pricehist_active set (security_invoker = true);
