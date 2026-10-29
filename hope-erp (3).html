@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hope, Inc. ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#eef3fb;--pn:#fff;--gl:rgba(255,255,255,.8);--edge:rgba(255,255,255,.85);--ink:#101a2b;--mu:#66748a;--ln:rgba(16,26,43,.09);
+ --ac:#1f63d8;--ach:#174fb4;--ai:#fff;--wr:#c8402a;--soft:#e6efff;--seg:rgba(16,26,43,.055);--sb:#0f2c6b;--sbi:#c9d7f2;--ring:rgba(31,99,216,.45);
+ --btn:linear-gradient(180deg,#3a7df0,#1d5bd0);--btnh:linear-gradient(180deg,#2f72e6,#164fb8);--btns:0 6px 16px rgba(31,99,216,.28),inset 0 1px 0 rgba(255,255,255,.25);
+ --sh:0 1px 2px rgba(18,42,96,.05),0 10px 28px rgba(18,42,96,.08);--shs:0 1px 2px rgba(18,42,96,.06),0 3px 10px rgba(18,42,96,.07);
+ --page:radial-gradient(900px 520px at 6% -8%,rgba(110,170,255,.30),transparent 60%),radial-gradient(760px 520px at 100% 2%,rgba(150,210,255,.32),transparent 58%),linear-gradient(180deg,#f7faff,#edf2fa);
+ --f:"Plus Jakarta Sans",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0b121c;--pn:#131f2e;--gl:rgba(19,31,46,.82);--edge:rgba(255,255,255,.08);--ink:#e8eff8;--mu:#8fa3ba;--ln:rgba(255,255,255,.09);
+ --ac:#5b9bf5;--ach:#86b6f8;--ai:#07182e;--wr:#ff8f78;--soft:#1a2c44;--seg:rgba(255,255,255,.07);--sb:#0a1a38;--ring:rgba(106,174,255,.6);
+ --btn:linear-gradient(180deg,#7db0fa,#5b9bf5);--btnh:linear-gradient(180deg,#9bc3fb,#7db0fa);--btns:0 6px 16px rgba(0,0,0,.35);
+ --sh:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.35);--shs:0 1px 2px rgba(0,0,0,.3),0 3px 10px rgba(0,0,0,.3);
+ --page:radial-gradient(900px 520px at 6% -8%,rgba(60,110,200,.28),transparent 60%),radial-gradient(760px 520px at 100% 2%,rgba(40,100,170,.25),transparent 58%),linear-gradient(180deg,#0d1522,#0a111b)}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--page) fixed;color:var(--ink);font:400 15px/1.5 var(--f)}
+button,input,select{font-family:inherit}
+h1,h2,h3{font-family:var(--f);margin:0;line-height:1.1}
+:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.brand{font:700 17px var(--f);letter-spacing:-.01em;display:flex;align-items:center;gap:11px;white-space:nowrap}
+.dot{width:38px;height:38px;flex:none;border-radius:50%;background:linear-gradient(145deg,#6aa8ff,#1f63d8);box-shadow:0 6px 16px rgba(31,99,216,.35),inset 0 0 0 1px rgba(255,255,255,.4);display:grid;place-items:center}
+.dot::after{content:"";width:14px;height:14px;border-radius:50%;border:3px solid #fff}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:0;border-radius:999px;background:var(--btn);color:var(--ai);font-size:14px;font-weight:600;cursor:pointer;box-shadow:var(--btns);transition:background .15s,transform .1s}
+.btn:hover{background:var(--btnh)}.btn:active{transform:translateY(1px)}.btn:disabled{opacity:.6;cursor:wait}
+.btn.ghost{background:var(--pn);color:var(--ink);box-shadow:var(--shs)}.btn.ghost:hover{background:var(--soft)}
+.btn.sm{padding:7px 15px;font-size:13px}
+.full{width:100%;margin-top:18px;padding:13px}
+.lnk{background:none;border:0;color:var(--ac);padding:0;font-size:14px;font-weight:500;text-decoration:underline;cursor:pointer;margin-top:12px}
+/* sign in */
+.split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:8px;padding:16px;min-height:100vh}
+.intro{border-radius:34px;background:radial-gradient(520px 380px at 85% 105%,rgba(120,185,255,.5),transparent 65%),radial-gradient(420px 300px at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(155deg,#2159c9,#0f2c6b 75%);color:#fff;padding:36px 48px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;gap:36px}
+.intro>*{position:relative;z-index:1}
+.intro h1{font-size:clamp(34px,4.2vw,54px);font-weight:500;letter-spacing:-.035em;line-height:1.05;max-width:13ch}
+.intro .lead{color:var(--sbi);max-width:42ch;margin:18px 0 0;font-size:15.5px}
+.sun{position:absolute!important;z-index:0!important;right:-90px;bottom:-130px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.34),rgba(255,255,255,.07) 55%,transparent 72%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.mods{list-style:none;margin:0 0 40px;padding:0;max-width:380px}
+.mods li{display:flex;justify-content:space-between;gap:16px;padding:12px 18px;margin-bottom:8px;border-radius:18px;background:rgba(255,255,255,.09);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.mods b{font-weight:600}.mods span{color:var(--sbi);font-size:13px;text-align:right}
+.auth{display:grid;place-items:center;padding:32px}
+.card{width:min(430px,100%);background:var(--gl);border:1px solid var(--edge);border-radius:30px;padding:30px;box-shadow:var(--sh);backdrop-filter:blur(14px)}
+.tabs{display:flex;gap:4px;background:var(--seg);padding:4px;border-radius:999px;margin-bottom:10px}
+.tabs button{flex:1;background:none;border:0;border-radius:999px;padding:9px 14px;font-size:14px;font-weight:600;color:var(--mu);cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--ink);color:var(--bg)}
+label{display:block;font-weight:500;font-size:13px;margin:14px 0 6px}
+input,select{width:100%;padding:11px 15px;border:1px solid var(--ln);border-radius:16px;background:color-mix(in srgb,var(--pn) 75%,transparent);color:var(--ink);font-size:15px}
+input:focus,select:focus{border-color:var(--ac)}
+input:disabled,select:disabled{opacity:.6}
+input[type=search]{padding-left:42px;border-radius:999px;border-color:transparent;box-shadow:var(--shs);background:var(--pn) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a8aa0' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 15px center/17px}
+.msg{min-height:20px;margin-top:12px;font-size:14px}.msg.err,.err{color:var(--wr)}.msg.ok{color:var(--ac)}
+.note{margin-top:12px;font-size:13px;background:var(--soft);border-radius:16px;padding:12px 14px;color:var(--mu)}
+/* app shell */
+.shell{min-height:100vh;display:grid;grid-template-columns:268px minmax(0,1fr)}
+.mainc{min-width:0}
+.side{position:sticky;top:0;height:100vh;height:100dvh;z-index:30;display:flex;flex-direction:column;gap:18px;padding:20px 14px 16px;background:var(--gl);border-right:1px solid var(--edge);backdrop-filter:blur(16px) saturate(1.4);overflow-y:auto}
+.side .brand{padding:2px 8px 6px}
+#tabs{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.nl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mu);padding:0 14px;margin:18px 0 6px}.nl:first-child{margin-top:0}
+#tabs button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-radius:14px;padding:11px 14px;font-size:14px;font-weight:600;color:var(--mu);cursor:pointer;text-align:left;transition:background .15s,color .15s}
+#tabs button:hover{background:var(--soft);color:var(--ink)}
+#tabs button.on{background:var(--btn);color:var(--ai);box-shadow:var(--btns)}
+#tabs svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.me{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:20px;background:var(--pn);box-shadow:var(--shs)}
+.mi{display:flex;align-items:center;gap:10px;min-width:0}
+.me .btn{width:100%;background:var(--seg);color:var(--ink);box-shadow:none}.me .btn:hover{background:var(--soft)}
+.mbar{display:none}
+.scrim{display:none}
+.av{width:38px;height:38px;flex:none;border-radius:50%;background:var(--soft);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:13px}
+.wi{display:flex;flex-direction:column;line-height:1.3;font-size:13px;min-width:0}.wi b{font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.pill{background:var(--soft);color:var(--ac);border-radius:999px;padding:0 8px;font-size:11px;font-weight:600;text-transform:capitalize;width:max-content}
+.pagehead,#view{margin:0 auto}
+.pagehead{max-width:1280px;padding:30px 36px 6px;display:flex;flex-direction:column;gap:6px}
+.pagehead h1{font-size:clamp(30px,3.4vw,40px);font-weight:500;letter-spacing:-.03em}
+.pagehead p{margin:0;color:var(--mu);font-size:14px}
+#view{padding:16px 36px 64px;max-width:1280px}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.head>:last-child{margin-left:auto}
+#view .head h2,#kb .head h2{display:none}#view .head:has(>h2:only-child){display:none}
+.head h2{font-size:22px;font-weight:600}.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.tools input{width:240px}
+.seg{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--seg)}
+.seg button{background:none;border:0;border-radius:999px;padding:7px 15px;font-size:13px;font-weight:600;color:var(--mu);cursor:pointer;text-transform:capitalize}
+.seg button.on{background:var(--pn);color:var(--ink);box-shadow:var(--shs)}
+.sub{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.sub button{display:inline-flex;align-items:center;gap:8px;border:0;background:var(--pn);color:var(--ink);padding:8px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:var(--shs)}
+.sub button::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ac)}
+.sub button:nth-child(2)::before{background:#4aa8f5}.sub button:nth-child(3)::before{background:#6b63e6}.sub button:nth-child(4)::before{background:#14a3b8}.sub button:nth-child(5)::before{background:#8ab4f8}
+.sub button:hover{background:var(--soft)}.sub button.on{background:var(--ink);color:var(--bg)}.sub button.on::before{background:var(--bg)}
+/* overview */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:28px}
+.stat{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:11px;row-gap:14px;text-align:left;background:var(--gl);border:1px solid var(--edge);border-radius:24px;padding:18px 20px 20px;cursor:pointer;color:var(--ink);box-shadow:var(--sh);transition:transform .15s}
+.stat:hover{transform:translateY(-2px)}
+.si{width:34px;height:34px;border-radius:11px;background:var(--soft);color:var(--ac);display:grid;place-items:center}
+.si svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.stat span{color:var(--mu);font-size:13px;font-weight:500}
+.stat b{grid-column:1/-1;font:500 30px/1 var(--f);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.sec{font-size:18px;font-weight:600;margin-bottom:12px}
+/* tables */
+.tw{background:var(--gl);border:1px solid var(--edge);border-radius:26px;overflow-x:auto;box-shadow:var(--sh)}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th{text-align:left;padding:15px 20px;font-size:12.5px;color:var(--mu);font-weight:600;border-bottom:1px solid var(--ln);white-space:nowrap}
+td{padding:14px 20px;border-bottom:1px solid var(--ln);vertical-align:middle}
+tbody tr:hover td{background:color-mix(in srgb,var(--soft) 60%,transparent)}
+tr:last-child td{border:0}tr.del td{background:color-mix(in srgb,var(--wr) 7%,transparent);color:var(--mu)}
+td small{color:var(--mu);font-size:12px}
+.b{display:inline-block;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:600}
+.b.on{background:var(--soft);color:var(--ac)}.b.off{background:color-mix(in srgb,var(--wr) 14%,transparent);color:var(--wr)}
+.acts{display:flex;gap:6px;white-space:nowrap;justify-content:flex-end}
+.acts button{border:0;background:var(--pn);color:var(--ink);padding:6px 13px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:var(--shs)}
+.acts button:hover{background:var(--soft)}
+.acts .k{background:var(--soft);color:var(--ac);box-shadow:none}
+.acts .d{color:var(--wr)}.acts .d:hover{background:color-mix(in srgb,var(--wr) 10%,var(--pn))}
+.acts .r{color:var(--ac)}
+.empty{text-align:center;color:var(--mu);padding:40px}
+dialog{border:1px solid var(--edge);border-radius:30px;background:var(--pn);color:var(--ink);padding:28px;width:min(520px,94vw);box-shadow:0 30px 70px rgba(10,30,80,.3)}
+#dlg2{width:min(900px,96vw)}dialog::backdrop{background:rgba(10,25,60,.45);backdrop-filter:blur(4px)}
+dialog h2{font-size:21px;font-weight:600;margin-bottom:6px}.row{display:flex;gap:8px;margin-top:22px}
+.mods2 label{display:inline-flex;gap:5px;align-items:center;margin:0 12px 0 0;font-weight:400}.mods2 input{width:auto}
+td select{padding:6px 12px;width:auto;border-radius:999px}
+/* users */
+:root{--ok:#12805c;--wn:#a86a0a}
+@media (prefers-color-scheme:dark){:root{--ok:#4fd6a0;--wn:#f5c26b}}
+.ut{min-width:880px}
+.ucell{display:flex;align-items:center;gap:12px}.ucell b{display:block;font-weight:600}.ucell small{display:block}
+.ucell .av{width:36px;height:36px;font-size:12px}
+.sel{appearance:none;-webkit-appearance:none;width:auto;min-width:132px;padding:8px 34px 8px 15px;border-radius:999px;border:1px solid var(--ln);background:var(--pn) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a9bb0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/12px;color:var(--ink);font-size:13.5px;font-weight:600;text-transform:capitalize;cursor:pointer;box-shadow:var(--shs);transition:border-color .15s}
+.sel:hover:not(:disabled){border-color:var(--ac)}
+.sel:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
+.sel option{background:var(--pn);color:var(--ink)}
+.sel.s-active{color:var(--ok);background-color:color-mix(in srgb,var(--ok) 11%,var(--pn))}
+.sel.s-pending{color:var(--wn);background-color:color-mix(in srgb,var(--wn) 12%,var(--pn))}
+.sel.s-blocked,.sel.s-disapproved{color:var(--wr);background-color:color-mix(in srgb,var(--wr) 10%,var(--pn))}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative;display:inline-flex;align-items:center;gap:7px;margin:0;padding:6px 13px 6px 10px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--mu);background:var(--seg);border:1px solid transparent;cursor:pointer;transition:background .15s,color .15s}
+.chip:hover{color:var(--ink)}
+.chip input{position:absolute;opacity:0;width:0;height:0;padding:0;border:0;pointer-events:none}
+.chip::before{content:"";width:14px;height:14px;border-radius:5px;border:1.6px solid currentColor;flex:none}
+.chip:has(input:checked){background:var(--soft);color:var(--ac);border-color:color-mix(in srgb,var(--ac) 38%,transparent)}
+.chip:has(input:checked)::before{border-color:var(--ac);background:var(--ac) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-10'/%3E%3C/svg%3E") center/10px no-repeat}
+.chip:has(input:focus-visible){outline:3px solid var(--ring);outline-offset:2px}
+.allm{display:inline-flex;align-items:center;padding:5px 13px;border-radius:999px;background:var(--soft);color:var(--ac);font-size:12.5px;font-weight:600}
+.muted{color:var(--mu)}
+.seg button i{font-style:normal;margin-left:6px;padding:1px 7px;border-radius:999px;background:var(--seg);font-size:11px}
+.seg button.on i{background:var(--soft);color:var(--ac)}
+.acts button{padding:7px 14px;transition:background .15s}
+.acts .k:hover{background:var(--btn);color:var(--ai)}
+.acts .d{background:color-mix(in srgb,var(--wr) 9%,var(--pn))}.acts .d:hover{background:var(--wr);color:#fff}
+.pw{position:relative}.pw input{padding-right:64px}
+.pw button{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--ac);font-size:13px;font-weight:600;padding:6px 8px;border-radius:999px;cursor:pointer}
+.hint{margin:6px 2px 0;font-size:12.5px;color:var(--mu)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99;background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:var(--sh)}
+.rcount{font-size:13px;color:var(--mu);font-weight:500}
+@media (max-width:860px){
+ .split{grid-template-columns:1fr;padding:10px}.intro{padding:28px 24px;gap:24px;border-radius:28px}.mods{margin-bottom:90px}
+ .shell{display:block}
+ .side{position:fixed;left:0;top:0;bottom:0;width:min(290px,84vw);transform:translateX(-102%);transition:transform .25s;background:var(--pn);box-shadow:var(--sh)}
+ body.nv .side{transform:none}
+ body.nv .scrim{display:block;position:fixed;inset:0;z-index:25;background:rgba(10,25,60,.45)}
+ .mbar{display:flex;align-items:center;gap:12px;padding:12px 14px 0}.mbar .brand{font-size:15px}
+ .pagehead{padding:22px 18px 4px}#view{padding:14px 14px 40px}.tools input{width:100%}}
+@media print{.shell{display:block}.side,.mbar,.scrim,.tools,.sub,.noprint,.pagehead{display:none!important}body{background:#fff;color:#000}.tw{box-shadow:none;border:1px solid #ccc}}
+</style>
+</head>
+<body>
+<div id="land">
+ <div class="split">
+  <aside class="intro">
+   <div class="brand"><span class="dot"></span>Hope, Inc. ERP</div>
+   <div>
+    <h1>One workspace for Hope, Inc.</h1>
+    <p class="lead">Sign in to manage customers, products, people and sales. New here? Register and an administrator will approve your account.</p>
+   </div>
+   <ul class="mods"><li><b>Customers</b><span>Accounts and payment terms</span></li><li><b>Products</b><span>Catalog with price history</span></li><li><b>Human resources</b><span>Employees, jobs, departments</span></li><li><b>Sales</b><span>Transactions and line items</span></li></ul>
+   <span class="sun"></span>
+  </aside>
+  <section class="auth">
+   <div class="card" id="authcard">
+    <div class="tabs" id="atabs" role="tablist"><button role="tab" data-v="login" aria-selected="true">Sign in</button><button role="tab" data-v="reg" aria-selected="false">Register</button></div>
+    <form id="f-login"><label>Email<input id="l-e" type="email" required autocomplete="email"></label><label>Password<input id="l-p" type="password" required autocomplete="current-password"></label><button class="btn full">Sign in</button><button type="button" class="lnk" data-v="reset">Forgot your password?</button></form>
+    <form id="f-reg" hidden><label>Full name<input id="r-n" required autocomplete="name"></label><label>Work email<input id="r-e" type="email" required></label><label>Password<input id="r-p" type="password" minlength="8" required autocomplete="new-password"></label><p class="hint">Use at least 8 characters.</p><button class="btn full">Create account</button></form>
+    <form id="f-reset" hidden><label>Account email<input id="p-e" type="email" required></label><button class="btn full">Send reset link</button><button type="button" class="lnk" data-v="login">Back to sign in</button></form>
+    <form id="f-newpass" hidden><label>New password (8+ characters)<input id="n-p" type="password" minlength="8" required autocomplete="new-password"></label><button class="btn full">Save new password</button></form>
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    <div class="note" id="demo" hidden>Demo mode: add your Supabase keys in CFG to use real sign in. Try admin@hope.com, superadmin@hope.com or user@hope.com with any password.</div>
+   </div>
+  </section>
+ </div>
+</div>
+
+<div id="app" hidden>
+ <div class="shell">
+  <aside class="side" id="side">
+   <div class="brand"><span class="dot"></span>Hope, Inc. ERP</div>
+   <nav id="tabs" aria-label="Modules"></nav>
+   <div class="me"><div class="mi"><span class="av" id="av"></span><div class="wi"><b id="un"></b><span class="pill" id="ur"></span></div></div><button class="btn sm" id="out">Sign out</button></div>
+  </aside>
+  <div class="mainc">
+   <div class="mbar"><button class="btn ghost sm" id="burger" aria-label="Open menu">&#9776; Menu</button><div class="brand"><span class="dot"></span>Hope, Inc. ERP</div></div>
+   <header class="pagehead"><h1 id="pt"></h1><p id="ps"></p></header>
+   <main id="view"></main>
+  </div>
+ </div>
+ <div class="scrim" id="scrim"></div>
+</div>
+<dialog id="dlg"></dialog><dialog id="dlg2"></dialog>
+
+<script>
+const CFG={SUPABASE_URL:"",SUPABASE_ANON_KEY:""};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const mem={};
+const load=(k,d)=>{try{const v=localStorage.getItem(k);if(v)return JSON.parse(v)}catch(e){if(mem[k])return mem[k]}return d};
+const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){mem[k]=v}};
+const today=()=>new Date().toISOString().slice(0,10);
+const money=n=>'$'+Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+let U=null,V={mod:'overview',sub:'employees'};
+const isAdm=()=>U&&['superadmin','admin'].includes(U.role);
+const MODS={customers:'Customers',products:'Products',hr:'Human resources',sales:'Sales',reports:'Reports'};
+
+/* ---------- data ---------- */
+const data=n=>load('hope_'+n,SEED[n]||[]);
+const put=(n,v)=>save('hope_'+n,v);
+const act=n=>data(n).filter(r=>!r.del);
+const price=(c,d=today())=>{const p=act('prices').filter(x=>x.prod==c&&x.date<=d).sort((a,b)=>b.date.localeCompare(a.date))[0];return p?+p.price:0};
+const sdate=t=>(data('sales').find(s=>s.no==t)||{}).date||today();
+const lineAmt=l=>l.qty*price(l.prod,sdate(l.trans));
+const nm=(n,k,v,f)=>(data(n).find(x=>x[k]==v)||{})[f]||v;
+const opt=(n,k,fmt)=>()=>act(n).map(r=>[r[k],r[k]+' — '+fmt(r)]);
+const stamp=a=>a+' '+U.name.split(' ')[0].toLowerCase()+' '+new Date().toISOString().slice(0,16).replace('T',' ');
+
+const ENT={
+ customers:{t:'Customers',f:[{k:'no',l:'Cust no',u:1},{k:'name',l:'Name'},{k:'address',l:'Address'},{k:'terms',l:'Pay terms'}]},
+ products:{t:'Products',f:[{k:'code',l:'Code',u:1},{k:'desc',l:'Description'},{k:'unit',l:'Unit'}],kid:'prices',kk:'code',kl:'Prices',calc:[{l:'Current price',fn:r=>money(price(r.code))}]},
+ prices:{t:'Price history',par:'prod',uk:['prod','date'],f:[{k:'prod',l:'Product',h:1},{k:'date',l:'Effective date',type:'date'},{k:'price',l:'Unit price',type:'number',m:1}]},
+ employees:{t:'Employees',kid:'jobhist',kk:'no',kl:'History',f:[{k:'no',l:'Emp no',u:1},{k:'last',l:'Last name'},{k:'first',l:'First name'},{k:'gender',l:'Gender',o:()=>[['M','Male'],['F','Female'],['O','Other']]},{k:'birth',l:'Birth date',type:'date'},{k:'hire',l:'Hire date',type:'date'},{k:'sep',l:'Separation date',type:'date',opt:1}]},
+ jobhist:{t:'Job history',par:'emp',uk:['emp','date'],f:[{k:'emp',l:'Employee',h:1},{k:'date',l:'Effective date',type:'date'},{k:'job',l:'Job',o:opt('jobs','code',r=>r.desc)},{k:'dept',l:'Department',o:opt('depts','code',r=>r.name)},{k:'salary',l:'Salary',type:'number',m:1}]},
+ jobs:{t:'Jobs',f:[{k:'code',l:'Job code',u:1},{k:'desc',l:'Description'}]},
+ depts:{t:'Departments',f:[{k:'code',l:'Dept code',u:1},{k:'name',l:'Name'}]},
+ sales:{t:'Sales',kid:'lines',kk:'no',kl:'Lines',f:[{k:'no',l:'Trans no',u:1},{k:'date',l:'Sales date',type:'date'},{k:'cust',l:'Customer',o:opt('customers','no',r=>r.name)},{k:'emp',l:'Salesperson',o:opt('employees','no',r=>r.first+' '+r.last)}],calc:[{l:'Total',fn:r=>money(act('lines').filter(l=>l.trans==r.no).reduce((s,l)=>s+lineAmt(l),0))}]},
+ lines:{t:'Sale lines',par:'trans',uk:['trans','prod'],f:[{k:'trans',l:'Transaction',h:1},{k:'prod',l:'Product',o:opt('products','code',r=>r.desc)},{k:'qty',l:'Quantity',type:'number'}],calc:[{l:'Unit price',fn:r=>money(price(r.prod,sdate(r.trans)))},{l:'Amount',fn:r=>money(lineAmt(r))}]}
+};
+const T=(n,rows)=>rows.map((a,i)=>Object.fromEntries([['id',n+i],['del',false],['stamp','CREATED system 2026-10-01 09:00'],...ENT[n].f.map((f,j)=>[f.k,a[j]])]));
+const SEED={
+ customers:T('customers',[['C-001','Acme Corporation','123 Main St, Metro City','Net 30'],['C-002','Globex Industries','456 Oak Ave, Harbor Town','Net 45'],['C-003','Initech LLC','789 Pine Rd','COD']]),
+ products:T('products',[['P-001','Industrial Widget A','pcs'],['P-002','Steel Bracket','pcs'],['P-003','Lubricant Oil 5L','can']]),
+ prices:T('prices',[['P-001','2026-01-01',12.5],['P-001','2026-06-01',13.75],['P-002','2026-01-15',45],['P-003','2026-02-01',28]]),
+ employees:T('employees',[['E-001','Santos','Maria','F','1990-05-12','2020-03-01',''],['E-002','Reyes','Juan','M','1988-11-03','2019-07-15','']]),
+ jobhist:T('jobhist',[['E-001','2020-03-01','J-001','D-001',45000],['E-002','2019-07-15','J-002','D-002',55000]]),
+ jobs:T('jobs',[['J-001','Software Engineer'],['J-002','Sales Manager']]),
+ depts:T('depts',[['D-001','Engineering'],['D-002','Sales']]),
+ sales:T('sales',[['T-001','2026-10-01','C-001','E-002'],['T-002','2026-10-05','C-002','E-001']]),
+ lines:T('lines',[['T-001','P-001',10],['T-001','P-002',2],['T-002','P-003',5]])
+};
+
+/* ---------- generic table ---------- */
+const F={};
+const cell=(f,r)=>{const v=r[f.k];if(f.o){const m=f.o().find(x=>x[0]==v);return esc(m?m[1]:v)}if(f.m)return money(v);return v===''||v==null?'—':esc(v)};
+function draw(n,el,pv){
+ const E=ENT[n],st=F[n]||(F[n]={f:'active',q:''}),adm=isAdm(),cols=E.f.filter(f=>!f.h);
+ const heads=[...cols.map(f=>f.l),...(E.calc||[]).map(c=>c.l),...(adm?['Status','Stamp']:[]),''];
+ const seg=adm?`<div class="seg">${['active','inactive','all'].map(x=>`<button data-a="f" data-v="${x}" class="${st.f==x?'on':''}">${x}</button>`).join('')}</div>`:'';
+ el.innerHTML=`<div class="head"><h2>${E.t}</h2><div class="tools">${seg}<input type="search" data-s placeholder="Search" aria-label="Search" value="${esc(st.q)}"><button class="btn sm" data-a="add">+ Add new</button></div></div><div class="tw"><table><thead><tr>${heads.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody></tbody></table></div>`;
+ const redraw=()=>draw(n,el,pv);
+ const body=()=>{
+  let rs=data(n).filter(r=>pv==null||r[E.par]==pv);
+  if(!adm||st.f=='active')rs=rs.filter(r=>!r.del);else if(st.f=='inactive')rs=rs.filter(r=>r.del);
+  const q=st.q.toLowerCase();if(q)rs=rs.filter(r=>E.f.some(f=>String(r[f.k]).toLowerCase().includes(q)));
+  el.querySelector('tbody').innerHTML=rs.length?rs.map(r=>{
+   const a=r.del?(adm?`<button class="r" data-a="res" data-id="${r.id}">Restore</button>`:''):`${E.kid?`<button class="k" data-a="kid" data-id="${r.id}">${E.kl}</button>`:''}<button data-a="edit" data-id="${r.id}">Edit</button><button class="d" data-a="del" data-id="${r.id}">Delete</button>`;
+   return`<tr class="${r.del?'del':''}">${cols.map(f=>`<td>${cell(f,r)}</td>`).join('')}${(E.calc||[]).map(c=>`<td>${c.fn(r)}</td>`).join('')}${adm?`<td><span class="b ${r.del?'off':'on'}">${r.del?'Inactive':'Active'}</span></td><td><small>${esc(r.stamp)}</small></td>`:''}<td><div class="acts">${a}</div></td></tr>`}).join(''):`<tr><td colspan="${heads.length}" class="empty">Nothing here yet. Use Add to create the first record.</td></tr>`;
+ };
+ body();
+ el.oninput=e=>{if('s' in e.target.dataset){st.q=e.target.value;body()}};
+ el.onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,id=b.dataset.id;
+  if(a=='f'){st.f=b.dataset.v;redraw()}
+  else if(a=='add')form(n,null,pv,redraw);
+  else if(a=='edit')form(n,id,pv,redraw);
+  else if(a=='kid')kids(n,id);
+  else if(a=='del'){if(confirm('Mark this record inactive? An admin can restore it.')){mut(n,id,true,'DELETED');redraw();toast('Marked inactive')}}
+  else if(a=='res'){mut(n,id,false,'RESTORED');redraw();toast('Record restored')}};
+}
+function mut(n,id,del,w){const l=data(n),r=l.find(x=>x.id==id);r.del=del;r.stamp=stamp(w);put(n,l)}
+function kids(n,id){
+ const E=ENT[n],r=data(n).find(x=>x.id==id),c=E.kid,pv=r[E.kk],d=$('#dlg2');
+ d.innerHTML=`<div class="head"><div><h2>${ENT[c].t}</h2><p style="margin:0;color:var(--mu)">For <b>${esc(pv)}</b></p></div><button class="btn ghost sm" data-x>Close</button></div><div id="kb"></div>`;
+ draw(c,$('#kb'),pv);d.showModal();
+}
+function form(n,id,pv,done){
+ const E=ENT[n],all=data(n),r=id?all.find(x=>x.id==id):{},d=$('#dlg');
+ const lock=f=>id&&(f.u||(E.uk||[]).includes(f.k));
+ const inp=f=>{if(f.h)return'';const v=r[f.k]??'',dis=lock(f)?'disabled':'';
+  if(f.o)return`<label>${f.l}<select name="${f.k}" ${dis}>${f.o().map(o=>`<option value="${esc(o[0])}" ${o[0]==v?'selected':''}>${esc(o[1])}</option>`).join('')}</select></label>`;
+  return`<label>${f.l}<input name="${f.k}" type="${f.type||'text'}" ${f.type=='number'?'step="0.01" min="0"':''} value="${esc(v)}" ${f.opt?'':'required'} ${dis}></label>`};
+ d.innerHTML=`<h2>${id?'Edit':'Add'}: ${E.t}</h2><form>${E.f.map(inp).join('')}<p class="err" id="ferr"></p><div class="row"><button class="btn">Save</button><button type="button" class="btn ghost" data-x>Cancel</button></div></form>`;
+ const fm=d.querySelector('form');
+ fm.onsubmit=e=>{e.preventDefault();const v={};
+  E.f.forEach(f=>{if(f.h)v[f.k]=pv;else if(lock(f))v[f.k]=r[f.k];else{const x=String(fm.elements[f.k].value).trim();v[f.k]=f.type=='number'?parseFloat(x):x}});
+  const bad=E.f.some(f=>!f.opt&&(v[f.k]===''||Number.isNaN(v[f.k])||v[f.k]==null));
+  const err=m=>{$('#ferr').textContent=m};
+  if(bad)return err('Fill in every required field.');
+  if(E.f.some(f=>f.u&&all.some(x=>x.id!=id&&String(x[f.k]).toLowerCase()==String(v[f.k]).toLowerCase())))return err('That code already exists.');
+  if(E.uk&&all.some(x=>x.id!=id&&!x.del&&E.uk.every(k=>x[k]==v[k])))return err('That combination already exists. Edit the existing row instead.');
+  if(id)Object.assign(r,v,{stamp:stamp('EDITED')});else all.push({id:'n'+Date.now(),del:false,stamp:stamp('CREATED'),...v});
+  put(n,all);d.close();done();toast(id?'Changes saved':'Record added');};
+ d.showModal();
+}
+for(const d of [$('#dlg'),$('#dlg2')])d.onclick=e=>{if(e.target===d||e.target.closest('[data-x]'))d.close()};
+let tt;function toast(t){document.querySelector('.toast')?.remove();const n=document.createElement('div');n.className='toast';n.setAttribute('role','status');n.textContent=t;document.body.appendChild(n);clearTimeout(tt);tt=setTimeout(()=>n.remove(),2600)}
+document.addEventListener('keydown',e=>{if(e.key=='Escape')document.body.classList.remove('nv')});
+$('#dlg2').onclose=()=>route();
+
+/* ---------- reports ---------- */
+const R={r:'cust',from:'',to:'',n:10};
+function reports(el){
+ const defs={cust:'Top customers',prod:'Top products',master:'Product master',emp:'Active employees',empall:'All employees'};
+ const ranged=['cust','prod'].includes(R.r);
+ const sales=act('sales').filter(s=>(!R.from||s.date>=R.from)&&(!R.to||s.date<=R.to));
+ const lines=act('lines');let h=[],rows=[];
+ if(R.r=='cust'){const m={};sales.forEach(s=>lines.filter(l=>l.trans==s.no).forEach(l=>m[s.cust]=(m[s.cust]||0)+lineAmt(l)));
+  h=['Rank','Customer','Total sales'];rows=Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,R.n).map(([c,t],i)=>[i+1,nm('customers','no',c,'name'),money(t)])}
+ else if(R.r=='prod'){const m={};sales.forEach(s=>lines.filter(l=>l.trans==s.no).forEach(l=>{const o=m[l.prod]||(m[l.prod]={q:0,a:0});o.q+=l.qty;o.a+=lineAmt(l)}));
+  h=['Rank','Product','Qty sold','Amount'];rows=Object.entries(m).sort((a,b)=>b[1].a-a[1].a).slice(0,R.n).map(([c,o],i)=>[i+1,nm('products','code',c,'desc'),o.q,money(o.a)])}
+ else if(R.r=='master'){h=['Code','Description','Unit','Current price'];rows=act('products').map(p=>[p.code,p.desc,p.unit,money(price(p.code))])}
+ else{h=['Emp no','Name','Hired','Separated'];rows=act('employees').filter(e=>R.r=='empall'||!e.sep).map(e=>[e.no,e.first+' '+e.last,e.hire,e.sep||'—'])}
+ el.innerHTML=`<div class="head"><h2>Reports</h2><button class="btn sm noprint" data-r="print">Print or save as PDF</button></div>
+ <div class="sub">${Object.entries(defs).map(([k,l])=>`<button data-r="${k}" class="${R.r==k?'on':''}">${l}</button>`).join('')}</div>
+ ${ranged?`<div class="tools noprint" style="margin-bottom:14px"><label style="margin:0">From <input type="date" data-f="from" value="${R.from}"></label><label style="margin:0">To <input type="date" data-f="to" value="${R.to}"></label><label style="margin:0">Top <input type="number" min="1" max="100" data-f="n" value="${R.n}" style="width:80px"></label></div>`:''}
+ <div class="tw"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${h.length}" class="empty">No data for this report yet.</td></tr>`}</tbody></table></div>`;
+ el.onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;if(b.dataset.r=='print')return print();R.r=b.dataset.r;reports(el)};
+ el.onchange=e=>{const k=e.target.dataset.f;if(!k)return;R[k]=k=='n'?(parseInt(e.target.value)||10):e.target.value;reports(el)};
+}
+
+/* ---------- users ---------- */
+const SEEDU=[{email:'superadmin@hope.com',name:'Sarah Chen',role:'superadmin',status:'active',mods:[]},{email:'admin@hope.com',name:'Lisa Park',role:'admin',status:'active',mods:[]},{email:'user@hope.com',name:'Alex Rivera',role:'user',status:'active',mods:['customers','products','sales','reports']}];
+const users=()=>load('hope_users',SEEDU),saveUsers=v=>save('hope_users',v);
+let UF={f:'all',q:''};
+function usersView(el){
+ const sup=U.role=='superadmin',vis=users().filter(u=>sup||u.role!='superadmin');
+ const grp=u=>u.status=='blocked'||u.status=='disapproved'?'blocked':u.status;
+ const cnt=k=>k=='all'?vis.length:vis.filter(u=>grp(u)==k).length;
+ const list=vis.filter(u=>UF.f=='all'||grp(u)==UF.f);
+ const ini=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+ const so=(v,opts,dis,cls)=>`<select class="sel ${cls||''}" aria-label="Change" ${dis?'disabled':''}>${opts.map(o=>`<option ${o==v?'selected':''}>${o}</option>`).join('')}</select>`;
+ const row=u=>{const me=u.email==U.email,lock=me||(!sup&&u.role!='user'),e=esc(u.email);
+  const rb=u.role=='user'?`<button data-a="rights" data-e="${e}">Rights</button>`:'';
+  const ab=lock?'<span class="muted">—</span>'
+   :rb+(u.status=='pending'?`<button class="k" data-a="active" data-e="${e}">Approve</button><button class="d" data-a="disapproved" data-e="${e}">Reject</button>`
+   :u.status=='active'?`<button class="d" data-a="blocked" data-e="${e}">Block</button>`
+   :`<button class="k" data-a="active" data-e="${e}">Reactivate</button>`);
+  const hid=UF.q&&!(u.name+' '+u.email).toLowerCase().includes(UF.q)?'hidden':'';
+  return `<tr data-e="${e}" ${hid}><td><div class="ucell"><span class="av">${esc(ini(u.name))}</span><div><b>${esc(u.name)}</b><small>${e}</small></div></div></td>
+  <td data-k="role">${so(u.role,['user','admin','superadmin'],!sup||me)}</td>
+  <td data-k="status">${so(u.status,['active','pending','blocked','disapproved'],lock,'s-'+u.status)}</td>
+  <td>${u.role=='user'?`<span class="rcount">${u.mods.length} of ${Object.keys(MODS).length} modules</span>`:'<span class="allm">All modules</span>'}</td>
+  <td><div class="acts">${ab}</div></td></tr>`};
+ el.innerHTML=`<div class="head"><h2>User management</h2>
+  <div class="seg" role="group" aria-label="Filter by status">${[['all','All'],['pending','Pending'],['active','Active'],['blocked','Blocked']].map(([k,l])=>`<button data-f="${k}" class="${UF.f==k?'on':''}">${l}<i>${cnt(k)}</i></button>`).join('')}</div>
+  <div class="tools"><input type="search" id="uq" placeholder="Search name or email" value="${esc(UF.q)}" aria-label="Search users"></div></div>
+ ${sup?'':'<p class="muted" style="margin:0 0 14px">Superadmin accounts are hidden.</p>'}
+ <div class="tw"><table class="ut"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Modules</th><th style="text-align:right">Actions</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table>${list.length?'':'<div class="empty">No users in this view.</div>'}</div>`;
+ el.onchange=e=>{const tr=e.target.closest('tr[data-e]');if(!tr)return;const all=users(),u=all.find(x=>x.email==tr.dataset.e);
+  const k=e.target.closest('[data-k]');if(!k)return;
+  if(k.dataset.k=='role'&&e.target.value!='user'&&!confirm('Give '+u.name+' the '+e.target.value+' role? They will see every module.'))return usersView(el);
+  u[k.dataset.k]=e.target.value;saveUsers(all);usersView(el);toast('User updated')};
+ el.onclick=e=>{const f=e.target.closest('[data-f]');if(f){UF.f=f.dataset.f;return usersView(el)}
+  const a=e.target.closest('[data-a]');if(a){const all=users(),u=all.find(x=>x.email==a.dataset.e);if(!u)return;
+  if(a.dataset.a=='rights')return rights(u.email);
+  if(['blocked','disapproved'].includes(a.dataset.a)&&!confirm((a.dataset.a=='blocked'?'Block ':'Reject ')+u.name+'? They will not be able to sign in.'))return;
+  u.status=a.dataset.a;saveUsers(all);usersView(el);toast(u.status=='active'?'User approved':'User '+u.status)}};
+ el.oninput=e=>{if(e.target.id!='uq')return;UF.q=e.target.value.toLowerCase();el.querySelectorAll('tbody tr').forEach(tr=>tr.hidden=!!UF.q&&!tr.querySelector('.ucell').textContent.toLowerCase().includes(UF.q))};
+}
+
+
+function rights(email){
+ const all=users(),u=all.find(x=>x.email==email),d=$('#dlg');
+ d.innerHTML=`<h2>Rights: ${esc(u.name)}</h2><p class="muted" style="margin:0 0 14px">Choose the modules this person can open.</p><form><div class="chips">${Object.entries(MODS).map(([k,l])=>`<label class="chip"><input type="checkbox" value="${k}" ${u.mods.includes(k)?'checked':''}>${l}</label>`).join('')}</div><div class="row"><button class="btn">Save rights</button><button type="button" class="btn ghost" data-x>Cancel</button></div></form>`;
+ d.querySelector('form').onsubmit=e=>{e.preventDefault();u.mods=[...d.querySelectorAll('input:checked')].map(x=>x.value);saveUsers(all);d.close();usersView($('#view'));toast('Rights saved')};
+ d.showModal();
+}
+/* ---------- overview + nav icons ---------- */
+const svg=p=>`<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
+const IC={overview:svg('<path d="M4 4h6v7H4zM14 4h6v4h-6zM14 12h6v8h-6zM4 15h6v5H4z"/>'),
+ customers:svg('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5.5a3 3 0 010 5.6M18 14.2c1.8.7 3 2.5 3 4.8"/>'),
+ products:svg('<path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5zM3 7.5l9 4.5 9-4.5M12 12v9"/>'),
+ hr:svg('<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M3 13h18"/>'),
+ sales:svg('<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2zM9 8h6M9 12h6"/>'),
+ reports:svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+ users:svg('<path d="M12 3l8 3v6c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>')};
+const LB={overview:'Overview',users:'Users'};
+function overview(el){
+ const can=m=>isAdm()||(U.mods||[]).includes(m),sales=act('sales'),lines=act('lines');
+ const tot=s=>lines.filter(l=>l.trans==s.no).reduce((a,l)=>a+lineAmt(l),0);
+ const t=[['customers','Customers',act('customers').length],['products','Products',act('products').length],['hr','Active employees',act('employees').filter(e=>!e.sep).length],['sales','Sales to date',money(sales.reduce((a,s)=>a+tot(s),0))]].filter(x=>can(x[0]));
+ const rc=can('sales')?sales.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5):[];
+ if(!t.length)return el.innerHTML='<div class="empty">No modules assigned yet. Ask an administrator for access.</div>';
+ el.innerHTML=`<div class="stats">${t.map(([m,l,v])=>`<button class="stat" data-m="${m}"><i class="si">${IC[m]}</i><span>${l}</span><b>${v}</b></button>`).join('')}</div>`+
+ (rc.length?`<h3 class="sec">Recent sales</h3><div class="tw"><table><thead><tr><th>Trans no</th><th>Date</th><th>Customer</th><th>Total</th></tr></thead><tbody>${rc.map(s=>`<tr><td>${esc(s.no)}</td><td>${esc(s.date)}</td><td>${esc(nm('customers','no',s.cust,'name'))}</td><td>${money(tot(s))}</td></tr>`).join('')}</tbody></table></div>`:'');
+ el.onclick=e=>{const b=e.target.closest('[data-m]');if(b){V.mod=b.dataset.m;route()}};
+}
+
+/* ---------- shell ---------- */
+function route(){
+ const mods=['overview',...Object.keys(MODS).filter(m=>isAdm()||(U.mods||[]).includes(m))];if(isAdm())mods.push('users');
+ if(!mods.includes(V.mod))V.mod=mods[0];
+ const PT={overview:['Overview','Where things stand across Hope, Inc.'],customers:['Customers','Accounts and payment terms.'],products:['Products','Catalog, units and price history.'],hr:['Human resources','Employees, jobs and departments.'],sales:['Sales','Transactions and their line items.'],reports:['Reports','Rankings and lists you can print or save as PDF.'],users:['User management','Approve registrations, roles and module access.']};
+ const pt=PT[V.mod]||['',''];$('#pt').textContent=pt[0];$('#ps').textContent=pt[1];
+ $('#tabs').innerHTML='<span class="nl">Menu</span>'+mods.map(m=>(m=='users'?'<span class="nl">Admin</span>':'')+`<button data-m="${m}" class="${V.mod==m?'on':''}">${IC[m]||''}<span>${LB[m]||MODS[m]||'Users'}</span></button>`).join('');
+ const el=$('#view');el.onclick=el.onchange=el.oninput=null;
+ if(!mods.length)el.innerHTML='<div class="empty">No modules assigned yet. Ask an administrator for access.</div>';
+ else if(V.mod=='overview')overview(el);
+ else if(V.mod=='hr'){el.innerHTML=`<div class="sub">${[['employees','Employees'],['jobs','Jobs'],['depts','Departments']].map(([k,l])=>`<button data-sub="${k}" class="${V.sub==k?'on':''}">${l}</button>`).join('')}</div><div id="box"></div>`;draw(V.sub,$('#box'));
+  el.querySelector('.sub').onclick=e=>{const b=e.target.closest('[data-sub]');if(b){V.sub=b.dataset.sub;route()}}}
+ else if(V.mod=='reports')reports(el);else if(V.mod=='users')usersView(el);else draw(V.mod,el);
+}
+$('#tabs').onclick=e=>{const b=e.target.closest('[data-m]');if(b){V.mod=b.dataset.m;document.body.classList.remove('nv');route()}};
+$('#burger').onclick=()=>document.body.classList.add('nv');$('#scrim').onclick=()=>document.body.classList.remove('nv');
+function openApp(u){U=u;$('#land').hidden=true;$('#app').hidden=false;$('#un').textContent=u.name;$('#ur').textContent=u.role;$('#av').textContent=u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();route()}
+$('#out').onclick=async()=>{if(sb)await sb.auth.signOut();U=null;V.mod='overview';$('#app').hidden=true;$('#land').hidden=false;say('')};
+
+/* ---------- auth ---------- */
+let sb=null;
+if(CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY&&window.supabase)sb=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);else $('#demo').hidden=false;
+const say=(t,k)=>{const m=$('#msg');m.textContent=t||'';m.className='msg '+(k||'')};
+const FM={login:'f-login',reg:'f-reg',reset:'f-reset',newpass:'f-newpass'};
+function show(v){for(const[k,id]of Object.entries(FM))$('#'+id).hidden=k!=v;$('#atabs').hidden=v=='newpass';document.querySelectorAll('#atabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v==v));say('')}
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{show(b.dataset.go);$('#authcard').scrollIntoView({behavior:'smooth',block:'center'});$('#authcard input').focus()}));
+document.querySelectorAll('[data-v]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.v)));
+function enter(email,fromSb){
+ const all=users();let u=all.find(x=>x.email==email.toLowerCase());
+ if(!u){if(!fromSb)return say('No account found for that email. Register first.','err');
+  u={email:email.toLowerCase(),name:email.split('@')[0],role:'user',status:'pending',mods:[]};all.push(u);saveUsers(all)}
+ const blocked={pending:'Your account is waiting for administrator approval.',blocked:'This account is blocked. Contact an administrator.',disapproved:'This registration was not approved.'}[u.status];
+ if(blocked)return say(blocked,'err');
+ openApp(u);
+}
+document.querySelectorAll('input[type=password]').forEach(i=>{const w=document.createElement('span');w.className='pw';w.style.display='block';i.before(w);w.append(i);const b=document.createElement('button');b.type='button';b.textContent='Show';b.setAttribute('aria-label','Show password');b.onclick=()=>{const h=i.type=='password';i.type=h?'text':'password';b.textContent=h?'Hide':'Show';b.setAttribute('aria-label',h?'Hide password':'Show password')};w.append(b)});
+const guard=h=>async e=>{e.preventDefault();const b=e.target.querySelector('.btn');b.disabled=true;say('');try{await h()}catch(x){say(x.message||'Something went wrong. Try again.','err')}b.disabled=false};
+$('#f-login').onsubmit=guard(async()=>{const em=$('#l-e').value.trim();
+ if(sb){const{error}=await sb.auth.signInWithPassword({email:em,password:$('#l-p').value});if(error)throw error}
+ enter(em,!!sb)});
+$('#f-reg').onsubmit=guard(async()=>{const em=$('#r-e').value.trim().toLowerCase(),nmv=$('#r-n').value.trim();
+ if(users().some(u=>u.email==em))throw new Error('An account with this email already exists. Sign in instead.');
+ if(sb){const{error}=await sb.auth.signUp({email:em,password:$('#r-p').value,options:{data:{full_name:nmv},emailRedirectTo:location.href.split('#')[0]}});if(error)throw error}
+ const all=users();all.push({email:em,name:nmv,role:'user',status:'pending',mods:[]});saveUsers(all);
+ $('#f-reg').reset();show('login');say('Registration received. An administrator must approve your account before you can sign in.','ok')});
+$('#f-reset').onsubmit=guard(async()=>{const em=$('#p-e').value.trim();
+ if(sb){const{error}=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.href.split('#')[0]});if(error)throw error}
+ say('If that email has an account, a reset link is on its way.','ok')});
+$('#f-newpass').onsubmit=guard(async()=>{const{error}=await sb.auth.updateUser({password:$('#n-p').value});if(error)throw error;
+ say('Password updated. Opening the app…','ok');const{data}=await sb.auth.getSession();setTimeout(()=>enter(data.session.user.email,true),700)});
+if(sb){let rec=/type=recovery/.test(location.hash);
+ sb.auth.onAuthStateChange(ev=>{if(ev=='PASSWORD_RECOVERY'){rec=true;show('newpass')}});
+ sb.auth.getSession().then(({data})=>{if(rec)show('newpass');else if(data.session)enter(data.session.user.email,true)})}
+
+</script>
+</body>
+</html>
