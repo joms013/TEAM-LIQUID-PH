@@ -273,6 +273,51 @@ dialog::backdrop{background:rgba(17,35,62,.48);backdrop-filter:blur(3px)}
 @media(max-width:860px){.intro{min-height:500px}.intro h1{font-size:42px}.mods{margin-bottom:0}.card{padding:24px}.side{border-radius:0 6px 6px 0}.pagehead h1{font-size:32px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important}}
 @media print{body{background:#fff;color:#000}.tw{box-shadow:none}}
+/* interaction and layout polish */
+:root{--motion:cubic-bezier(.2,.7,.25,1)}
+button,input,select,.chip,.stat,.tw,.side,dialog{transition-duration:160ms;transition-timing-function:var(--motion)}
+button:not(:disabled),.chip{transition-property:background-color,color,border-color,box-shadow,transform}
+button:not(:disabled):active{transform:translateY(1px)}
+.btn:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 5px 12px rgba(24,75,158,.2)}
+.btn:not(:disabled):active{transform:translateY(0);box-shadow:var(--shs)}
+.lnk:hover{text-decoration-thickness:2px;text-underline-offset:3px}
+input:not(:disabled):hover,select:not(:disabled):hover{border-color:#9bb2d0}
+#tabs button:not(.on):hover{transform:translateX(2px);background:#eaf1fb;color:#184b9e}
+#tabs button.on:hover{background:#184b9e}
+.seg button:not(.on):hover{background:rgba(255,255,255,.72);color:#184b9e}
+.sub button:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(23,38,61,.09)}
+.stat{min-height:124px;transition:transform 180ms var(--motion),box-shadow 180ms var(--motion),border-color 180ms var(--motion)}
+.stat:hover{border-color:#b8cce8;box-shadow:0 8px 22px rgba(23,38,61,.1)}
+.si{transition:background-color 160ms var(--motion),color 160ms var(--motion)}
+.stat:hover .si{background:#dce9fb;color:#184b9e}
+.tw{transition:box-shadow 180ms var(--motion),border-color 180ms var(--motion)}
+th{letter-spacing:.015em}
+td,th{padding-right:18px;padding-left:18px}
+tbody tr:not(.del) td{transition:background-color 120ms linear}
+.acts button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 3px 8px rgba(23,38,61,.12)}
+.acts .d:hover:not(:disabled){background:#b54740;color:#fff}
+.chip:hover{transform:translateY(-1px);border-color:#b8cce8;background:#f5f8fd}
+.chip:has(input:checked):hover{background:#dce9fb;border-color:#94b4df}
+.pagehead{gap:8px}
+#view{padding-top:18px}
+#view .head{margin-bottom:18px;align-items:center}
+.stats{margin-bottom:30px}
+.sec{margin:0 0 14px}
+.authheading{margin-bottom:24px}
+#authcard form label{margin:0 0 16px}
+#authcard form label input{margin-top:7px}
+.tabs{margin-bottom:16px}
+.mods li{transition:transform 160ms var(--motion),background-color 160ms var(--motion)}
+.mods li:hover{transform:translateX(3px);background:rgba(13,40,78,.62)}
+.side{transition:transform 240ms var(--motion),box-shadow 240ms var(--motion)}
+body.nv .scrim{animation:scrim-in 180ms ease-out both}
+dialog[open]{animation:dialog-in 180ms var(--motion) both}
+.toast{animation:toast-in 180ms var(--motion) both}
+@keyframes dialog-in{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes scrim-in{from{opacity:0}to{opacity:1}}
+@keyframes toast-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+@media(max-width:860px){#view .head{align-items:stretch}.tools{width:100%}.tools input{flex:1 1 100%;min-width:0}.stat{min-height:112px}.intro{gap:28px}.mods li{padding:11px 13px}}
+@media(prefers-reduced-motion:reduce){button:not(:disabled),.chip,.stat,.tw,.side,dialog,.mods li,.si,.toast{animation:none!important;transition:none!important}button:not(:disabled):hover,.chip:hover,.stat:hover,.mods li:hover{transform:none!important}}
 </style>
 </head>
 <body>
