@@ -132,12 +132,6 @@ td select{padding:6px 12px;width:auto;border-radius:999px}
 .ut{min-width:880px}
 .ucell{display:flex;align-items:center;gap:12px}.ucell b{display:block;font-weight:600}.ucell small{display:block}
 .ucell .av{width:36px;height:36px;font-size:12px}
-.photo-slot{position:relative;display:grid;place-items:center;width:40px;height:40px;flex:none;overflow:hidden;border:1px dashed #9bb2d0;border-radius:50%;background:var(--soft);cursor:pointer}
-.photo-slot:hover{border-color:var(--ac);background:color-mix(in srgb,var(--soft) 72%,var(--pn))}
-.photo-slot:has(input:focus-visible){outline:3px solid var(--ring);outline-offset:2px}
-.photo-slot img{width:100%;height:100%;object-fit:cover}
-.photo-slot input[type=file]{position:absolute;inset:0;width:100%;height:100%;min-height:0;padding:0;border:0;opacity:0;cursor:pointer}
-:root[data-theme="dark"] .photo-slot{border-color:#496687;background:#203550}
 .sel{appearance:none;-webkit-appearance:none;width:auto;min-width:132px;padding:8px 34px 8px 15px;border-radius:999px;border:1px solid var(--ln);background:var(--pn) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a9bb0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/12px;color:var(--ink);font-size:13.5px;font-weight:600;text-transform:capitalize;cursor:pointer;box-shadow:var(--shs);transition:border-color .15s}
 .sel:hover:not(:disabled){border-color:var(--ac)}
 .sel:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
@@ -1071,6 +1065,7 @@ function usersView(el){
  const grp=u=>u.status=='blocked'||u.status=='disapproved'?'blocked':u.status;
  const cnt=k=>k=='all'?vis.length:vis.filter(u=>grp(u)==k).length;
  const list=vis.filter(u=>UF.f=='all'||grp(u)==UF.f);
+ const ini=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
  const so=(v,opts,dis,cls,labelText)=>`<select class="sel ${cls||''}" aria-label="${esc(labelText)}" ${dis?'disabled':''}>${opts.map(o=>`<option ${o==v?'selected':''}>${o}</option>`).join('')}</select>`;
  const row=u=>{const me=u.email==U.email,lock=me||(!sup&&u.role!='user'),e=esc(u.email);
   const rb=u.role=='user'?`<button data-a="rights" data-e="${e}">Rights</button>`:'';
@@ -1079,7 +1074,7 @@ function usersView(el){
    :u.status=='active'?`<button class="d" data-a="blocked" data-e="${e}">Block</button>`
    :`<button class="k" data-a="active" data-e="${e}">Reactivate</button>`);
   const hid=UF.q&&!(u.name+' '+u.email).toLowerCase().includes(UF.q)?'hidden':'';
-  return `<tr data-e="${e}" ${hid}><td><div class="ucell"><label class="photo-slot" title="Upload profile photo for ${esc(u.name)}">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:''}<input type="file" data-photo="${e}" accept="image/*" aria-label="Upload profile photo for ${esc(u.name)}"></label><div><b>${esc(u.name)}</b><small>${e}</small></div></div></td>
+  return `<tr data-e="${e}" ${hid}><td><div class="ucell"><span class="av">${esc(ini(u.name))}</span><div><b>${esc(u.name)}</b><small>${e}</small></div></div></td>
   <td data-k="role">${so(u.role,['user','admin','superadmin'],!sup||me,'',`Change role for ${u.name}`)}</td>
   <td data-k="status">${so(u.status,['active','pending','blocked','disapproved'],lock,'s-'+u.status,`Change status for ${u.name}`)}</td>
   <td>${u.role=='user'?`<span class="rcount">${u.mods.length} of ${Object.keys(MODS).length} modules</span>`:'<span class="allm">All modules</span>'}</td>
@@ -1089,18 +1084,7 @@ function usersView(el){
   <div class="tools"><input type="search" id="uq" placeholder="Search name or email" value="${esc(UF.q)}" aria-label="Search users"></div></div>
  ${sup?'':'<p class="muted" style="margin:0 0 14px">Superadmin accounts are hidden.</p>'}
  <div class="tw"><table class="ut"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Modules</th><th style="text-align:right">Actions</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table>${list.length?'':'<div class="empty">No users in this view.</div>'}</div>`;
- el.onchange=e=>{
-  const photo=e.target.closest('input[type="file"][data-photo]');
-  if(photo){
-   const file=photo.files[0];if(!file)return;
-   if(!file.type.startsWith('image/')){toast('Choose an image file.');photo.value='';return}
-   if(file.size>1024*1024){toast('Choose an image smaller than 1 MB.');photo.value='';return}
-   const reader=new FileReader();
-   reader.onload=()=>{const all=users(),u=all.find(x=>x.email==photo.dataset.photo);if(!u)return;u.avatar=reader.result;saveUsers(all);usersView(el);toast('Profile photo saved')};
-   reader.onerror=()=>toast('Could not read that image. Try another file.');
-   reader.readAsDataURL(file);return;
-  }
-  const tr=e.target.closest('tr[data-e]');if(!tr)return;const all=users(),u=all.find(x=>x.email==tr.dataset.e);
+ el.onchange=e=>{const tr=e.target.closest('tr[data-e]');if(!tr)return;const all=users(),u=all.find(x=>x.email==tr.dataset.e);
   const k=e.target.closest('[data-k]');if(!k)return;
   if(k.dataset.k=='role'&&e.target.value!='user'&&!confirm('Give '+u.name+' the '+e.target.value+' role? They will see every module.'))return usersView(el);
   u[k.dataset.k]=e.target.value;saveUsers(all);usersView(el);toast('User updated')};
