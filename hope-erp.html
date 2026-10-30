@@ -8,16 +8,16 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
 :root{--bg:#eef3fb;--pn:#fff;--gl:rgba(255,255,255,.8);--edge:rgba(255,255,255,.85);--ink:#101a2b;--mu:#66748a;--ln:rgba(16,26,43,.09);
- --ac:#1f63d8;--ach:#174fb4;--ai:#fff;--wr:#c8402a;--soft:#e6efff;--seg:rgba(16,26,43,.055);--sb:#0f2c6b;--sbi:#c9d7f2;--ring:rgba(31,99,216,.45);
- --btn:linear-gradient(180deg,#3a7df0,#1d5bd0);--btnh:linear-gradient(180deg,#2f72e6,#164fb8);--btns:0 6px 16px rgba(31,99,216,.28),inset 0 1px 0 rgba(255,255,255,.25);
- --sh:0 1px 2px rgba(18,42,96,.05),0 10px 28px rgba(18,42,96,.08);--shs:0 1px 2px rgba(18,42,96,.06),0 3px 10px rgba(18,42,96,.07);
- --page:radial-gradient(900px 520px at 6% -8%,rgba(110,170,255,.30),transparent 60%),radial-gradient(760px 520px at 100% 2%,rgba(150,210,255,.32),transparent 58%),linear-gradient(180deg,#f7faff,#edf2fa);
- --f:"Plus Jakarta Sans",system-ui,sans-serif}
+--ac:#1f63d8;--ach:#174fb4;--ai:#fff;--wr:#c8402a;--soft:#e6efff;--seg:rgba(16,26,43,.055);--sb:#0f2c6b;--sbi:#c9d7f2;--ring:rgba(31,99,216,.45);
+--btn:linear-gradient(180deg,#3a7df0,#1d5bd0);--btnh:linear-gradient(180deg,#2f72e6,#164fb8);--btns:0 6px 16px rgba(31,99,216,.28),inset 0 1px 0 rgba(255,255,255,.25);
+--sh:0 1px 2px rgba(18,42,96,.05),0 10px 28px rgba(18,42,96,.08);--shs:0 1px 2px rgba(18,42,96,.06),0 3px 10px rgba(18,42,96,.07);
+--page:radial-gradient(900px 520px at 6% -8%,rgba(110,170,255,.30),transparent 60%),radial-gradient(760px 520px at 100% 2%,rgba(150,210,255,.32),transparent 58%),linear-gradient(180deg,#f7faff,#edf2fa);
+--f:"Plus Jakarta Sans",system-ui,sans-serif}
 @media (prefers-color-scheme:dark){:root{--bg:#0b121c;--pn:#131f2e;--gl:rgba(19,31,46,.82);--edge:rgba(255,255,255,.08);--ink:#e8eff8;--mu:#8fa3ba;--ln:rgba(255,255,255,.09);
- --ac:#5b9bf5;--ach:#86b6f8;--ai:#07182e;--wr:#ff8f78;--soft:#1a2c44;--seg:rgba(255,255,255,.07);--sb:#0a1a38;--ring:rgba(106,174,255,.6);
- --btn:linear-gradient(180deg,#7db0fa,#5b9bf5);--btnh:linear-gradient(180deg,#9bc3fb,#7db0fa);--btns:0 6px 16px rgba(0,0,0,.35);
- --sh:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.35);--shs:0 1px 2px rgba(0,0,0,.3),0 3px 10px rgba(0,0,0,.3);
- --page:radial-gradient(900px 520px at 6% -8%,rgba(60,110,200,.28),transparent 60%),radial-gradient(760px 520px at 100% 2%,rgba(40,100,170,.25),transparent 58%),linear-gradient(180deg,#0d1522,#0a111b)}}
+--ac:#5b9bf5;--ach:#86b6f8;--ai:#07182e;--wr:#ff8f78;--soft:#1a2c44;--seg:rgba(255,255,255,.07);--sb:#0a1a38;--ring:rgba(106,174,255,.6);
+--btn:linear-gradient(180deg,#7db0fa,#5b9bf5);--btnh:linear-gradient(180deg,#9bc3fb,#7db0fa);--btns:0 6px 16px rgba(0,0,0,.35);
+--sh:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.35);--shs:0 1px 2px rgba(0,0,0,.3),0 3px 10px rgba(0,0,0,.3);
+--page:radial-gradient(900px 520px at 6% -8%,rgba(60,110,200,.28),transparent 60%),radial-gradient(760px 520px at 100% 2%,rgba(40,100,170,.25),transparent 58%),linear-gradient(180deg,#0d1522,#0a111b)}}
 *{box-sizing:border-box}[hidden]{display:none!important}
 body{margin:0;background:var(--page) fixed;color:var(--ink);font:400 15px/1.5 var(--f)}
 button,input,select{font-family:inherit}
@@ -132,6 +132,12 @@ td select{padding:6px 12px;width:auto;border-radius:999px}
 .ut{min-width:880px}
 .ucell{display:flex;align-items:center;gap:12px}.ucell b{display:block;font-weight:600}.ucell small{display:block}
 .ucell .av{width:36px;height:36px;font-size:12px}
+.photo-slot{position:relative;display:grid;place-items:center;width:40px;height:40px;flex:none;overflow:hidden;border:1px dashed #9bb2d0;border-radius:50%;background:var(--soft);cursor:pointer}
+.photo-slot:hover{border-color:var(--ac);background:color-mix(in srgb,var(--soft) 72%,var(--pn))}
+.photo-slot:has(input:focus-visible){outline:3px solid var(--ring);outline-offset:2px}
+.photo-slot img{width:100%;height:100%;object-fit:cover}
+.photo-slot input[type=file]{position:absolute;inset:0;width:100%;height:100%;min-height:0;padding:0;border:0;opacity:0;cursor:pointer}
+:root[data-theme="dark"] .photo-slot{border-color:#496687;background:#203550}
 .sel{appearance:none;-webkit-appearance:none;width:auto;min-width:132px;padding:8px 34px 8px 15px;border-radius:999px;border:1px solid var(--ln);background:var(--pn) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a9bb0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/12px;color:var(--ink);font-size:13.5px;font-weight:600;text-transform:capitalize;cursor:pointer;box-shadow:var(--shs);transition:border-color .15s}
 .sel:hover:not(:disabled){border-color:var(--ac)}
 .sel:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
@@ -399,135 +405,661 @@ dialog[open]{animation:dialog-in 180ms var(--motion) both}
 </button>
 
 <script>
-const CFG={SUPABASE_URL:"",SUPABASE_ANON_KEY:""};
-const $=s=>document.querySelector(s);
+const CFG = { SUPABASE_URL: "", SUPABASE_ANON_KEY: "" };
+const $ = (selector) => document.querySelector(selector);
 const themeToggle=$('#themeToggle');
-const setTheme=mode=>{const dark=mode==='dark';document.documentElement.dataset.theme=dark?'dark':'light';themeToggle.setAttribute('aria-pressed',String(dark));themeToggle.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');themeToggle.title=dark?'Switch to light mode':'Switch to dark mode';themeToggle.querySelector('.moon-icon').hidden=dark;themeToggle.querySelector('.sun-icon').hidden=!dark;try{localStorage.setItem('hope_theme',dark?'dark':'light')}catch(e){}};
-let savedTheme='light';try{savedTheme=localStorage.getItem('hope_theme')||'light'}catch(e){}
+const setTheme = (mode) => {
+  const dark = mode === "dark";
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  themeToggle.setAttribute("aria-pressed", String(dark));
+  themeToggle.setAttribute(
+    "aria-label",
+    dark ? "Switch to light mode" : "Switch to dark mode",
+  );
+  themeToggle.title = dark ? "Switch to light mode" : "Switch to dark mode";
+  themeToggle.querySelector(".moon-icon").hidden = dark;
+  themeToggle.querySelector(".sun-icon").hidden = !dark;
+
+  try {
+    localStorage.setItem("hope_theme", dark ? "dark" : "light");
+  } catch (error) {}
+};
+
+let savedTheme = "light";
+try {
+  savedTheme = localStorage.getItem("hope_theme") || "light";
+} catch (error) {}
 setTheme(savedTheme);
-themeToggle.addEventListener('click',()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
-const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const mem={};
-const load=(k,d)=>{try{const v=localStorage.getItem(k);if(v)return JSON.parse(v)}catch(e){if(mem[k])return mem[k]}return d};
-const save=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){mem[k]=v}};
-const today=()=>new Date().toISOString().slice(0,10);
-const money=n=>'$'+Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
-let U=null,V={mod:'overview',sub:'employees'};
-const isAdm=()=>U&&['superadmin','admin'].includes(U.role);
-const MODS={customers:'Customers',products:'Products',hr:'Human resources',sales:'Sales',reports:'Reports'};
+
+themeToggle.addEventListener("click", () => {
+  const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  setTheme(nextTheme);
+});
+
+const esc = (value) =>
+  String(value ?? "").replace(/[&<>"']/g, (character) =>
+    ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    })[character],
+  );
+
+const mem = {};
+const load = (key, fallback) => {
+  try {
+    const value = localStorage.getItem(key);
+    if (value) return JSON.parse(value);
+  } catch (error) {
+    if (mem[key]) return mem[key];
+  }
+  return fallback;
+};
+const save = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    mem[key] = value;
+  }
+};
+const today = () => new Date().toISOString().slice(0, 10);
+const money = (value) =>
+  "$" +
+  Number(value || 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+let U = null;
+let V = { mod: "overview", sub: "employees" };
+const isAdm = () => U && ["superadmin", "admin"].includes(U.role);
+const MODS = {
+  customers: "Customers",
+  products: "Products",
+  hr: "Human resources",
+  sales: "Sales",
+  reports: "Reports",
+};
 
 /* ---------- data ---------- */
-const data=n=>load('hope_'+n,SEED[n]||[]);
-const put=(n,v)=>save('hope_'+n,v);
-const act=n=>data(n).filter(r=>!r.del);
-const price=(c,d=today())=>{const p=act('prices').filter(x=>x.prod==c&&x.date<=d).sort((a,b)=>b.date.localeCompare(a.date))[0];return p?+p.price:0};
-const sdate=t=>(data('sales').find(s=>s.no==t)||{}).date||today();
-const lineAmt=l=>l.qty*price(l.prod,sdate(l.trans));
-const nm=(n,k,v,f)=>(data(n).find(x=>x[k]==v)||{})[f]||v;
-const opt=(n,k,fmt)=>()=>act(n).map(r=>[r[k],r[k]+' — '+fmt(r)]);
-const stamp=a=>a+' '+U.name.split(' ')[0].toLowerCase()+' '+new Date().toISOString().slice(0,16).replace('T',' ');
-
-const ENT={
- customers:{t:'Customers',f:[{k:'no',l:'Cust no',u:1},{k:'name',l:'Name'},{k:'address',l:'Address'},{k:'terms',l:'Pay terms'}]},
- products:{t:'Products',f:[{k:'code',l:'Code',u:1},{k:'desc',l:'Description'},{k:'unit',l:'Unit'}],kid:'prices',kk:'code',kl:'Prices',calc:[{l:'Current price',fn:r=>money(price(r.code))}]},
- prices:{t:'Price history',par:'prod',uk:['prod','date'],f:[{k:'prod',l:'Product',h:1},{k:'date',l:'Effective date',type:'date'},{k:'price',l:'Unit price',type:'number',m:1}]},
- employees:{t:'Employees',kid:'jobhist',kk:'no',kl:'History',f:[{k:'no',l:'Emp no',u:1},{k:'last',l:'Last name'},{k:'first',l:'First name'},{k:'gender',l:'Gender',o:()=>[['M','Male'],['F','Female'],['O','Other']]},{k:'birth',l:'Birth date',type:'date'},{k:'hire',l:'Hire date',type:'date'},{k:'sep',l:'Separation date',type:'date',opt:1}]},
- jobhist:{t:'Job history',par:'emp',uk:['emp','date'],f:[{k:'emp',l:'Employee',h:1},{k:'date',l:'Effective date',type:'date'},{k:'job',l:'Job',o:opt('jobs','code',r=>r.desc)},{k:'dept',l:'Department',o:opt('depts','code',r=>r.name)},{k:'salary',l:'Salary',type:'number',m:1}]},
- jobs:{t:'Jobs',f:[{k:'code',l:'Job code',u:1},{k:'desc',l:'Description'}]},
- depts:{t:'Departments',f:[{k:'code',l:'Dept code',u:1},{k:'name',l:'Name'}]},
- sales:{t:'Sales',kid:'lines',kk:'no',kl:'Lines',f:[{k:'no',l:'Trans no',u:1},{k:'date',l:'Sales date',type:'date'},{k:'cust',l:'Customer',o:opt('customers','no',r=>r.name)},{k:'emp',l:'Salesperson',o:opt('employees','no',r=>r.first+' '+r.last)}],calc:[{l:'Total',fn:r=>money(act('lines').filter(l=>l.trans==r.no).reduce((s,l)=>s+lineAmt(l),0))}]},
- lines:{t:'Sale lines',par:'trans',uk:['trans','prod'],f:[{k:'trans',l:'Transaction',h:1},{k:'prod',l:'Product',o:opt('products','code',r=>r.desc)},{k:'qty',l:'Quantity',type:'number'}],calc:[{l:'Unit price',fn:r=>money(price(r.prod,sdate(r.trans)))},{l:'Amount',fn:r=>money(lineAmt(r))}]}
+const data = (name) => load("hope_" + name, SEED[name] || []);
+const put = (name, value) => save("hope_" + name, value);
+const act = (name) => data(name).filter((record) => !record.del);
+const price = (code, date = today()) => {
+  const current = act("prices")
+    .filter((record) => record.prod == code && record.date <= date)
+    .sort((a, b) => b.date.localeCompare(a.date))[0];
+  return current ? +current.price : 0;
 };
-const T=(n,rows)=>rows.map((a,i)=>Object.fromEntries([['id',n+i],['del',false],['stamp','CREATED system 2026-10-01 09:00'],...ENT[n].f.map((f,j)=>[f.k,a[j]])]));
-const SEED={
- customers:T('customers',[['C-001','Acme Corporation','123 Main St, Metro City','Net 30'],['C-002','Globex Industries','456 Oak Ave, Harbor Town','Net 45'],['C-003','Initech LLC','789 Pine Rd','COD']]),
- products:T('products',[['P-001','Industrial Widget A','pcs'],['P-002','Steel Bracket','pcs'],['P-003','Lubricant Oil 5L','can']]),
- prices:T('prices',[['P-001','2026-01-01',12.5],['P-001','2026-06-01',13.75],['P-002','2026-01-15',45],['P-003','2026-02-01',28]]),
- employees:T('employees',[['E-001','Santos','Maria','F','1990-05-12','2020-03-01',''],['E-002','Reyes','Juan','M','1988-11-03','2019-07-15','']]),
- jobhist:T('jobhist',[['E-001','2020-03-01','J-001','D-001',45000],['E-002','2019-07-15','J-002','D-002',55000]]),
- jobs:T('jobs',[['J-001','Software Engineer'],['J-002','Sales Manager']]),
- depts:T('depts',[['D-001','Engineering'],['D-002','Sales']]),
- sales:T('sales',[['T-001','2026-10-01','C-001','E-002'],['T-002','2026-10-05','C-002','E-001']]),
- lines:T('lines',[['T-001','P-001',10],['T-001','P-002',2],['T-002','P-003',5]])
+const sdate = (transaction) =>
+  (data("sales").find((sale) => sale.no == transaction) || {}).date || today();
+const lineAmt = (line) => line.qty * price(line.prod, sdate(line.trans));
+const nm = (name, key, value, field) =>
+  (data(name).find((record) => record[key] == value) || {})[field] || value;
+const opt = (name, key, format) => () =>
+  act(name).map((record) => [record[key], record[key] + " — " + format(record)]);
+const stamp = (action) =>
+  action +
+  " " +
+  U.name.split(" ")[0].toLowerCase() +
+  " " +
+  new Date().toISOString().slice(0, 16).replace("T", " ");
+
+const ENT = {
+  customers: {
+    t: "Customers",
+    f: [
+      { k: "no", l: "Cust no", u: 1 },
+      { k: "name", l: "Name" },
+      { k: "address", l: "Address" },
+      { k: "terms", l: "Pay terms" },
+    ],
+  },
+  products: {
+    t: "Products",
+    f: [
+      { k: "code", l: "Code", u: 1 },
+      { k: "desc", l: "Description" },
+      { k: "unit", l: "Unit" },
+    ],
+    kid: "prices",
+    kk: "code",
+    kl: "Prices",
+    calc: [{ l: "Current price", fn: (record) => money(price(record.code)) }],
+  },
+  prices: {
+    t: "Price history",
+    par: "prod",
+    uk: ["prod", "date"],
+    f: [
+      { k: "prod", l: "Product", h: 1 },
+      { k: "date", l: "Effective date", type: "date" },
+      { k: "price", l: "Unit price", type: "number", m: 1 },
+    ],
+  },
+  employees: {
+    t: "Employees",
+    kid: "jobhist",
+    kk: "no",
+    kl: "History",
+    f: [
+      { k: "no", l: "Emp no", u: 1 },
+      { k: "last", l: "Last name" },
+      { k: "first", l: "First name" },
+      { k: "gender", l: "Gender", o: () => [["M", "Male"], ["F", "Female"], ["O", "Other"]] },
+      { k: "birth", l: "Birth date", type: "date" },
+      { k: "hire", l: "Hire date", type: "date" },
+      { k: "sep", l: "Separation date", type: "date", opt: 1 },
+    ],
+  },
+  jobhist: {
+    t: "Job history",
+    par: "emp",
+    uk: ["emp", "date"],
+    f: [
+      { k: "emp", l: "Employee", h: 1 },
+      { k: "date", l: "Effective date", type: "date" },
+      { k: "job", l: "Job", o: opt("jobs", "code", (record) => record.desc) },
+      { k: "dept", l: "Department", o: opt("depts", "code", (record) => record.name) },
+      { k: "salary", l: "Salary", type: "number", m: 1 },
+    ],
+  },
+  jobs: {
+    t: "Jobs",
+    f: [
+      { k: "code", l: "Job code", u: 1 },
+      { k: "desc", l: "Description" },
+    ],
+  },
+  depts: {
+    t: "Departments",
+    f: [
+      { k: "code", l: "Dept code", u: 1 },
+      { k: "name", l: "Name" },
+    ],
+  },
+  sales: {
+    t: "Sales",
+    kid: "lines",
+    kk: "no",
+    kl: "Lines",
+    f: [
+      { k: "no", l: "Trans no", u: 1 },
+      { k: "date", l: "Sales date", type: "date" },
+      { k: "cust", l: "Customer", o: opt("customers", "no", (record) => record.name) },
+      { k: "emp", l: "Salesperson", o: opt("employees", "no", (record) => record.first + " " + record.last) },
+    ],
+    calc: [
+      {
+        l: "Total",
+        fn: (record) =>
+          money(
+            act("lines")
+              .filter((line) => line.trans == record.no)
+              .reduce((sum, line) => sum + lineAmt(line), 0),
+          ),
+      },
+    ],
+  },
+  lines: {
+    t: "Sale lines",
+    par: "trans",
+    uk: ["trans", "prod"],
+    f: [
+      { k: "trans", l: "Transaction", h: 1 },
+      { k: "prod", l: "Product", o: opt("products", "code", (record) => record.desc) },
+      { k: "qty", l: "Quantity", type: "number" },
+    ],
+    calc: [
+      { l: "Unit price", fn: (record) => money(price(record.prod, sdate(record.trans))) },
+      { l: "Amount", fn: (record) => money(lineAmt(record)) },
+    ],
+  },
+};
+
+const T = (name, rows) =>
+  rows.map((row, index) =>
+    Object.fromEntries([
+      ["id", name + index],
+      ["del", false],
+      ["stamp", "CREATED system 2026-10-01 09:00"],
+      ...ENT[name].f.map((field, fieldIndex) => [field.k, row[fieldIndex]]),
+    ]),
+  );
+
+const SEED = {
+  customers: T("customers", [
+    ["C-001", "Acme Corporation", "123 Main St, Metro City", "Net 30"],
+    ["C-002", "Globex Industries", "456 Oak Ave, Harbor Town", "Net 45"],
+    ["C-003", "Initech LLC", "789 Pine Rd", "COD"],
+  ]),
+  products: T("products", [
+    ["P-001", "Industrial Widget A", "pcs"],
+    ["P-002", "Steel Bracket", "pcs"],
+    ["P-003", "Lubricant Oil 5L", "can"],
+  ]),
+  prices: T("prices", [
+    ["P-001", "2026-01-01", 12.5],
+    ["P-001", "2026-06-01", 13.75],
+    ["P-002", "2026-01-15", 45],
+    ["P-003", "2026-02-01", 28],
+  ]),
+  employees: T("employees", [
+    ["E-001", "Santos", "Maria", "F", "1990-05-12", "2020-03-01", ""],
+    ["E-002", "Reyes", "Juan", "M", "1988-11-03", "2019-07-15", ""],
+  ]),
+  jobhist: T("jobhist", [
+    ["E-001", "2020-03-01", "J-001", "D-001", 45000],
+    ["E-002", "2019-07-15", "J-002", "D-002", 55000],
+  ]),
+  jobs: T("jobs", [["J-001", "Software Engineer"], ["J-002", "Sales Manager"]]),
+  depts: T("depts", [["D-001", "Engineering"], ["D-002", "Sales"]]),
+  sales: T("sales", [
+    ["T-001", "2026-10-01", "C-001", "E-002"],
+    ["T-002", "2026-10-05", "C-002", "E-001"],
+  ]),
+  lines: T("lines", [
+    ["T-001", "P-001", 10],
+    ["T-001", "P-002", 2],
+    ["T-002", "P-003", 5],
+  ]),
 };
 
 /* ---------- generic table ---------- */
-const F={};
-const cell=(f,r)=>{const v=r[f.k];if(f.o){const m=f.o().find(x=>x[0]==v);return esc(m?m[1]:v)}if(f.m)return money(v);return v===''||v==null?'—':esc(v)};
-function draw(n,el,pv){
- const E=ENT[n],st=F[n]||(F[n]={f:'active',q:''}),adm=isAdm(),cols=E.f.filter(f=>!f.h);
- const heads=[...cols.map(f=>f.l),...(E.calc||[]).map(c=>c.l),...(adm?['Status','Stamp']:[]),''];
- const seg=adm?`<div class="seg">${['active','inactive','all'].map(x=>`<button data-a="f" data-v="${x}" class="${st.f==x?'on':''}">${x}</button>`).join('')}</div>`:'';
- el.innerHTML=`<div class="head"><h2>${E.t}</h2><div class="tools">${seg}<input type="search" data-s placeholder="Search" aria-label="Search" value="${esc(st.q)}"><button class="btn sm" data-a="add">+ Add new</button></div></div><div class="tw"><table><thead><tr>${heads.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody></tbody></table></div>`;
- const redraw=()=>draw(n,el,pv);
- const body=()=>{
-  let rs=data(n).filter(r=>pv==null||r[E.par]==pv);
-  if(!adm||st.f=='active')rs=rs.filter(r=>!r.del);else if(st.f=='inactive')rs=rs.filter(r=>r.del);
-  const q=st.q.toLowerCase();if(q)rs=rs.filter(r=>E.f.some(f=>String(r[f.k]).toLowerCase().includes(q)));
-  el.querySelector('tbody').innerHTML=rs.length?rs.map(r=>{
-   const a=r.del?(adm?`<button class="r" data-a="res" data-id="${r.id}">Restore</button>`:''):`${E.kid?`<button class="k" data-a="kid" data-id="${r.id}">${E.kl}</button>`:''}<button data-a="edit" data-id="${r.id}">Edit</button><button class="d" data-a="del" data-id="${r.id}">Delete</button>`;
-   return`<tr class="${r.del?'del':''}">${cols.map(f=>`<td>${cell(f,r)}</td>`).join('')}${(E.calc||[]).map(c=>`<td>${c.fn(r)}</td>`).join('')}${adm?`<td><span class="b ${r.del?'off':'on'}">${r.del?'Inactive':'Active'}</span></td><td><small>${esc(r.stamp)}</small></td>`:''}<td><div class="acts">${a}</div></td></tr>`}).join(''):`<tr><td colspan="${heads.length}" class="empty">Nothing here yet. Use Add to create the first record.</td></tr>`;
- };
- body();
- el.oninput=e=>{if('s' in e.target.dataset){st.q=e.target.value;body()}};
- el.onclick=e=>{const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,id=b.dataset.id;
-  if(a=='f'){st.f=b.dataset.v;redraw()}
-  else if(a=='add')form(n,null,pv,redraw);
-  else if(a=='edit')form(n,id,pv,redraw);
-  else if(a=='kid')kids(n,id);
-  else if(a=='del'){if(confirm('Mark this record inactive? An admin can restore it.')){mut(n,id,true,'DELETED');redraw();toast('Marked inactive')}}
-  else if(a=='res'){mut(n,id,false,'RESTORED');redraw();toast('Record restored')}};
+const F = {};
+const cell = (field, record) => {
+  const value = record[field.k];
+  if (field.o) {
+    const option = field.o().find((item) => item[0] == value);
+    return esc(option ? option[1] : value);
+  }
+  if (field.m) return money(value);
+  return value === "" || value == null ? "—" : esc(value);
+};
+
+function draw(name, element, parentValue) {
+  const entity = ENT[name];
+  const state = F[name] || (F[name] = { f: "active", q: "" });
+  const admin = isAdm();
+  const columns = entity.f.filter((field) => !field.h);
+  const headers = [
+    ...columns.map((field) => field.l),
+    ...(entity.calc || []).map((column) => column.l),
+    ...(admin ? ["Status", "Stamp"] : []),
+    "",
+  ];
+  const filters = admin
+    ? `<div class="seg">${["active", "inactive", "all"]
+        .map(
+          (filter) =>
+            `<button data-a="f" data-v="${filter}" class="${state.f == filter ? "on" : ""}">${filter}</button>`,
+        )
+        .join("")}</div>`
+    : "";
+
+  element.innerHTML = `
+    <div class="head">
+      <h2>${entity.t}</h2>
+      <div class="tools">
+        ${filters}
+        <input type="search" data-s placeholder="Search" aria-label="Search" value="${esc(state.q)}">
+        <button class="btn sm" data-a="add">+ Add new</button>
+      </div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr>${headers.map((header) => `<th>${header}</th>`).join("")}</tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>`;
+
+  const redraw = () => draw(name, element, parentValue);
+  const renderBody = () => {
+    let records = data(name).filter(
+      (record) => parentValue == null || record[entity.par] == parentValue,
+    );
+
+    if (!admin || state.f == "active") {
+      records = records.filter((record) => !record.del);
+    } else if (state.f == "inactive") {
+      records = records.filter((record) => record.del);
+    }
+
+    const query = state.q.toLowerCase();
+    if (query) {
+      records = records.filter((record) =>
+        entity.f.some((field) => String(record[field.k]).toLowerCase().includes(query)),
+      );
+    }
+
+    element.querySelector("tbody").innerHTML = records.length
+      ? records
+          .map((record) => {
+            const actions = record.del
+              ? admin
+                ? `<button class="r" data-a="res" data-id="${record.id}">Restore</button>`
+                : ""
+              : `${entity.kid ? `<button class="k" data-a="kid" data-id="${record.id}">${entity.kl}</button>` : ""}<button data-a="edit" data-id="${record.id}">Edit</button><button class="d" data-a="del" data-id="${record.id}">Delete</button>`;
+
+            return `<tr class="${record.del ? "del" : ""}">
+              ${columns.map((field) => `<td>${cell(field, record)}</td>`).join("")}
+              ${(entity.calc || []).map((column) => `<td>${column.fn(record)}</td>`).join("")}
+              ${admin ? `<td><span class="b ${record.del ? "off" : "on"}">${record.del ? "Inactive" : "Active"}</span></td><td><small>${esc(record.stamp)}</small></td>` : ""}
+              <td><div class="acts">${actions}</div></td>
+            </tr>`;
+          })
+          .join("")
+      : `<tr><td colspan="${headers.length}" class="empty">Nothing here yet. Use Add to create the first record.</td></tr>`;
+  };
+
+  renderBody();
+  element.oninput = (event) => {
+    if (!("s" in event.target.dataset)) return;
+    state.q = event.target.value;
+    renderBody();
+  };
+  element.onclick = (event) => {
+    const button = event.target.closest("[data-a]");
+    if (!button) return;
+
+    const action = button.dataset.a;
+    const id = button.dataset.id;
+    if (action == "f") {
+      state.f = button.dataset.v;
+      redraw();
+    } else if (action == "add") {
+      form(name, null, parentValue, redraw);
+    } else if (action == "edit") {
+      form(name, id, parentValue, redraw);
+    } else if (action == "kid") {
+      kids(name, id);
+    } else if (action == "del") {
+      if (confirm("Mark this record inactive? An admin can restore it.")) {
+        mut(name, id, true, "DELETED");
+        redraw();
+        toast("Marked inactive");
+      }
+    } else if (action == "res") {
+      mut(name, id, false, "RESTORED");
+      redraw();
+      toast("Record restored");
+    }
+  };
 }
-function mut(n,id,del,w){const l=data(n),r=l.find(x=>x.id==id);r.del=del;r.stamp=stamp(w);put(n,l)}
-function kids(n,id){
- const E=ENT[n],r=data(n).find(x=>x.id==id),c=E.kid,pv=r[E.kk],d=$('#dlg2');
- d.innerHTML=`<div class="head"><div><h2>${ENT[c].t}</h2><p style="margin:0;color:var(--mu)">For <b>${esc(pv)}</b></p></div><button class="btn ghost sm" data-x>Close</button></div><div id="kb"></div>`;
- draw(c,$('#kb'),pv);d.showModal();
+
+function mut(name, id, deleted, action) {
+  const records = data(name);
+  const record = records.find((item) => item.id == id);
+  record.del = deleted;
+  record.stamp = stamp(action);
+  put(name, records);
 }
-function form(n,id,pv,done){
- const E=ENT[n],all=data(n),r=id?all.find(x=>x.id==id):{},d=$('#dlg');
- d.removeAttribute('aria-labelledby');d.removeAttribute('aria-describedby');
- const lock=f=>id&&(f.u||(E.uk||[]).includes(f.k));
- const inp=f=>{if(f.h)return'';const v=r[f.k]??'',dis=lock(f)?'disabled':'';
-  if(f.o)return`<label>${f.l}<select name="${f.k}" ${dis}>${f.o().map(o=>`<option value="${esc(o[0])}" ${o[0]==v?'selected':''}>${esc(o[1])}</option>`).join('')}</select></label>`;
-  return`<label>${f.l}<input name="${f.k}" type="${f.type||'text'}" ${f.type=='number'?'step="0.01" min="0"':''} value="${esc(v)}" ${f.opt?'':'required'} ${dis}></label>`};
- d.innerHTML=`<h2>${id?'Edit':'Add'}: ${E.t}</h2><form>${E.f.map(inp).join('')}<p class="err" id="ferr"></p><div class="row"><button class="btn">Save</button><button type="button" class="btn ghost" data-x>Cancel</button></div></form>`;
- const fm=d.querySelector('form');
- fm.onsubmit=e=>{e.preventDefault();const v={};
-  E.f.forEach(f=>{if(f.h)v[f.k]=pv;else if(lock(f))v[f.k]=r[f.k];else{const x=String(fm.elements[f.k].value).trim();v[f.k]=f.type=='number'?parseFloat(x):x}});
-  const bad=E.f.some(f=>!f.opt&&(v[f.k]===''||Number.isNaN(v[f.k])||v[f.k]==null));
-  const err=m=>{$('#ferr').textContent=m};
-  if(bad)return err('Fill in every required field.');
-  if(E.f.some(f=>f.u&&all.some(x=>x.id!=id&&String(x[f.k]).toLowerCase()==String(v[f.k]).toLowerCase())))return err('That code already exists.');
-  if(E.uk&&all.some(x=>x.id!=id&&!x.del&&E.uk.every(k=>x[k]==v[k])))return err('That combination already exists. Edit the existing row instead.');
-  if(id)Object.assign(r,v,{stamp:stamp('EDITED')});else all.push({id:'n'+Date.now(),del:false,stamp:stamp('CREATED'),...v});
-  put(n,all);d.close();done();toast(id?'Changes saved':'Record added');};
- d.showModal();
+
+function kids(name, id) {
+  const entity = ENT[name];
+  const record = data(name).find((item) => item.id == id);
+  const childName = entity.kid;
+  const parentValue = record[entity.kk];
+  const dialog = $("#dlg2");
+
+  dialog.innerHTML = `
+    <div class="head">
+      <div>
+        <h2>${ENT[childName].t}</h2>
+        <p style="margin:0;color:var(--mu)">For <b>${esc(parentValue)}</b></p>
+      </div>
+      <button class="btn ghost sm" data-x>Close</button>
+    </div>
+    <div id="kb"></div>`;
+  draw(childName, $("#kb"), parentValue);
+  dialog.showModal();
 }
-for(const d of [$('#dlg'),$('#dlg2')])d.onclick=e=>{if(e.target===d||e.target.closest('[data-x]'))d.close()};
-let tt;function toast(t){document.querySelector('.toast')?.remove();const n=document.createElement('div');n.className='toast';n.setAttribute('role','status');n.textContent=t;document.body.appendChild(n);clearTimeout(tt);tt=setTimeout(()=>n.remove(),2600)}
-document.addEventListener('keydown',e=>{if(e.key=='Escape')document.body.classList.remove('nv')});
-$('#dlg2').onclose=()=>route();
+
+function form(name, id, parentValue, done) {
+  const entity = ENT[name];
+  const records = data(name);
+  const record = id ? records.find((item) => item.id == id) : {};
+  const dialog = $("#dlg");
+  dialog.removeAttribute("aria-labelledby");
+  dialog.removeAttribute("aria-describedby");
+
+  const isLocked = (field) => id && (field.u || (entity.uk || []).includes(field.k));
+  const input = (field) => {
+    if (field.h) return "";
+
+    const value = record[field.k] ?? "";
+    const disabled = isLocked(field) ? "disabled" : "";
+    if (field.o) {
+      return `<label>${field.l}<select name="${field.k}" ${disabled}>${field
+        .o()
+        .map(
+          (option) =>
+            `<option value="${esc(option[0])}" ${option[0] == value ? "selected" : ""}>${esc(option[1])}</option>`,
+        )
+        .join("")}</select></label>`;
+    }
+
+    return `<label>${field.l}<input name="${field.k}" type="${field.type || "text"}" ${field.type == "number" ? 'step="0.01" min="0"' : ""} value="${esc(value)}" ${field.opt ? "" : "required"} ${disabled}></label>`;
+  };
+
+  dialog.innerHTML = `
+    <h2>${id ? "Edit" : "Add"}: ${entity.t}</h2>
+    <form>
+      ${entity.f.map(input).join("")}
+      <p class="err" id="ferr"></p>
+      <div class="row">
+        <button class="btn">Save</button>
+        <button type="button" class="btn ghost" data-x>Cancel</button>
+      </div>
+    </form>`;
+
+  const formElement = dialog.querySelector("form");
+  formElement.onsubmit = (event) => {
+    event.preventDefault();
+    const values = {};
+
+    entity.f.forEach((field) => {
+      if (field.h) {
+        values[field.k] = parentValue;
+      } else if (isLocked(field)) {
+        values[field.k] = record[field.k];
+      } else {
+        const value = String(formElement.elements[field.k].value).trim();
+        values[field.k] = field.type == "number" ? parseFloat(value) : value;
+      }
+    });
+
+    const invalid = entity.f.some(
+      (field) =>
+        !field.opt &&
+        (values[field.k] === "" || Number.isNaN(values[field.k]) || values[field.k] == null),
+    );
+    const showError = (message) => {
+      $("#ferr").textContent = message;
+    };
+
+    if (invalid) return showError("Fill in every required field.");
+    if (
+      entity.f.some((field) =>
+        field.u &&
+        records.some(
+          (item) =>
+            item.id != id &&
+            String(item[field.k]).toLowerCase() == String(values[field.k]).toLowerCase(),
+        ),
+      )
+    ) {
+      return showError("That code already exists.");
+    }
+    if (
+      entity.uk &&
+      records.some(
+        (item) =>
+          item.id != id && !item.del && entity.uk.every((key) => item[key] == values[key]),
+      )
+    ) {
+      return showError("That combination already exists. Edit the existing row instead.");
+    }
+
+    if (id) {
+      Object.assign(record, values, { stamp: stamp("EDITED") });
+    } else {
+      records.push({ id: "n" + Date.now(), del: false, stamp: stamp("CREATED"), ...values });
+    }
+
+    put(name, records);
+    dialog.close();
+    done();
+    toast(id ? "Changes saved" : "Record added");
+  };
+  dialog.showModal();
+}
+
+for (const dialog of [$("#dlg"), $("#dlg2")]) {
+  dialog.onclick = (event) => {
+    if (event.target === dialog || event.target.closest("[data-x]")) dialog.close();
+  };
+}
+
+let tt;
+function toast(message) {
+  document.querySelector(".toast")?.remove();
+  const element = document.createElement("div");
+  element.className = "toast";
+  element.setAttribute("role", "status");
+  element.textContent = message;
+  document.body.appendChild(element);
+  clearTimeout(tt);
+  tt = setTimeout(() => element.remove(), 2600);
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key == "Escape") document.body.classList.remove("nv");
+});
+$("#dlg2").onclose = () => route();
 
 /* ---------- reports ---------- */
-const R={r:'cust',from:'',to:'',n:10};
-function reports(el){
- const defs={cust:'Top customers',prod:'Top products',master:'Product master',emp:'Active employees',empall:'All employees'};
- const ranged=['cust','prod'].includes(R.r);
- const sales=act('sales').filter(s=>(!R.from||s.date>=R.from)&&(!R.to||s.date<=R.to));
- const lines=act('lines');let h=[],rows=[];
- if(R.r=='cust'){const m={};sales.forEach(s=>lines.filter(l=>l.trans==s.no).forEach(l=>m[s.cust]=(m[s.cust]||0)+lineAmt(l)));
-  h=['Rank','Customer','Total sales'];rows=Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,R.n).map(([c,t],i)=>[i+1,nm('customers','no',c,'name'),money(t)])}
- else if(R.r=='prod'){const m={};sales.forEach(s=>lines.filter(l=>l.trans==s.no).forEach(l=>{const o=m[l.prod]||(m[l.prod]={q:0,a:0});o.q+=l.qty;o.a+=lineAmt(l)}));
-  h=['Rank','Product','Qty sold','Amount'];rows=Object.entries(m).sort((a,b)=>b[1].a-a[1].a).slice(0,R.n).map(([c,o],i)=>[i+1,nm('products','code',c,'desc'),o.q,money(o.a)])}
- else if(R.r=='master'){h=['Code','Description','Unit','Current price'];rows=act('products').map(p=>[p.code,p.desc,p.unit,money(price(p.code))])}
- else{h=['Emp no','Name','Hired','Separated'];rows=act('employees').filter(e=>R.r=='empall'||!e.sep).map(e=>[e.no,e.first+' '+e.last,e.hire,e.sep||'—'])}
- el.innerHTML=`<div class="head"><h2>Reports</h2><button class="btn sm noprint" data-r="print">Print or save as PDF</button></div>
- <div class="sub">${Object.entries(defs).map(([k,l])=>`<button data-r="${k}" class="${R.r==k?'on':''}">${l}</button>`).join('')}</div>
- ${ranged?`<div class="tools noprint" style="margin-bottom:14px"><label style="margin:0">From <input type="date" data-f="from" value="${R.from}"></label><label style="margin:0">To <input type="date" data-f="to" value="${R.to}"></label><label style="margin:0">Top <input type="number" min="1" max="100" data-f="n" value="${R.n}" style="width:80px"></label></div>`:''}
- <div class="tw"><table><thead><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${h.length}" class="empty">No data for this report yet.</td></tr>`}</tbody></table></div>`;
- el.onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;if(b.dataset.r=='print')return print();R.r=b.dataset.r;reports(el)};
- el.onchange=e=>{const k=e.target.dataset.f;if(!k)return;R[k]=k=='n'?(parseInt(e.target.value)||10):e.target.value;reports(el)};
+const R = { r: "cust", from: "", to: "", n: 10 };
+function reports(element) {
+  const definitions = {
+    cust: "Top customers",
+    prod: "Top products",
+    master: "Product master",
+    emp: "Active employees",
+    empall: "All employees",
+  };
+  const ranged = ["cust", "prod"].includes(R.r);
+  const sales = act("sales").filter(
+    (sale) => (!R.from || sale.date >= R.from) && (!R.to || sale.date <= R.to),
+  );
+  const lines = act("lines");
+  let headers = [];
+  let rows = [];
+
+  if (R.r == "cust") {
+    const totals = {};
+    sales.forEach((sale) => {
+      lines
+        .filter((line) => line.trans == sale.no)
+        .forEach((line) => {
+          totals[sale.cust] = (totals[sale.cust] || 0) + lineAmt(line);
+        });
+    });
+    headers = ["Rank", "Customer", "Total sales"];
+    rows = Object.entries(totals)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, R.n)
+      .map(([customer, total], index) => [
+        index + 1,
+        nm("customers", "no", customer, "name"),
+        money(total),
+      ]);
+  } else if (R.r == "prod") {
+    const totals = {};
+    sales.forEach((sale) => {
+      lines
+        .filter((line) => line.trans == sale.no)
+        .forEach((line) => {
+          const product = totals[line.prod] || (totals[line.prod] = { q: 0, a: 0 });
+          product.q += line.qty;
+          product.a += lineAmt(line);
+        });
+    });
+    headers = ["Rank", "Product", "Qty sold", "Amount"];
+    rows = Object.entries(totals)
+      .sort((a, b) => b[1].a - a[1].a)
+      .slice(0, R.n)
+      .map(([code, product], index) => [
+        index + 1,
+        nm("products", "code", code, "desc"),
+        product.q,
+        money(product.a),
+      ]);
+  } else if (R.r == "master") {
+    headers = ["Code", "Description", "Unit", "Current price"];
+    rows = act("products").map((product) => [
+      product.code,
+      product.desc,
+      product.unit,
+      money(price(product.code)),
+    ]);
+  } else {
+    headers = ["Emp no", "Name", "Hired", "Separated"];
+    rows = act("employees")
+      .filter((employee) => R.r == "empall" || !employee.sep)
+      .map((employee) => [
+        employee.no,
+        employee.first + " " + employee.last,
+        employee.hire,
+        employee.sep || "—",
+      ]);
+  }
+
+  element.innerHTML = `
+    <div class="head">
+      <h2>Reports</h2>
+      <button class="btn sm noprint" data-r="print">Print or save as PDF</button>
+    </div>
+    <div class="sub">
+      ${Object.entries(definitions)
+        .map(
+          ([key, label]) =>
+            `<button data-r="${key}" class="${R.r == key ? "on" : ""}">${label}</button>`,
+        )
+        .join("")}
+    </div>
+    ${ranged ? `
+      <div class="tools noprint" style="margin-bottom:14px">
+        <label style="margin:0">From <input type="date" data-f="from" value="${R.from}"></label>
+        <label style="margin:0">To <input type="date" data-f="to" value="${R.to}"></label>
+        <label style="margin:0">Top <input type="number" min="1" max="100" data-f="n" value="${R.n}" style="width:80px"></label>
+      </div>` : ""}
+    <div class="tw">
+      <table>
+        <thead><tr>${headers.map((header) => `<th>${header}</th>`).join("")}</tr></thead>
+        <tbody>
+          ${rows.length
+            ? rows.map((row) => `<tr>${row.map((value) => `<td>${esc(value)}</td>`).join("")}</tr>`).join("")
+            : `<tr><td colspan="${headers.length}" class="empty">No data for this report yet.</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+
+  element.onclick = (event) => {
+    const button = event.target.closest("[data-r]");
+    if (!button) return;
+    if (button.dataset.r == "print") return print();
+    R.r = button.dataset.r;
+    reports(element);
+  };
+  element.onchange = (event) => {
+    const key = event.target.dataset.f;
+    if (!key) return;
+    R[key] = key == "n" ? parseInt(event.target.value) || 10 : event.target.value;
+    reports(element);
+  };
 }
 
 /* ---------- users ---------- */
@@ -539,7 +1071,6 @@ function usersView(el){
  const grp=u=>u.status=='blocked'||u.status=='disapproved'?'blocked':u.status;
  const cnt=k=>k=='all'?vis.length:vis.filter(u=>grp(u)==k).length;
  const list=vis.filter(u=>UF.f=='all'||grp(u)==UF.f);
- const ini=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
  const so=(v,opts,dis,cls,labelText)=>`<select class="sel ${cls||''}" aria-label="${esc(labelText)}" ${dis?'disabled':''}>${opts.map(o=>`<option ${o==v?'selected':''}>${o}</option>`).join('')}</select>`;
  const row=u=>{const me=u.email==U.email,lock=me||(!sup&&u.role!='user'),e=esc(u.email);
   const rb=u.role=='user'?`<button data-a="rights" data-e="${e}">Rights</button>`:'';
@@ -548,7 +1079,7 @@ function usersView(el){
    :u.status=='active'?`<button class="d" data-a="blocked" data-e="${e}">Block</button>`
    :`<button class="k" data-a="active" data-e="${e}">Reactivate</button>`);
   const hid=UF.q&&!(u.name+' '+u.email).toLowerCase().includes(UF.q)?'hidden':'';
-  return `<tr data-e="${e}" ${hid}><td><div class="ucell"><span class="av">${esc(ini(u.name))}</span><div><b>${esc(u.name)}</b><small>${e}</small></div></div></td>
+  return `<tr data-e="${e}" ${hid}><td><div class="ucell"><label class="photo-slot" title="Upload profile photo for ${esc(u.name)}">${u.avatar?`<img src="${esc(u.avatar)}" alt="">`:''}<input type="file" data-photo="${e}" accept="image/*" aria-label="Upload profile photo for ${esc(u.name)}"></label><div><b>${esc(u.name)}</b><small>${e}</small></div></div></td>
   <td data-k="role">${so(u.role,['user','admin','superadmin'],!sup||me,'',`Change role for ${u.name}`)}</td>
   <td data-k="status">${so(u.status,['active','pending','blocked','disapproved'],lock,'s-'+u.status,`Change status for ${u.name}`)}</td>
   <td>${u.role=='user'?`<span class="rcount">${u.mods.length} of ${Object.keys(MODS).length} modules</span>`:'<span class="allm">All modules</span>'}</td>
@@ -558,7 +1089,18 @@ function usersView(el){
   <div class="tools"><input type="search" id="uq" placeholder="Search name or email" value="${esc(UF.q)}" aria-label="Search users"></div></div>
  ${sup?'':'<p class="muted" style="margin:0 0 14px">Superadmin accounts are hidden.</p>'}
  <div class="tw"><table class="ut"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Modules</th><th style="text-align:right">Actions</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table>${list.length?'':'<div class="empty">No users in this view.</div>'}</div>`;
- el.onchange=e=>{const tr=e.target.closest('tr[data-e]');if(!tr)return;const all=users(),u=all.find(x=>x.email==tr.dataset.e);
+ el.onchange=e=>{
+  const photo=e.target.closest('input[type="file"][data-photo]');
+  if(photo){
+   const file=photo.files[0];if(!file)return;
+   if(!file.type.startsWith('image/')){toast('Choose an image file.');photo.value='';return}
+   if(file.size>1024*1024){toast('Choose an image smaller than 1 MB.');photo.value='';return}
+   const reader=new FileReader();
+   reader.onload=()=>{const all=users(),u=all.find(x=>x.email==photo.dataset.photo);if(!u)return;u.avatar=reader.result;saveUsers(all);usersView(el);toast('Profile photo saved')};
+   reader.onerror=()=>toast('Could not read that image. Try another file.');
+   reader.readAsDataURL(file);return;
+  }
+  const tr=e.target.closest('tr[data-e]');if(!tr)return;const all=users(),u=all.find(x=>x.email==tr.dataset.e);
   const k=e.target.closest('[data-k]');if(!k)return;
   if(k.dataset.k=='role'&&e.target.value!='user'&&!confirm('Give '+u.name+' the '+e.target.value+' role? They will see every module.'))return usersView(el);
   u[k.dataset.k]=e.target.value;saveUsers(all);usersView(el);toast('User updated')};
@@ -619,40 +1161,201 @@ function openApp(u){U=u;$('#land').hidden=true;$('#app').hidden=false;$('#un').t
 $('#out').onclick=async()=>{if(sb)await sb.auth.signOut();U=null;V.mod='overview';$('#app').hidden=true;$('#land').hidden=false;say('')};
 
 /* ---------- auth ---------- */
-let sb=null;
-if(CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY&&window.supabase)sb=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);else $('#demo').hidden=false;
-const say=(t,k)=>{const m=$('#msg');m.textContent=t||'';m.className='msg '+(k||'')};
-const FM={login:'f-login',reg:'f-reg',reset:'f-reset',newpass:'f-newpass'};
-function show(v){for(const[k,id]of Object.entries(FM))$('#'+id).hidden=k!=v;$('#atabs').hidden=v=='reset'||v=='newpass';document.querySelectorAll('#atabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v==v));const copy={login:['Welcome back','Sign in to your workspace to continue.'],reg:['Create your account','Register with your work email. An administrator will review your request.'],reset:['Reset your password','Enter your work email and we will send a secure reset link.'],newpass:['Set a new password','Choose a new password to finish recovering your account.']}[v];$('#auth-title').textContent=copy[0];$('#auth-subtitle').textContent=copy[1];say('')}
-document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{show(b.dataset.go);$('#authcard').scrollIntoView({behavior:'smooth',block:'center'});$('#authcard input').focus()}));
-document.querySelectorAll('[data-v]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.v)));
-$('#atabs').onkeydown=e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;const tabs=[...$('#atabs').querySelectorAll('[role="tab"]')],current=tabs.indexOf(document.activeElement),next=e.key=='Home'?0:e.key=='End'?tabs.length-1:(current+(e.key=='ArrowRight'?1:-1)+tabs.length)%tabs.length;e.preventDefault();tabs[next].focus();tabs[next].click()};
-function enter(email,fromSb){
- const all=users();let u=all.find(x=>x.email==email.toLowerCase());
- if(!u){if(!fromSb)return say('No account found for that email. Register first.','err');
-  u={email:email.toLowerCase(),name:email.split('@')[0],role:'user',status:'pending',mods:[]};all.push(u);saveUsers(all)}
- const blocked={pending:'Your account is waiting for administrator approval.',blocked:'This account is blocked. Contact an administrator.',disapproved:'This registration was not approved.'}[u.status];
- if(blocked)return say(blocked,'err');
- openApp(u);
+let sb = null;
+if (CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY && window.supabase) {
+  sb = supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
+} else {
+  $("#demo").hidden = false;
 }
-document.querySelectorAll('input[type=password]').forEach(i=>{const w=document.createElement('span');w.className='pw';w.style.display='block';i.before(w);w.append(i);const b=document.createElement('button');b.type='button';b.textContent='Show';b.setAttribute('aria-label','Show password');b.onclick=()=>{const h=i.type=='password';i.type=h?'text':'password';b.textContent=h?'Hide':'Show';b.setAttribute('aria-label',h?'Hide password':'Show password')};w.append(b)});
-const guard=h=>async e=>{e.preventDefault();const b=e.target.querySelector('.btn');b.disabled=true;say('');try{await h()}catch(x){say(x.message||'Something went wrong. Try again.','err')}b.disabled=false};
-$('#f-login').onsubmit=guard(async()=>{const em=$('#l-e').value.trim();
- if(sb){const{error}=await sb.auth.signInWithPassword({email:em,password:$('#l-p').value});if(error)throw error}
- enter(em,!!sb)});
-$('#f-reg').onsubmit=guard(async()=>{const em=$('#r-e').value.trim().toLowerCase(),nmv=$('#r-n').value.trim();
- if(users().some(u=>u.email==em))throw new Error('An account with this email already exists. Sign in instead.');
- if(sb){const{error}=await sb.auth.signUp({email:em,password:$('#r-p').value,options:{data:{full_name:nmv},emailRedirectTo:location.href.split('#')[0]}});if(error)throw error}
- const all=users();all.push({email:em,name:nmv,role:'user',status:'pending',mods:[]});saveUsers(all);
- $('#f-reg').reset();show('login');say('Registration received. An administrator must approve your account before you can sign in.','ok')});
-$('#f-reset').onsubmit=guard(async()=>{const em=$('#p-e').value.trim();
- if(sb){const{error}=await sb.auth.resetPasswordForEmail(em,{redirectTo:location.href.split('#')[0]});if(error)throw error}
- say('If that email has an account, a reset link is on its way.','ok')});
-$('#f-newpass').onsubmit=guard(async()=>{const{error}=await sb.auth.updateUser({password:$('#n-p').value});if(error)throw error;
- say('Password updated. Opening the app…','ok');const{data}=await sb.auth.getSession();setTimeout(()=>enter(data.session.user.email,true),700)});
-if(sb){let rec=/type=recovery/.test(location.hash);
- sb.auth.onAuthStateChange(ev=>{if(ev=='PASSWORD_RECOVERY'){rec=true;show('newpass')}});
- sb.auth.getSession().then(({data})=>{if(rec)show('newpass');else if(data.session)enter(data.session.user.email,true)})}
+
+const say = (text, kind) => {
+  const message = $("#msg");
+  message.textContent = text || "";
+  message.className = "msg " + (kind || "");
+};
+const FM = {
+  login: "f-login",
+  reg: "f-reg",
+  reset: "f-reset",
+  newpass: "f-newpass",
+};
+
+function show(view) {
+  for (const [key, id] of Object.entries(FM)) {
+    $("#" + id).hidden = key != view;
+  }
+  $("#atabs").hidden = view == "reset" || view == "newpass";
+  document.querySelectorAll("#atabs button").forEach((button) => {
+    button.setAttribute("aria-selected", button.dataset.v == view);
+  });
+
+  const copy = {
+    login: ["Welcome back", "Sign in to your workspace to continue."],
+    reg: ["Create your account", "Register with your work email. An administrator will review your request."],
+    reset: ["Reset your password", "Enter your work email and we will send a secure reset link."],
+    newpass: ["Set a new password", "Choose a new password to finish recovering your account."],
+  }[view];
+  $("#auth-title").textContent = copy[0];
+  $("#auth-subtitle").textContent = copy[1];
+  say("");
+}
+
+document.querySelectorAll("[data-go]").forEach((button) => {
+  button.addEventListener("click", () => {
+    show(button.dataset.go);
+    $("#authcard").scrollIntoView({ behavior: "smooth", block: "center" });
+    $("#authcard input").focus();
+  });
+});
+document.querySelectorAll("[data-v]").forEach((button) => {
+  button.addEventListener("click", () => show(button.dataset.v));
+});
+$("#atabs").onkeydown = (event) => {
+  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+  const tabs = [...$("#atabs").querySelectorAll('[role="tab"]')];
+  const current = tabs.indexOf(document.activeElement);
+  const next =
+    event.key == "Home"
+      ? 0
+      : event.key == "End"
+        ? tabs.length - 1
+        : (current + (event.key == "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+  event.preventDefault();
+  tabs[next].focus();
+  tabs[next].click();
+};
+
+function enter(email, fromSupabase) {
+  const allUsers = users();
+  let user = allUsers.find((item) => item.email == email.toLowerCase());
+  if (!user) {
+    if (!fromSupabase) return say("No account found for that email. Register first.", "err");
+    user = {
+      email: email.toLowerCase(),
+      name: email.split("@")[0],
+      role: "user",
+      status: "pending",
+      mods: [],
+    };
+    allUsers.push(user);
+    saveUsers(allUsers);
+  }
+
+  const blockedMessage = {
+    pending: "Your account is waiting for administrator approval.",
+    blocked: "This account is blocked. Contact an administrator.",
+    disapproved: "This registration was not approved.",
+  }[user.status];
+  if (blockedMessage) return say(blockedMessage, "err");
+  openApp(user);
+}
+
+document.querySelectorAll('input[type="password"]').forEach((input) => {
+  const wrapper = document.createElement("span");
+  wrapper.className = "pw";
+  wrapper.style.display = "block";
+  input.before(wrapper);
+  wrapper.append(input);
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = "Show";
+  button.setAttribute("aria-label", "Show password");
+  button.onclick = () => {
+    const showPassword = input.type == "password";
+    input.type = showPassword ? "text" : "password";
+    button.textContent = showPassword ? "Hide" : "Show";
+    button.setAttribute("aria-label", showPassword ? "Hide password" : "Show password");
+  };
+  wrapper.append(button);
+});
+
+const guard = (handler) => async (event) => {
+  event.preventDefault();
+  const button = event.target.querySelector(".btn");
+  button.disabled = true;
+  say("");
+  try {
+    await handler();
+  } catch (error) {
+    say(error.message || "Something went wrong. Try again.", "err");
+  }
+  button.disabled = false;
+};
+
+$("#f-login").onsubmit = guard(async () => {
+  const email = $("#l-e").value.trim();
+  if (sb) {
+    const { error } = await sb.auth.signInWithPassword({
+      email,
+      password: $("#l-p").value,
+    });
+    if (error) throw error;
+  }
+  enter(email, !!sb);
+});
+
+$("#f-reg").onsubmit = guard(async () => {
+  const email = $("#r-e").value.trim().toLowerCase();
+  const name = $("#r-n").value.trim();
+  if (users().some((user) => user.email == email)) {
+    throw new Error("An account with this email already exists. Sign in instead.");
+  }
+  if (sb) {
+    const { error } = await sb.auth.signUp({
+      email,
+      password: $("#r-p").value,
+      options: {
+        data: { full_name: name },
+        emailRedirectTo: location.href.split("#")[0],
+      },
+    });
+    if (error) throw error;
+  }
+
+  const allUsers = users();
+  allUsers.push({ email, name, role: "user", status: "pending", mods: [] });
+  saveUsers(allUsers);
+  $("#f-reg").reset();
+  show("login");
+  say("Registration received. An administrator must approve your account before you can sign in.", "ok");
+});
+
+$("#f-reset").onsubmit = guard(async () => {
+  const email = $("#p-e").value.trim();
+  if (sb) {
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: location.href.split("#")[0],
+    });
+    if (error) throw error;
+  }
+  say("If that email has an account, a reset link is on its way.", "ok");
+});
+
+$("#f-newpass").onsubmit = guard(async () => {
+  const { error } = await sb.auth.updateUser({ password: $("#n-p").value });
+  if (error) throw error;
+  say("Password updated. Opening the app…", "ok");
+  const { data: sessionData } = await sb.auth.getSession();
+  setTimeout(() => enter(sessionData.session.user.email, true), 700);
+});
+
+if (sb) {
+  let recovery = /type=recovery/.test(location.hash);
+  sb.auth.onAuthStateChange((event) => {
+    if (event == "PASSWORD_RECOVERY") {
+      recovery = true;
+      show("newpass");
+    }
+  });
+  sb.auth.getSession().then(({ data: sessionData }) => {
+    if (recovery) {
+      show("newpass");
+    } else if (sessionData.session) {
+      enter(sessionData.session.user.email, true);
+    }
+  });
+}
 
 </script>
 </body>
