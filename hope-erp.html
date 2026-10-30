@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hope, Inc. ERP</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
 :root{--bg:#eef3fb;--pn:#fff;--gl:rgba(255,255,255,.8);--edge:rgba(255,255,255,.85);--ink:#101a2b;--mu:#66748a;--ln:rgba(16,26,43,.09);
@@ -164,6 +164,115 @@ td select{padding:6px 12px;width:auto;border-radius:999px}
  .mbar{display:flex;align-items:center;gap:12px;padding:12px 14px 0}.mbar .brand{font-size:15px}
  .pagehead{padding:22px 18px 4px}#view{padding:14px 14px 40px}.tools input{width:100%}}
 @media print{.shell{display:block}.side,.mbar,.scrim,.tools,.sub,.noprint,.pagehead{display:none!important}body{background:#fff;color:#000}.tw{box-shadow:none;border:1px solid #ccc}}
+:root{color-scheme:light;--bg:#f4f6f1;--pn:#fff;--gl:rgba(255,255,255,.92);--edge:#e1e7df;--ink:#172a24;--mu:#69766f;--ln:#dce3dc;--ac:#315b48;--ach:#234536;--ai:#fff;--wr:#b5533b;--soft:#e8efe7;--seg:#eef1ec;--sb:#234536;--sbi:#d9e7dc;--ring:rgba(49,91,72,.38);--btn:linear-gradient(180deg,#386d54,#315b48);--btnh:linear-gradient(180deg,#315b48,#234536);--btns:0 2px 6px rgba(35,69,54,.18);--sh:0 1px 2px rgba(23,42,36,.04),0 8px 24px rgba(23,42,36,.06);--shs:0 1px 3px rgba(23,42,36,.08);--page:radial-gradient(800px 460px at 5% -8%,rgba(190,211,187,.36),transparent 62%),radial-gradient(600px 420px at 100% 0%,rgba(237,195,169,.2),transparent 62%),#f4f6f1;--f:"DM Sans",sans-serif}
+body{background:var(--page) fixed}
+.brand{letter-spacing:0}
+.dot{background:#315b48;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.intro{border-radius:8px;background:linear-gradient(180deg,rgba(18,43,32,.16),rgba(18,43,32,.24) 38%,rgba(18,43,32,.86)),url("https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1800&q=88") center/cover}
+.intro h1{font-family:"Newsreader",Georgia,serif;font-size:clamp(40px,5vw,66px);font-weight:500;letter-spacing:0;line-height:1;max-width:12ch}
+.intro .lead{color:rgba(255,255,255,.82)}
+.mods li{border-radius:5px;background:rgba(18,43,32,.42);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);backdrop-filter:blur(8px)}
+.sun{display:none}
+.card{border-radius:8px;background:var(--pn);border-color:var(--edge);backdrop-filter:none;box-shadow:0 12px 36px rgba(23,42,36,.08)}
+.tabs{border-radius:5px;background:#eef1ec}
+.tabs button,.tabs button[aria-selected=true]{border-radius:4px}
+.btn{border-radius:5px;box-shadow:var(--btns)}
+.btn.ghost{box-shadow:inset 0 0 0 1px var(--ln)}
+.lnk{color:var(--ac)}
+input,select{border-radius:5px;background:#fff}
+input[type=search]{border-radius:5px;background-color:#fff}
+.shell{background:transparent}
+.side{background:#fff;border-right:1px solid var(--ln);backdrop-filter:none}
+#tabs button{border-radius:5px}
+#tabs button.on{background:#315b48;box-shadow:none}
+.me{border-radius:5px;background:#f4f6f1;box-shadow:none}
+.av{border-radius:5px;background:#e8efe7;color:#315b48}
+.pill,.b,.allm{border-radius:4px}
+.pagehead h1{font-family:"Newsreader",Georgia,serif;font-weight:500;letter-spacing:0}
+.seg{border-radius:5px;background:#eef1ec}
+.seg button,.seg button.on{border-radius:4px}
+.sub button{border-radius:5px;box-shadow:inset 0 0 0 1px var(--ln)}
+.sub button.on{background:#315b48;color:#fff}
+.stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px}
+.stat{border-radius:6px;border-color:var(--ln);background:#fff;box-shadow:var(--sh)}
+.stat:hover{transform:translateY(-1px)}
+.si{border-radius:5px;background:#e8efe7;color:#315b48}
+.tw{border-radius:6px;border-color:var(--ln);background:#fff;box-shadow:var(--sh)}
+th{background:#f7f8f5}
+.acts button{border-radius:4px;box-shadow:inset 0 0 0 1px var(--ln)}
+.acts .k{color:#315b48;background:#e8efe7;box-shadow:none}
+dialog{border-radius:8px;border-color:var(--ln);box-shadow:0 24px 60px rgba(23,42,36,.22)}
+dialog::backdrop{background:rgba(23,42,36,.42)}
+.sel{border-radius:5px;box-shadow:none}
+.chip{border-radius:5px}
+.toast{border-radius:5px;background:#234536;color:#fff}
+@media(max-width:860px){.intro{min-height:500px}.mods{margin-bottom:0}.card{padding:24px}.side{border-radius:0 6px 6px 0}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important}}
+@media print{body{background:#fff;color:#000}.tw{box-shadow:none}}
+:root{color-scheme:light;--bg:#f3f6fc;--pn:#fff;--gl:#fff;--edge:#dce5f1;--ink:#17263d;--mu:#62728a;--ln:#dbe4f0;--ac:#2463c4;--ach:#184b9e;--ai:#fff;--wr:#b54740;--soft:#eaf1fb;--seg:#edf2f8;--sb:#143460;--sbi:#d8e6f8;--ring:rgba(36,99,196,.4);--btn:#2463c4;--btnh:#184b9e;--btns:0 2px 6px rgba(24,75,158,.18);--sh:0 1px 2px rgba(23,38,61,.04),0 8px 24px rgba(23,38,61,.06);--shs:0 1px 3px rgba(23,38,61,.1);--page:linear-gradient(135deg,#f8faff 0%,#f0f5fc 54%,#f6f7fa 100%);--f:"DM Sans",sans-serif;--accent:#d77d62;--ok:#16745a;--wn:#9b650c}
+body{background:var(--page) fixed}
+.brand{letter-spacing:0}
+.dot{background:#2463c4;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.intro{border-radius:8px;background:linear-gradient(180deg,rgba(13,40,78,.16),rgba(13,40,78,.36) 38%,rgba(13,40,78,.88)),url("https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1800&q=88") center/cover}
+.intro h1,.pagehead h1,.authheading h2{font-family:"Newsreader",Georgia,serif;font-weight:500;letter-spacing:0}
+.intro h1{font-size:56px;line-height:1;max-width:12ch}
+.intro .lead{color:rgba(255,255,255,.84)}
+.mods li{border-radius:5px;background:rgba(13,40,78,.48);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);backdrop-filter:blur(8px)}
+.sun{display:none}
+.card{border-radius:8px;background:#fff;border-color:var(--edge);backdrop-filter:none;box-shadow:0 14px 38px rgba(23,38,61,.1)}
+.authheading{margin-bottom:22px}
+.authheading .eyebrow{margin:0 0 8px;color:var(--ac);font-size:11px;font-weight:700;text-transform:uppercase}
+.authheading h2{font-size:34px;line-height:1.04;color:var(--ink)}
+.authheading p:last-child{margin:8px 0 0;color:var(--mu);font-size:14px;line-height:1.55}
+.tabs{border-radius:5px;background:#edf2f8}
+.tabs button,.tabs button[aria-selected=true]{border-radius:4px}
+.tabs button[aria-selected=true]{background:#2463c4;color:#fff}
+.btn{min-height:42px;border-radius:5px;background:var(--btn);box-shadow:var(--btns);transition:background .15s,transform .12s}
+.btn:hover{background:var(--btnh)}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ln)}
+.btn.ghost:hover{background:var(--soft)}
+.lnk{color:var(--ac)}
+input,select{min-height:44px;border-radius:5px;background:#fff}
+input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(36,99,196,.12)}
+input[type=search]{min-height:42px;border-radius:5px;background-color:#fff}
+.msg.err,.err{color:var(--wr)}
+.msg.ok{color:var(--ok)}
+.note{border-radius:5px;background:#eef4fd;color:#465b76}
+.shell{background:transparent}
+.side{background:#fff;border-right:1px solid var(--ln);backdrop-filter:none}
+#tabs button{border-radius:5px}
+#tabs button.on{background:#2463c4;box-shadow:none}
+.me{border-radius:6px;background:#f4f7fc;box-shadow:none}
+.av{border-radius:5px;background:#eaf1fb;color:#184b9e}
+.pill,.b,.allm{border-radius:4px}
+.pagehead h1{font-size:36px}
+.seg{border-radius:5px;background:#edf2f8}
+.seg button,.seg button.on{border-radius:4px}
+.seg button.on{background:#fff;color:#17263d}
+.sub button{border-radius:5px;box-shadow:inset 0 0 0 1px var(--ln)}
+.sub button.on{background:#184b9e;color:#fff}
+.sub button:nth-child(2)::before{background:#4f8be3}.sub button:nth-child(3)::before{background:#d77d62}.sub button:nth-child(4)::before{background:#2c9b9b}.sub button:nth-child(5)::before{background:#8aa6cd}
+.stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px}
+.stat{border-radius:6px;border-color:var(--ln);background:#fff;box-shadow:var(--sh)}
+.stat:hover{transform:translateY(-1px)}
+.si{border-radius:5px;background:#eaf1fb;color:#2463c4}
+.tw{border-radius:6px;border-color:var(--ln);background:#fff;box-shadow:var(--sh)}
+th{background:#f6f8fc}
+.acts button{min-height:34px;border-radius:4px;box-shadow:inset 0 0 0 1px var(--ln)}
+.acts .k{color:#184b9e;background:#eaf1fb;box-shadow:none}
+.acts .d{color:#a63f39}
+dialog{border-radius:8px;border-color:var(--ln);box-shadow:0 24px 60px rgba(23,38,61,.24)}
+dialog::backdrop{background:rgba(17,35,62,.48);backdrop-filter:blur(3px)}
+.sel{min-height:38px;border-radius:5px;box-shadow:none}
+.sel.s-active{color:#12684f;background-color:#e8f4ef}
+.sel.s-pending{color:#895a0b;background-color:#fff4dc}
+.sel.s-blocked,.sel.s-disapproved{color:#a63f39;background-color:#fbecea}
+.chip{border-radius:5px}
+.chip:has(input:checked){background:#eaf1fb;color:#184b9e;border-color:rgba(36,99,196,.35)}
+.toast{border-radius:5px;background:#143460;color:#fff}
+@media(max-width:860px){.intro{min-height:500px}.intro h1{font-size:42px}.mods{margin-bottom:0}.card{padding:24px}.side{border-radius:0 6px 6px 0}.pagehead h1{font-size:32px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important}}
+@media print{body{background:#fff;color:#000}.tw{box-shadow:none}}
 </style>
 </head>
 <body>
@@ -180,9 +289,10 @@ td select{padding:6px 12px;width:auto;border-radius:999px}
   </aside>
   <section class="auth">
    <div class="card" id="authcard">
-    <div class="tabs" id="atabs" role="tablist"><button role="tab" data-v="login" aria-selected="true">Sign in</button><button role="tab" data-v="reg" aria-selected="false">Register</button></div>
-    <form id="f-login"><label>Email<input id="l-e" type="email" required autocomplete="email"></label><label>Password<input id="l-p" type="password" required autocomplete="current-password"></label><button class="btn full">Sign in</button><button type="button" class="lnk" data-v="reset">Forgot your password?</button></form>
-    <form id="f-reg" hidden><label>Full name<input id="r-n" required autocomplete="name"></label><label>Work email<input id="r-e" type="email" required></label><label>Password<input id="r-p" type="password" minlength="8" required autocomplete="new-password"></label><p class="hint">Use at least 8 characters.</p><button class="btn full">Create account</button></form>
+    <div class="authheading"><p class="eyebrow">Hope team workspace</p><h2 id="auth-title">Welcome back</h2><p id="auth-subtitle">Sign in to your workspace to continue.</p></div>
+    <div class="tabs" id="atabs" role="tablist" aria-label="Account access"><button id="tab-login" role="tab" aria-controls="f-login" data-v="login" aria-selected="true">Sign in</button><button id="tab-register" role="tab" aria-controls="f-reg" data-v="reg" aria-selected="false">Register</button></div>
+    <form id="f-login" role="tabpanel" aria-labelledby="tab-login"><label>Email<input id="l-e" type="email" required autocomplete="email"></label><label>Password<input id="l-p" type="password" required autocomplete="current-password"></label><button class="btn full">Sign in</button><button type="button" class="lnk" data-v="reset">Forgot your password?</button></form>
+    <form id="f-reg" role="tabpanel" aria-labelledby="tab-register" hidden><label>Full name<input id="r-n" required autocomplete="name"></label><label>Work email<input id="r-e" type="email" required autocomplete="email"></label><label>Password<input id="r-p" type="password" minlength="8" required autocomplete="new-password"></label><p class="hint">Use at least 8 characters.</p><button class="btn full">Create account</button></form>
     <form id="f-reset" hidden><label>Account email<input id="p-e" type="email" required></label><button class="btn full">Send reset link</button><button type="button" class="lnk" data-v="login">Back to sign in</button></form>
     <form id="f-newpass" hidden><label>New password (8+ characters)<input id="n-p" type="password" minlength="8" required autocomplete="new-password"></label><button class="btn full">Save new password</button></form>
     <div class="msg" id="msg" role="status" aria-live="polite"></div>
@@ -292,6 +402,7 @@ function kids(n,id){
 }
 function form(n,id,pv,done){
  const E=ENT[n],all=data(n),r=id?all.find(x=>x.id==id):{},d=$('#dlg');
+ d.removeAttribute('aria-labelledby');d.removeAttribute('aria-describedby');
  const lock=f=>id&&(f.u||(E.uk||[]).includes(f.k));
  const inp=f=>{if(f.h)return'';const v=r[f.k]??'',dis=lock(f)?'disabled':'';
   if(f.o)return`<label>${f.l}<select name="${f.k}" ${dis}>${f.o().map(o=>`<option value="${esc(o[0])}" ${o[0]==v?'selected':''}>${esc(o[1])}</option>`).join('')}</select></label>`;
@@ -345,7 +456,7 @@ function usersView(el){
  const cnt=k=>k=='all'?vis.length:vis.filter(u=>grp(u)==k).length;
  const list=vis.filter(u=>UF.f=='all'||grp(u)==UF.f);
  const ini=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
- const so=(v,opts,dis,cls)=>`<select class="sel ${cls||''}" aria-label="Change" ${dis?'disabled':''}>${opts.map(o=>`<option ${o==v?'selected':''}>${o}</option>`).join('')}</select>`;
+ const so=(v,opts,dis,cls,labelText)=>`<select class="sel ${cls||''}" aria-label="${esc(labelText)}" ${dis?'disabled':''}>${opts.map(o=>`<option ${o==v?'selected':''}>${o}</option>`).join('')}</select>`;
  const row=u=>{const me=u.email==U.email,lock=me||(!sup&&u.role!='user'),e=esc(u.email);
   const rb=u.role=='user'?`<button data-a="rights" data-e="${e}">Rights</button>`:'';
   const ab=lock?'<span class="muted">—</span>'
@@ -354,8 +465,8 @@ function usersView(el){
    :`<button class="k" data-a="active" data-e="${e}">Reactivate</button>`);
   const hid=UF.q&&!(u.name+' '+u.email).toLowerCase().includes(UF.q)?'hidden':'';
   return `<tr data-e="${e}" ${hid}><td><div class="ucell"><span class="av">${esc(ini(u.name))}</span><div><b>${esc(u.name)}</b><small>${e}</small></div></div></td>
-  <td data-k="role">${so(u.role,['user','admin','superadmin'],!sup||me)}</td>
-  <td data-k="status">${so(u.status,['active','pending','blocked','disapproved'],lock,'s-'+u.status)}</td>
+  <td data-k="role">${so(u.role,['user','admin','superadmin'],!sup||me,'',`Change role for ${u.name}`)}</td>
+  <td data-k="status">${so(u.status,['active','pending','blocked','disapproved'],lock,'s-'+u.status,`Change status for ${u.name}`)}</td>
   <td>${u.role=='user'?`<span class="rcount">${u.mods.length} of ${Object.keys(MODS).length} modules</span>`:'<span class="allm">All modules</span>'}</td>
   <td><div class="acts">${ab}</div></td></tr>`};
  el.innerHTML=`<div class="head"><h2>User management</h2>
@@ -378,9 +489,10 @@ function usersView(el){
 
 function rights(email){
  const all=users(),u=all.find(x=>x.email==email),d=$('#dlg');
- d.innerHTML=`<h2>Rights: ${esc(u.name)}</h2><p class="muted" style="margin:0 0 14px">Choose the modules this person can open.</p><form><div class="chips">${Object.entries(MODS).map(([k,l])=>`<label class="chip"><input type="checkbox" value="${k}" ${u.mods.includes(k)?'checked':''}>${l}</label>`).join('')}</div><div class="row"><button class="btn">Save rights</button><button type="button" class="btn ghost" data-x>Cancel</button></div></form>`;
+ d.setAttribute('aria-labelledby','rights-title');d.setAttribute('aria-describedby','rights-help');
+ d.innerHTML=`<h2 id="rights-title">Module access: ${esc(u.name)}</h2><p class="muted" id="rights-help" style="margin:0 0 14px">Select the modules this person is allowed to open.</p><form><div class="chips">${Object.entries(MODS).map(([k,l])=>`<label class="chip"><input type="checkbox" value="${k}" ${u.mods.includes(k)?'checked':''}>${l}</label>`).join('')}</div><div class="row"><button class="btn">Save access</button><button type="button" class="btn ghost" data-x>Cancel</button></div></form>`;
  d.querySelector('form').onsubmit=e=>{e.preventDefault();u.mods=[...d.querySelectorAll('input:checked')].map(x=>x.value);saveUsers(all);d.close();usersView($('#view'));toast('Rights saved')};
- d.showModal();
+ d.showModal();d.querySelector('input')?.focus();
 }
 /* ---------- overview + nav icons ---------- */
 const svg=p=>`<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
@@ -427,9 +539,10 @@ let sb=null;
 if(CFG.SUPABASE_URL&&CFG.SUPABASE_ANON_KEY&&window.supabase)sb=supabase.createClient(CFG.SUPABASE_URL,CFG.SUPABASE_ANON_KEY);else $('#demo').hidden=false;
 const say=(t,k)=>{const m=$('#msg');m.textContent=t||'';m.className='msg '+(k||'')};
 const FM={login:'f-login',reg:'f-reg',reset:'f-reset',newpass:'f-newpass'};
-function show(v){for(const[k,id]of Object.entries(FM))$('#'+id).hidden=k!=v;$('#atabs').hidden=v=='newpass';document.querySelectorAll('#atabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v==v));say('')}
+function show(v){for(const[k,id]of Object.entries(FM))$('#'+id).hidden=k!=v;$('#atabs').hidden=v=='reset'||v=='newpass';document.querySelectorAll('#atabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.v==v));const copy={login:['Welcome back','Sign in to your workspace to continue.'],reg:['Create your account','Register with your work email. An administrator will review your request.'],reset:['Reset your password','Enter your work email and we will send a secure reset link.'],newpass:['Set a new password','Choose a new password to finish recovering your account.']}[v];$('#auth-title').textContent=copy[0];$('#auth-subtitle').textContent=copy[1];say('')}
 document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{show(b.dataset.go);$('#authcard').scrollIntoView({behavior:'smooth',block:'center'});$('#authcard input').focus()}));
 document.querySelectorAll('[data-v]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.v)));
+$('#atabs').onkeydown=e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;const tabs=[...$('#atabs').querySelectorAll('[role="tab"]')],current=tabs.indexOf(document.activeElement),next=e.key=='Home'?0:e.key=='End'?tabs.length-1:(current+(e.key=='ArrowRight'?1:-1)+tabs.length)%tabs.length;e.preventDefault();tabs[next].focus();tabs[next].click()};
 function enter(email,fromSb){
  const all=users();let u=all.find(x=>x.email==email.toLowerCase());
  if(!u){if(!fromSb)return say('No account found for that email. Register first.','err');
