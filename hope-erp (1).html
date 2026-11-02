@@ -1,0 +1,2178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hope, Inc. ERP</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bg:#eef3fb;--pn:#fff;--gl:rgba(255,255,255,.8);--edge:rgba(255,255,255,.85);--ink:#101a2b;--mu:#66748a;--ln:rgba(16,26,43,.09);
+--ac:#1f63d8;--ach:#174fb4;--ai:#fff;--wr:#c8402a;--soft:#e6efff;--seg:rgba(16,26,43,.055);--sb:#0f2c6b;--sbi:#c9d7f2;--ring:rgba(31,99,216,.45);
+--btn:linear-gradient(180deg,#3a7df0,#1d5bd0);--btnh:linear-gradient(180deg,#2f72e6,#164fb8);--btns:0 6px 16px rgba(31,99,216,.28),inset 0 1px 0 rgba(255,255,255,.25);
+--sh:0 1px 2px rgba(18,42,96,.05),0 10px 28px rgba(18,42,96,.08);--shs:0 1px 2px rgba(18,42,96,.06),0 3px 10px rgba(18,42,96,.07);
+--page:radial-gradient(900px 520px at 6% -8%,rgba(110,170,255,.30),transparent 60%),radial-gradient(760px 520px at 100% 2%,rgba(150,210,255,.32),transparent 58%),linear-gradient(180deg,#f7faff,#edf2fa);
+--f:"Plus Jakarta Sans",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0b121c;--pn:#131f2e;--gl:rgba(19,31,46,.82);--edge:rgba(255,255,255,.08);--ink:#e8eff8;--mu:#8fa3ba;--ln:rgba(255,255,255,.09);
+--ac:#5b9bf5;--ach:#86b6f8;--ai:#07182e;--wr:#ff8f78;--soft:#1a2c44;--seg:rgba(255,255,255,.07);--sb:#0a1a38;--ring:rgba(106,174,255,.6);
+--btn:linear-gradient(180deg,#7db0fa,#5b9bf5);--btnh:linear-gradient(180deg,#9bc3fb,#7db0fa);--btns:0 6px 16px rgba(0,0,0,.35);
+--sh:0 1px 2px rgba(0,0,0,.3),0 10px 28px rgba(0,0,0,.35);--shs:0 1px 2px rgba(0,0,0,.3),0 3px 10px rgba(0,0,0,.3);
+--page:radial-gradient(900px 520px at 6% -8%,rgba(60,110,200,.28),transparent 60%),radial-gradient(760px 520px at 100% 2%,rgba(40,100,170,.25),transparent 58%),linear-gradient(180deg,#0d1522,#0a111b)}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--page) fixed;color:var(--ink);font:400 15px/1.5 var(--f)}
+button,input,select{font-family:inherit}
+h1,h2,h3{font-family:var(--f);margin:0;line-height:1.1}
+:focus-visible{outline:3px solid var(--ring);outline-offset:2px}
+.brand{font:700 17px var(--f);letter-spacing:-.01em;display:flex;align-items:center;gap:11px;white-space:nowrap}
+.dot{width:38px;height:38px;flex:none;border-radius:8px;background:linear-gradient(145deg,#4d8be9,#184b9e);box-shadow:0 4px 10px rgba(24,75,158,.24),inset 0 0 0 1px rgba(255,255,255,.25);display:grid;place-items:center;color:#fff;font-size:20px;font-weight:700}
+.dot::after{content:none}
+.brandcopy{display:grid;gap:3px;line-height:1.1}
+.brandname{font-size:15px;font-weight:700}
+.brandtag{font-size:9px;font-weight:700;color:var(--mu)}
+.intro .brandtag{color:rgba(255,255,255,.76)}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:0;border-radius:999px;background:var(--btn);color:var(--ai);font-size:14px;font-weight:600;cursor:pointer;box-shadow:var(--btns);transition:background .15s,transform .1s}
+.btn:hover{background:var(--btnh)}.btn:active{transform:translateY(1px)}.btn:disabled{opacity:.6;cursor:wait}
+.btn.ghost{background:var(--pn);color:var(--ink);box-shadow:var(--shs)}.btn.ghost:hover{background:var(--soft)}
+.btn.sm{padding:7px 15px;font-size:13px}
+.full{width:100%;margin-top:18px;padding:13px}
+.lnk{background:none;border:0;color:var(--ac);padding:0;font-size:14px;font-weight:500;text-decoration:underline;cursor:pointer;margin-top:12px}
+/* sign in */
+.split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:8px;padding:16px;min-height:100vh}
+.intro{border-radius:34px;background:radial-gradient(520px 380px at 85% 105%,rgba(120,185,255,.5),transparent 65%),radial-gradient(420px 300px at 0% 0%,rgba(255,255,255,.16),transparent 60%),linear-gradient(155deg,#2159c9,#0f2c6b 75%);color:#fff;padding:36px 48px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;gap:36px}
+.intro>*{position:relative;z-index:1}
+.intro h1{font-size:clamp(34px,4.2vw,54px);font-weight:500;letter-spacing:-.035em;line-height:1.05;max-width:13ch}
+.intro .lead{color:var(--sbi);max-width:42ch;margin:18px 0 0;font-size:15.5px}
+.sun{position:absolute!important;z-index:0!important;right:-90px;bottom:-130px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.34),rgba(255,255,255,.07) 55%,transparent 72%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+.mods{list-style:none;margin:0 0 40px;padding:0;max-width:380px}
+.mods li{display:flex;justify-content:space-between;gap:16px;padding:12px 18px;margin-bottom:8px;border-radius:18px;background:rgba(255,255,255,.09);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.mods b{font-weight:600}.mods span{color:var(--sbi);font-size:13px;text-align:right}
+.auth{display:grid;place-items:center;padding:32px}
+.card{width:min(430px,100%);background:var(--gl);border:1px solid var(--edge);border-radius:30px;padding:30px;box-shadow:var(--sh);backdrop-filter:blur(14px)}
+.tabs{display:flex;gap:4px;background:var(--seg);padding:4px;border-radius:999px;margin-bottom:10px}
+.tabs button{flex:1;background:none;border:0;border-radius:999px;padding:9px 14px;font-size:14px;font-weight:600;color:var(--mu);cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--ink);color:var(--bg)}
+label{display:block;font-weight:500;font-size:13px;margin:14px 0 6px}
+input,select{width:100%;padding:11px 15px;border:1px solid var(--ln);border-radius:16px;background:color-mix(in srgb,var(--pn) 75%,transparent);color:var(--ink);font-size:15px}
+input:focus,select:focus{border-color:var(--ac)}
+input:disabled,select:disabled{opacity:.6}
+input[type=search]{padding-left:42px;border-radius:999px;border-color:transparent;box-shadow:var(--shs);background:var(--pn) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237a8aa0' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 15px center/17px}
+.msg{min-height:20px;margin-top:12px;font-size:14px}.msg.err,.err{color:var(--wr)}.msg.ok{color:var(--ac)}
+.note{margin-top:12px;font-size:13px;background:var(--soft);border-radius:16px;padding:12px 14px;color:var(--mu)}
+/* app shell */
+.shell{min-height:100vh;display:grid;grid-template-columns:268px minmax(0,1fr)}
+.mainc{min-width:0}
+.side{position:sticky;top:0;height:100vh;height:100dvh;z-index:30;display:flex;flex-direction:column;gap:18px;padding:20px 14px 16px;background:var(--gl);border-right:1px solid var(--edge);backdrop-filter:blur(16px) saturate(1.4);overflow-y:auto}
+.side .brand{padding:2px 8px 6px}
+#tabs{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+.nl{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mu);padding:0 14px;margin:18px 0 6px}.nl:first-child{margin-top:0}
+#tabs button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-radius:14px;padding:11px 14px;font-size:14px;font-weight:600;color:var(--mu);cursor:pointer;text-align:left;transition:background .15s,color .15s}
+#tabs button:hover{background:var(--soft);color:var(--ink)}
+#tabs button.on{background:var(--btn);color:var(--ai);box-shadow:var(--btns)}
+#tabs svg{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.me{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:20px;background:var(--pn);box-shadow:var(--shs)}
+.mi{display:flex;align-items:center;gap:10px;min-width:0}
+.me .btn{width:100%;background:var(--seg);color:var(--ink);box-shadow:none}.me .btn:hover{background:var(--soft)}
+.mbar{display:none}
+.scrim{display:none}
+.av{width:38px;height:38px;flex:none;border-radius:50%;background:var(--soft);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:13px}
+.wi{display:flex;flex-direction:column;line-height:1.3;font-size:13px;min-width:0}.wi b{font-weight:600;overflow:hidden;text-overflow:ellipsis}
+.pill{background:var(--soft);color:var(--ac);border-radius:999px;padding:0 8px;font-size:11px;font-weight:600;text-transform:capitalize;width:max-content}
+.pagehead,#view{margin:0 auto}
+.pagehead{max-width:1280px;padding:30px 36px 6px;display:flex;flex-direction:column;gap:6px}
+.pagehead h1{font-size:clamp(30px,3.4vw,40px);font-weight:500;letter-spacing:-.03em}
+.pagehead p{margin:0;color:var(--mu);font-size:14px}
+#view{padding:16px 36px 64px;max-width:1280px}
+.head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.head>:last-child{margin-left:auto}
+#view .head h2,#kb .head h2{display:none}#view .head:has(>h2:only-child){display:none}
+.head h2{font-size:22px;font-weight:600}.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.tools input{width:240px}
+.seg{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--seg)}
+.seg button{background:none;border:0;border-radius:999px;padding:7px 15px;font-size:13px;font-weight:600;color:var(--mu);cursor:pointer;text-transform:capitalize}
+.seg button.on{background:var(--pn);color:var(--ink);box-shadow:var(--shs)}
+.sub{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.sub button{display:inline-flex;align-items:center;gap:8px;border:0;background:var(--pn);color:var(--ink);padding:8px 16px;border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:var(--shs)}
+.sub button::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ac)}
+.sub button:nth-child(2)::before{background:#4aa8f5}.sub button:nth-child(3)::before{background:#6b63e6}.sub button:nth-child(4)::before{background:#14a3b8}.sub button:nth-child(5)::before{background:#8ab4f8}
+.sub button:hover{background:var(--soft)}.sub button.on{background:var(--ink);color:var(--bg)}.sub button.on::before{background:var(--bg)}
+/* overview */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:28px}
+.stat{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:11px;row-gap:14px;text-align:left;background:var(--gl);border:1px solid var(--edge);border-radius:24px;padding:18px 20px 20px;cursor:pointer;color:var(--ink);box-shadow:var(--sh);transition:transform .15s}
+.stat:hover{transform:translateY(-2px)}
+.si{width:34px;height:34px;border-radius:11px;background:var(--soft);color:var(--ac);display:grid;place-items:center}
+.si svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.stat span{color:var(--mu);font-size:13px;font-weight:500}
+.stat b{grid-column:1/-1;font:500 30px/1 var(--f);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.sec{font-size:18px;font-weight:600;margin-bottom:12px}
+/* tables */
+.tw{background:var(--gl);border:1px solid var(--edge);border-radius:26px;overflow-x:auto;box-shadow:var(--sh)}
+table{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+th{text-align:left;padding:15px 20px;font-size:12.5px;color:var(--mu);font-weight:600;border-bottom:1px solid var(--ln);white-space:nowrap}
+td{padding:14px 20px;border-bottom:1px solid var(--ln);vertical-align:middle}
+tbody tr:hover td{background:color-mix(in srgb,var(--soft) 60%,transparent)}
+tr:last-child td{border:0}tr.del td{background:color-mix(in srgb,var(--wr) 7%,transparent);color:var(--mu)}
+td small{color:var(--mu);font-size:12px}
+.b{display:inline-block;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:600}
+.b.on{background:var(--soft);color:var(--ac)}.b.off{background:color-mix(in srgb,var(--wr) 14%,transparent);color:var(--wr)}
+.acts{display:flex;gap:6px;white-space:nowrap;justify-content:flex-end}
+.acts button{border:0;background:var(--pn);color:var(--ink);padding:6px 13px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;box-shadow:var(--shs)}
+.acts button:hover{background:var(--soft)}
+.acts .k{background:var(--soft);color:var(--ac);box-shadow:none}
+.acts .d{color:var(--wr)}.acts .d:hover{background:color-mix(in srgb,var(--wr) 10%,var(--pn))}
+.acts .r{color:var(--ac)}
+.empty{text-align:center;color:var(--mu);padding:40px}
+dialog{border:1px solid var(--edge);border-radius:30px;background:var(--pn);color:var(--ink);padding:28px;width:min(520px,94vw);box-shadow:0 30px 70px rgba(10,30,80,.3)}
+#dlg2{width:min(900px,96vw)}dialog::backdrop{background:rgba(10,25,60,.45);backdrop-filter:blur(4px)}
+dialog h2{font-size:21px;font-weight:600;margin-bottom:6px}.row{display:flex;gap:8px;margin-top:22px}
+.mods2 label{display:inline-flex;gap:5px;align-items:center;margin:0 12px 0 0;font-weight:400}.mods2 input{width:auto}
+td select{padding:6px 12px;width:auto;border-radius:999px}
+/* users */
+:root{--ok:#12805c;--wn:#a86a0a}
+@media (prefers-color-scheme:dark){:root{--ok:#4fd6a0;--wn:#f5c26b}}
+.ut{min-width:880px}
+.ucell{display:flex;align-items:center;gap:12px}.ucell b{display:block;font-weight:600}.ucell small{display:block}
+.ucell .av{width:36px;height:36px;font-size:12px}
+.sel{appearance:none;-webkit-appearance:none;width:auto;min-width:132px;padding:8px 34px 8px 15px;border-radius:999px;border:1px solid var(--ln);background:var(--pn) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a9bb0' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center/12px;color:var(--ink);font-size:13.5px;font-weight:600;text-transform:capitalize;cursor:pointer;box-shadow:var(--shs);transition:border-color .15s}
+.sel:hover:not(:disabled){border-color:var(--ac)}
+.sel:disabled{opacity:.55;cursor:not-allowed;box-shadow:none}
+.sel option{background:var(--pn);color:var(--ink)}
+.sel.s-active{color:var(--ok);background-color:color-mix(in srgb,var(--ok) 11%,var(--pn))}
+.sel.s-pending{color:var(--wn);background-color:color-mix(in srgb,var(--wn) 12%,var(--pn))}
+.sel.s-blocked,.sel.s-disapproved{color:var(--wr);background-color:color-mix(in srgb,var(--wr) 10%,var(--pn))}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative;display:inline-flex;align-items:center;gap:7px;margin:0;padding:6px 13px 6px 10px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--mu);background:var(--seg);border:1px solid transparent;cursor:pointer;transition:background .15s,color .15s}
+.chip:hover{color:var(--ink)}
+.chip input{position:absolute;opacity:0;width:0;height:0;padding:0;border:0;pointer-events:none}
+.chip::before{content:"";width:14px;height:14px;border-radius:5px;border:1.6px solid currentColor;flex:none}
+.chip:has(input:checked){background:var(--soft);color:var(--ac);border-color:color-mix(in srgb,var(--ac) 38%,transparent)}
+.chip:has(input:checked)::before{border-color:var(--ac);background:var(--ac) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 5 5 9-10'/%3E%3C/svg%3E") center/10px no-repeat}
+.chip:has(input:focus-visible){outline:3px solid var(--ring);outline-offset:2px}
+.allm{display:inline-flex;align-items:center;padding:5px 13px;border-radius:999px;background:var(--soft);color:var(--ac);font-size:12.5px;font-weight:600}
+.muted{color:var(--mu)}
+.seg button i{font-style:normal;margin-left:6px;padding:1px 7px;border-radius:999px;background:var(--seg);font-size:11px}
+.seg button.on i{background:var(--soft);color:var(--ac)}
+.acts button{padding:7px 14px;transition:background .15s}
+.acts .k:hover{background:var(--btn);color:var(--ai)}
+.acts .d{background:color-mix(in srgb,var(--wr) 9%,var(--pn))}.acts .d:hover{background:var(--wr);color:#fff}
+.pw{position:relative}.pw input{padding-right:64px}
+.pw button{position:absolute;right:8px;top:50%;transform:translateY(-50%);border:0;background:none;color:var(--ac);font-size:13px;font-weight:600;padding:6px 8px;border-radius:999px;cursor:pointer}
+.hint{margin:6px 2px 0;font-size:12.5px;color:var(--mu)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99;background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:999px;font-size:14px;font-weight:600;box-shadow:var(--sh)}
+.rcount{font-size:13px;color:var(--mu);font-weight:500}
+@media (max-width:860px){
+ .split{grid-template-columns:1fr;padding:10px}.intro{padding:28px 24px;gap:24px;border-radius:28px}.mods{margin-bottom:90px}
+ .shell{display:block}
+ .side{position:fixed;left:0;top:0;bottom:0;width:min(290px,84vw);transform:translateX(-102%);transition:transform .25s;background:var(--pn);box-shadow:var(--sh)}
+ body.nv .side{transform:none}
+ body.nv .scrim{display:block;position:fixed;inset:0;z-index:25;background:rgba(10,25,60,.45)}
+ .mbar{display:flex;align-items:center;gap:12px;padding:12px 14px 0}.mbar .brand{font-size:15px}
+ .pagehead{padding:22px 18px 4px}#view{padding:14px 14px 40px}.tools input{width:100%}}
+@media print{.shell{display:block}.side,.mbar,.scrim,.tools,.sub,.noprint,.pagehead{display:none!important}body{background:#fff;color:#000}.tw{box-shadow:none;border:1px solid #ccc}}
+:root{color-scheme:light;--bg:#f4f6f1;--pn:#fff;--gl:rgba(255,255,255,.92);--edge:#e1e7df;--ink:#172a24;--mu:#69766f;--ln:#dce3dc;--ac:#315b48;--ach:#234536;--ai:#fff;--wr:#b5533b;--soft:#e8efe7;--seg:#eef1ec;--sb:#234536;--sbi:#d9e7dc;--ring:rgba(49,91,72,.38);--btn:linear-gradient(180deg,#386d54,#315b48);--btnh:linear-gradient(180deg,#315b48,#234536);--btns:0 2px 6px rgba(35,69,54,.18);--sh:0 1px 2px rgba(23,42,36,.04),0 8px 24px rgba(23,42,36,.06);--shs:0 1px 3px rgba(23,42,36,.08);--page:radial-gradient(800px 460px at 5% -8%,rgba(190,211,187,.36),transparent 62%),radial-gradient(600px 420px at 100% 0%,rgba(237,195,169,.2),transparent 62%),#f4f6f1;--f:"DM Sans",sans-serif}
+body{background:var(--page) fixed}
+.brand{letter-spacing:0}
+.dot{background:#315b48;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.intro{border-radius:8px;background:linear-gradient(180deg,rgba(18,43,32,.16),rgba(18,43,32,.24) 38%,rgba(18,43,32,.86)),url("https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1800&q=88") center/cover}
+.intro h1{font-family:"Newsreader",Georgia,serif;font-size:clamp(40px,5vw,66px);font-weight:500;letter-spacing:0;line-height:1;max-width:12ch}
+.intro .lead{color:rgba(255,255,255,.82)}
+.mods li{border-radius:5px;background:rgba(18,43,32,.42);box-shadow:inset 0 0 0 1px rgba(255,255,255,.16);backdrop-filter:blur(8px)}
+.sun{display:none}
+.card{border-radius:8px;background:var(--pn);border-color:var(--edge);backdrop-filter:none;box-shadow:0 12px 36px rgba(23,42,36,.08)}
+.tabs{border-radius:5px;background:#eef1ec}
+.tabs button,.tabs button[aria-selected=true]{border-radius:4px}
+.btn{border-radius:5px;box-shadow:var(--btns)}
+.btn.ghost{box-shadow:inset 0 0 0 1px var(--ln)}
+.lnk{color:var(--ac)}
+input,select{border-radius:5px;background:#fff}
+input[type=search]{border-radius:5px;background-color:#fff}
+.shell{background:transparent}
+.side{background:#fff;border-right:1px solid var(--ln);backdrop-filter:none}
+#tabs button{border-radius:5px}
+#tabs button.on{background:#315b48;box-shadow:none}
+.me{border-radius:5px;background:#f4f6f1;box-shadow:none}
+.av{border-radius:5px;background:#e8efe7;color:#315b48}
+.pill,.b,.allm{border-radius:4px}
+.pagehead h1{font-family:"Newsreader",Georgia,serif;font-weight:500;letter-spacing:0}
+.seg{border-radius:5px;background:#eef1ec}
+.seg button,.seg button.on{border-radius:4px}
+.sub button{border-radius:5px;box-shadow:inset 0 0 0 1px var(--ln)}
+.sub button.on{background:#315b48;color:#fff}
+.stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px}
+.stat{border-radius:6px;border-color:var(--ln);background:#fff;box-shadow:var(--sh)}
+.stat:hover{transform:translateY(-1px)}
+.si{border-radius:5px;background:#e8efe7;color:#315b48}
+.tw{border-radius:6px;border-color:var(--ln);background:#fff;box-shadow:var(--sh)}
+th{background:#f7f8f5}
+.acts button{border-radius:4px;box-shadow:inset 0 0 0 1px var(--ln)}
+.acts .k{color:#315b48;background:#e8efe7;box-shadow:none}
+dialog{border-radius:8px;border-color:var(--ln);box-shadow:0 24px 60px rgba(23,42,36,.22)}
+dialog::backdrop{background:rgba(23,42,36,.42)}
+.sel{border-radius:5px;box-shadow:none}
+.chip{border-radius:5px}
+.toast{border-radius:5px;background:#234536;color:#fff}
+@media(max-width:860px){.intro{min-height:500px}.mods{margin-bottom:0}.card{padding:24px}.side{border-radius:0 6px 6px 0}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important}}
+@media print{body{background:#fff;color:#000}.tw{box-shadow:none}}
+:root{color-scheme:light;--bg:#f3f6fc;--pn:#fff;--gl:#fff;--edge:#dce5f1;--ink:#17263d;--mu:#62728a;--ln:#dbe4f0;--ac:#2463c4;--ach:#184b9e;--ai:#fff;--wr:#b54740;--soft:#eaf1fb;--seg:#edf2f8;--sb:#143460;--sbi:#d8e6f8;--ring:rgba(36,99,196,.4);--btn:#2463c4;--btnh:#184b9e;--btns:0 2px 6px rgba(24,75,158,.18);--sh:0 1px 2px rgba(23,38,61,.04),0 8px 24px rgba(23,38,61,.06);--shs:0 1px 3px rgba(23,38,61,.1);--page:linear-gradient(135deg,#f8faff 0%,#f0f5fc 54%,#f6f7fa 100%);--f:"DM Sans",sans-serif;--accent:#d77d62;--ok:#16745a;--wn:#9b650c}
+body{background:var(--page) fixed}
+.brand{letter-spacing:0}
+.dot{background:#2463c4;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
+.intro{border-radius:8px;background:linear-gradient(180deg,rgba(13,40,78,.16),rgba(13,40,78,.36) 38%,rgba(13,40,78,.88)),url("https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1800&q=88") center/cover}
+.intro h1,.pagehead h1,.authheading h2{font-family:"Newsreader",Georgia,serif;font-weight:500;letter-spacing:0}
+.intro h1{font-size:56px;line-height:1;max-width:12ch}
+.intro .lead{color:rgba(255,255,255,.84)}
+.mods li{border-radius:5px;background:rgba(13,40,78,.48);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);backdrop-filter:blur(8px)}
+.sun{display:none}
+.card{border-radius:8px;background:#fff;border-color:var(--edge);backdrop-filter:none;box-shadow:0 14px 38px rgba(23,38,61,.1)}
+.authheading{margin-bottom:22px}
+.authheading .eyebrow{margin:0 0 8px;color:var(--ac);font-size:11px;font-weight:700;text-transform:uppercase}
+.authheading h2{font-size:34px;line-height:1.04;color:var(--ink)}
+.authheading p:last-child{margin:8px 0 0;color:var(--mu);font-size:14px;line-height:1.55}
+.tabs{border-radius:5px;background:#edf2f8}
+.tabs button,.tabs button[aria-selected=true]{border-radius:4px}
+.tabs button[aria-selected=true]{background:#2463c4;color:#fff}
+.btn{min-height:42px;border-radius:5px;background:var(--btn);box-shadow:var(--btns);transition:background .15s,transform .12s}
+.btn:hover{background:var(--btnh)}
+.btn.ghost{background:#fff;color:var(--ink);box-shadow:inset 0 0 0 1px var(--ln)}
+.btn.ghost:hover{background:var(--soft)}
+.lnk{color:var(--ac)}
+input,select{min-height:44px;border-radius:5px;background:#fff}
+input:focus,select:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(36,99,196,.12)}
+input[type=search]{min-height:42px;border-radius:5px;background-color:#fff}
+.msg.err,.err{color:var(--wr)}
+.msg.ok{color:var(--ok)}
+.note{border-radius:5px;background:#eef4fd;color:#465b76}
+.shell{background:transparent}
+.side{background:#fff;border-right:1px solid var(--ln);backdrop-filter:none}
+#tabs button{border-radius:5px}
+#tabs button.on{background:#2463c4;box-shadow:none}
+.me{border-radius:6px;background:#f4f7fc;box-shadow:none}
+.av{border-radius:5px;background:#eaf1fb;color:#184b9e}
+.pill,.b,.allm{border-radius:4px}
+.pagehead h1{font-size:36px}
+.seg{border-radius:5px;background:#edf2f8}
+.seg button,.seg button.on{border-radius:4px}
+.seg button.on{background:#fff;color:#17263d}
+.sub button{border-radius:5px;box-shadow:inset 0 0 0 1px var(--ln)}
+.sub button.on{background:#184b9e;color:#fff}
+.sub button:nth-child(2)::before{background:#4f8be3}.sub button:nth-child(3)::before{background:#d77d62}.sub button:nth-child(4)::before{background:#2c9b9b}.sub button:nth-child(5)::before{background:#8aa6cd}
+.stats{grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:12px}
+.stat{border-radius:6px;border-color:var(--ln);background:#fff;box-shadow:var(--sh)}
+.stat:hover{transform:translateY(-1px)}
+.si{border-radius:5px;background:#eaf1fb;color:#2463c4}
+.tw{border-radius:6px;border-color:var(--ln);background:#fff;box-shadow:var(--sh)}
+th{background:#f6f8fc}
+.acts button{min-height:34px;border-radius:4px;box-shadow:inset 0 0 0 1px var(--ln)}
+.acts .k{color:#184b9e;background:#eaf1fb;box-shadow:none}
+.acts .d{color:#a63f39}
+dialog{border-radius:8px;border-color:var(--ln);box-shadow:0 24px 60px rgba(23,38,61,.24)}
+dialog::backdrop{background:rgba(17,35,62,.48);backdrop-filter:blur(3px)}
+.sel{min-height:38px;border-radius:5px;box-shadow:none}
+.sel.s-active{color:#12684f;background-color:#e8f4ef}
+.sel.s-pending{color:#895a0b;background-color:#fff4dc}
+.sel.s-blocked,.sel.s-disapproved{color:#a63f39;background-color:#fbecea}
+.chip{border-radius:5px}
+.chip:has(input:checked){background:#eaf1fb;color:#184b9e;border-color:rgba(36,99,196,.35)}
+.toast{border-radius:5px;background:#143460;color:#fff}
+@media(max-width:860px){.intro{min-height:500px}.intro h1{font-size:42px}.mods{margin-bottom:0}.card{padding:24px}.side{border-radius:0 6px 6px 0}.pagehead h1{font-size:32px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important}}
+@media print{body{background:#fff;color:#000}.tw{box-shadow:none}}
+/* interaction and layout polish */
+:root{--motion:cubic-bezier(.2,.7,.25,1)}
+button,input,select,.chip,.stat,.tw,.side,dialog{transition-duration:160ms;transition-timing-function:var(--motion)}
+button:not(:disabled),.chip{transition-property:background-color,color,border-color,box-shadow,transform}
+button:not(:disabled):active{transform:translateY(1px)}
+.btn:not(:disabled):hover{transform:translateY(-1px);box-shadow:0 5px 12px rgba(24,75,158,.2)}
+.btn:not(:disabled):active{transform:translateY(0);box-shadow:var(--shs)}
+.lnk:hover{text-decoration-thickness:2px;text-underline-offset:3px}
+input:not(:disabled):hover,select:not(:disabled):hover{border-color:#9bb2d0}
+#tabs button:not(.on):hover{transform:translateX(2px);background:#eaf1fb;color:#184b9e}
+#tabs button.on:hover{background:#184b9e}
+.seg button:not(.on):hover{background:rgba(255,255,255,.72);color:#184b9e}
+.sub button:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(23,38,61,.09)}
+.stat{min-height:124px;transition:transform 180ms var(--motion),box-shadow 180ms var(--motion),border-color 180ms var(--motion)}
+.stat:hover{border-color:#b8cce8;box-shadow:0 8px 22px rgba(23,38,61,.1)}
+.si{transition:background-color 160ms var(--motion),color 160ms var(--motion)}
+.stat:hover .si{background:#dce9fb;color:#184b9e}
+.tw{transition:box-shadow 180ms var(--motion),border-color 180ms var(--motion)}
+th{letter-spacing:.015em}
+td,th{padding-right:18px;padding-left:18px}
+tbody tr:not(.del) td{transition:background-color 120ms linear}
+.acts button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 3px 8px rgba(23,38,61,.12)}
+.acts .d:hover:not(:disabled){background:#b54740;color:#fff}
+.chip:hover{transform:translateY(-1px);border-color:#b8cce8;background:#f5f8fd}
+.chip:has(input:checked):hover{background:#dce9fb;border-color:#94b4df}
+.pagehead{gap:8px}
+#view{padding-top:18px}
+#view .head{margin-bottom:18px;align-items:center}
+.stats{margin-bottom:30px}
+.sec{margin:0 0 14px}
+.authheading{margin-bottom:24px}
+#authcard form label{margin:0 0 16px}
+#authcard form label input{margin-top:7px}
+.tabs{margin-bottom:16px}
+.mods li{transition:transform 160ms var(--motion),background-color 160ms var(--motion)}
+.mods li:hover{transform:translateX(3px);background:rgba(13,40,78,.62)}
+.side{transition:transform 240ms var(--motion),box-shadow 240ms var(--motion)}
+body.nv .scrim{animation:scrim-in 180ms ease-out both}
+dialog[open]{animation:dialog-in 180ms var(--motion) both}
+.toast{animation:toast-in 180ms var(--motion) both}
+.theme-toggle{position:fixed;z-index:45;top:16px;right:18px;width:42px;height:42px;display:grid;place-items:center;padding:0;border:1px solid var(--ln);border-radius:6px;background:var(--pn);color:var(--ink);box-shadow:var(--shs);cursor:pointer}
+.theme-toggle svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.theme-toggle:hover{transform:translateY(-1px);border-color:#9bb2d0;background:var(--soft);color:var(--ac)}
+.theme-toggle:active{transform:translateY(0)}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0d1728;--pn:#15243a;--gl:#15243a;--edge:#2b3d56;--ink:#e7eef8;--mu:#a4b4ca;--ln:#30435e;--ac:#83b2f6;--ach:#a4c7fb;--ai:#091424;--wr:#ff938b;--soft:#203550;--seg:#1a2b42;--sb:#0a1a31;--sbi:#d8e6f8;--ring:rgba(131,178,246,.55);--btn:#3475ce;--btnh:#4388e6;--btns:0 2px 8px rgba(0,0,0,.32);--sh:0 1px 2px rgba(0,0,0,.24),0 8px 24px rgba(0,0,0,.24);--shs:0 1px 4px rgba(0,0,0,.28);--page:linear-gradient(135deg,#101c2e 0%,#111f33 54%,#172237 100%);--ok:#70d5b0;--wn:#f3c46b}
+:root[data-theme="dark"] .card,:root[data-theme="dark"] .side,:root[data-theme="dark"] .tw,:root[data-theme="dark"] .theme-toggle{background:var(--pn);border-color:var(--edge);color:var(--ink)}
+:root[data-theme="dark"] .me,:root[data-theme="dark"] th,:root[data-theme="dark"] .tabs,:root[data-theme="dark"] .seg,:root[data-theme="dark"] .note{background:#1b2c43;color:var(--ink)}
+:root[data-theme="dark"] input,:root[data-theme="dark"] select,:root[data-theme="dark"] .btn.ghost{background-color:#101d30;color:var(--ink)}
+:root[data-theme="dark"] .sel{background-color:#15243a}
+:root[data-theme="dark"] .stat,:root[data-theme="dark"] .acts button{background:#15243a;color:var(--ink)}
+:root[data-theme="dark"] .acts .d{background:#402a31;color:#ffaaa3}
+:root[data-theme="dark"] .acts .d:hover:not(:disabled){background:#b54740;color:#fff}
+:root[data-theme="dark"] .si,:root[data-theme="dark"] .acts .k,:root[data-theme="dark"] .chip:has(input:checked){background:#203550;color:#a4c7fb}
+:root[data-theme="dark"] .sub button{background:#15243a;color:var(--ink)}
+:root[data-theme="dark"] .sub button.on{background:#3475ce;color:#fff}
+:root[data-theme="dark"] #tabs button:not(.on):hover,:root[data-theme="dark"] .seg button:not(.on):hover,:root[data-theme="dark"] .sub button:hover{background:#203550;color:#e7eef8}
+:root[data-theme="dark"] .chip:hover{background:#203550;border-color:#496687;color:#e7eef8}
+:root[data-theme="dark"] .chip:has(input:checked):hover{background:#284363}
+:root[data-theme="dark"] dialog{background:#15243a;color:var(--ink);border-color:var(--edge)}
+:root[data-theme="dark"] .sel.s-active{color:#70d5b0;background-color:#183c37}
+:root[data-theme="dark"] .sel.s-pending{color:#f3c46b;background-color:#3a3120}
+:root[data-theme="dark"] .sel.s-blocked,:root[data-theme="dark"] .sel.s-disapproved{color:#ffaaa3;background-color:#402a31}
+:root[data-theme="dark"] .toast{background:#0a1a31;color:#fff}
+:root[data-theme="dark"] .brandtag{color:#a4b4ca}
+:root[data-theme="dark"] .intro .brandtag{color:rgba(255,255,255,.76)}
+:root[data-theme="dark"] .theme-toggle:hover{background:#203550;color:#a4c7fb}
+@keyframes dialog-in{from{opacity:0;transform:translateY(8px) scale(.99)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes scrim-in{from{opacity:0}to{opacity:1}}
+@keyframes toast-in{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+@media(max-width:860px){#view .head{align-items:stretch}.tools{width:100%}.tools input{flex:1 1 100%;min-width:0}.stat{min-height:112px}.intro{gap:28px}.mods li{padding:11px 13px}}
+@media(prefers-reduced-motion:reduce){button:not(:disabled),.chip,.stat,.tw,.side,dialog,.mods li,.si,.toast{animation:none!important;transition:none!important}button:not(:disabled):hover,.chip:hover,.stat:hover,.mods li:hover{transform:none!important}}
+
+/* ===== Home page + photo background + design polish ===== */
+:root{--photo:url("https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1800&q=88");--r:16px;--wash:rgba(240,245,253,.88);--glass:rgba(255,255,255,.80);--panel:rgba(255,255,255,.94);--c1:#2463c4;--c2:#12a3a3;--c3:#6b63e6;--c4:#e0952b}
+:root[data-theme="dark"]{--wash:rgba(9,18,33,.90);--glass:rgba(16,29,48,.78);--panel:rgba(21,36,58,.94)}
+#app{min-height:100vh;background:linear-gradient(var(--wash),var(--wash)),var(--photo) center/cover fixed,linear-gradient(135deg,#143460,#2463c4)}
+.side{background:var(--glass)!important;backdrop-filter:blur(18px) saturate(1.5)!important;-webkit-backdrop-filter:blur(18px) saturate(1.5)}
+:root[data-theme="dark"] .side{background:var(--glass)!important}
+.brand .dot{border-radius:12px;background:linear-gradient(145deg,#4d8be9,#184b9e)}
+#tabs button{border-radius:12px;padding:12px 14px}
+#tabs button.on{border-radius:12px;background:linear-gradient(180deg,#3a7df0,#1d5bd0);box-shadow:0 6px 16px rgba(31,99,216,.3)}
+.me{border-radius:16px}.av{border-radius:12px}
+.tw,.stat{border-radius:var(--r);background:var(--panel)}
+:root[data-theme="dark"] .tw,:root[data-theme="dark"] .stat{background:var(--panel)}
+.btn{border-radius:10px}.card{border-radius:20px}
+dialog{border-radius:20px}
+.sub button,.seg,.seg button,.tabs,.tabs button{border-radius:10px}
+.sub button.on{background:#184b9e}
+body.ishome .pagehead{display:none}
+body.ishome #view{padding-top:26px}
+/* hero */
+.hero{position:relative;overflow:hidden;border-radius:24px;padding:38px 40px 34px;min-height:260px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;color:#fff;margin-bottom:22px;
+ background:linear-gradient(100deg,rgba(8,28,66,.90),rgba(8,28,66,.55) 55%,rgba(8,28,66,.18)),var(--photo) center/cover,linear-gradient(135deg,#143460,#2463c4);box-shadow:0 18px 44px rgba(12,38,90,.28)}
+.hero::after{content:"";position:absolute;right:-70px;top:-90px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.28),rgba(255,255,255,.04) 60%,transparent 72%);pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.hero .eyebrow{margin:0;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.78)}
+.hero h2{font-family:"Newsreader",Georgia,serif;font-size:clamp(30px,4vw,46px);font-weight:500;line-height:1.04;letter-spacing:-.01em;max-width:18ch}
+.hero p{margin:0;max-width:52ch;color:rgba(255,255,255,.86);font-size:15px}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px}
+.hero .tag{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.26);backdrop-filter:blur(8px)}
+.hero .tag.live::before{content:"";width:7px;height:7px;border-radius:50%;background:#5ee6a8;box-shadow:0 0 0 3px rgba(94,230,168,.25)}
+.qa{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.qa button{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.14);color:#fff;font-weight:600;font-size:14px;cursor:pointer;backdrop-filter:blur(8px);transition:background .15s,transform .15s}
+.qa button:hover{background:rgba(255,255,255,.28);transform:translateY(-1px)}
+.qa button:first-child{background:#fff;color:#184b9e;border-color:#fff}
+.qa button:first-child:hover{background:#eaf1fb}
+.qa svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+/* stats */
+.stats{gap:14px;margin-bottom:22px}
+.stat{min-height:132px;padding:18px 20px;position:relative;overflow:hidden;border:1px solid var(--ln)}
+.stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c1)}
+.stat:nth-child(2)::before{background:var(--c2)}.stat:nth-child(3)::before{background:var(--c3)}.stat:nth-child(4)::before{background:var(--c4)}
+.stat .si{border-radius:12px;width:38px;height:38px}
+.stat:nth-child(2) .si{background:rgba(18,163,163,.13);color:var(--c2)}
+.stat:nth-child(3) .si{background:rgba(107,99,230,.13);color:var(--c3)}
+.stat:nth-child(4) .si{background:rgba(224,149,43,.15);color:var(--c4)}
+.stat b{font-size:32px}
+.stat:hover{transform:translateY(-3px);box-shadow:0 14px 30px rgba(18,42,96,.14)}
+/* panels */
+.hgrid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);gap:16px;align-items:start}
+.pnl{background:var(--panel);border:1px solid var(--ln);border-radius:var(--r);box-shadow:var(--sh);padding:20px 22px 18px}
+.pnl .sec{margin:0 0 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.pnl .sec button{border:0;background:none;color:var(--ac);font-weight:600;font-size:13px;cursor:pointer;padding:0}
+.pnl .sec button:hover{text-decoration:underline}
+.pnl .tw{border:0;box-shadow:none;border-radius:0;background:none;margin:0 -8px}
+.pnl th{background:none}
+.rank{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.rank li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:2px 12px;align-items:center}
+.rank .n{grid-row:1/3;width:28px;height:28px;border-radius:9px;background:var(--soft);color:var(--ac);display:grid;place-items:center;font-size:12.5px;font-weight:700}
+.rank .nm{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rank .am{font-weight:600;font-size:14px;font-variant-numeric:tabular-nums}
+.rank .bar{grid-column:2/4;height:6px;border-radius:99px;background:var(--seg);overflow:hidden}
+.rank .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#4d8be9,#1d5bd0)}
+.rank li:nth-child(1) .n{background:#fff3d6;color:#a86a0a}
+:root[data-theme="dark"] .rank li:nth-child(1) .n{background:#3a3120;color:#f3c46b}
+:root[data-theme="dark"] .hero .tag{background:rgba(255,255,255,.12)}
+/* login side: soft photo wash */
+.auth{background:linear-gradient(rgba(243,246,252,.93),rgba(243,246,252,.96)),var(--photo) center/cover}
+:root[data-theme="dark"] .auth{background:linear-gradient(rgba(9,18,33,.92),rgba(9,18,33,.95)),var(--photo) center/cover}
+.card{box-shadow:0 20px 50px rgba(18,42,96,.16)}
+.intro{border-radius:22px;background:linear-gradient(180deg,rgba(13,40,78,.18),rgba(13,40,78,.40) 38%,rgba(13,40,78,.90)),var(--photo) center/cover,linear-gradient(155deg,#2159c9,#0f2c6b)}
+.mods li{border-radius:12px}
+@media(max-width:980px){.hgrid{grid-template-columns:1fr}}
+@media(max-width:860px){.hero{padding:26px 22px;min-height:230px;border-radius:20px}body.ishome #view{padding-top:14px}.qa button{flex:1 1 auto;justify-content:center}}
+@media print{#app{background:none}}
+</style>
+</head>
+<body>
+<div id="land">
+ <div class="split">
+  <aside class="intro">
+  <div class="brand"><span class="dot" aria-hidden="true">H</span><span class="brandcopy"><span class="brandname">Hope, Inc. ERP</span><span class="brandtag">TEAM LIQUID PH</span></span></div>
+   <div>
+    <h1>One workspace for Hope, Inc.</h1>
+    <p class="lead">Sign in to manage customers, products, people and sales. New here? Register and an administrator will approve your account.</p>
+   </div>
+   <ul class="mods"><li><b>Customers</b><span>Accounts and payment terms</span></li><li><b>Products</b><span>Catalog with price history</span></li><li><b>Human resources</b><span>Employees, jobs, departments</span></li><li><b>Sales</b><span>Transactions and line items</span></li></ul>
+   <span class="sun"></span>
+  </aside>
+  <section class="auth">
+   <div class="card" id="authcard">
+    <div class="authheading"><p class="eyebrow">Hope team workspace</p><h2 id="auth-title">Welcome back</h2><p id="auth-subtitle">Sign in to your workspace to continue.</p></div>
+    <div class="tabs" id="atabs" role="tablist" aria-label="Account access"><button id="tab-login" role="tab" aria-controls="f-login" data-v="login" aria-selected="true">Sign in</button><button id="tab-register" role="tab" aria-controls="f-reg" data-v="reg" aria-selected="false">Register</button></div>
+    <form id="f-login" role="tabpanel" aria-labelledby="tab-login"><label>Email<input id="l-e" type="email" required autocomplete="email"></label><label>Password<input id="l-p" type="password" required autocomplete="current-password"></label><button class="btn full">Sign in</button><button type="button" class="lnk" data-v="reset">Forgot your password?</button></form>
+    <form id="f-reg" role="tabpanel" aria-labelledby="tab-register" hidden><label>Full name<input id="r-n" required autocomplete="name"></label><label>Work email<input id="r-e" type="email" required autocomplete="email"></label><label>Password<input id="r-p" type="password" minlength="8" required autocomplete="new-password"></label><p class="hint">Use at least 8 characters.</p><button class="btn full">Create account</button></form>
+    <form id="f-reset" hidden><label>Account email<input id="p-e" type="email" required></label><button class="btn full">Send reset link</button><button type="button" class="lnk" data-v="login">Back to sign in</button></form>
+    <form id="f-newpass" hidden><label>New password (8+ characters)<input id="n-p" type="password" minlength="8" required autocomplete="new-password"></label><button class="btn full">Save new password</button></form>
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    <div class="note" id="demo" hidden>Demo mode: add your Supabase keys in CFG to use real sign in. Try admin@hope.com, superadmin@hope.com or user@hope.com with any password.</div>
+   </div>
+  </section>
+ </div>
+</div>
+
+<div id="app" hidden>
+ <div class="shell">
+  <aside class="side" id="side">
+  <div class="brand"><span class="dot" aria-hidden="true">H</span><span class="brandcopy"><span class="brandname">Hope, Inc. ERP</span><span class="brandtag">TEAM LIQUID PH</span></span></div>
+   <nav id="tabs" aria-label="Modules"></nav>
+   <div class="me"><div class="mi"><span class="av" id="av"></span><div class="wi"><b id="un"></b><span class="pill" id="ur"></span></div></div><button class="btn sm" id="out">Sign out</button></div>
+  </aside>
+  <div class="mainc">
+  <div class="mbar"><button class="btn ghost sm" id="burger" aria-label="Open menu">&#9776; Menu</button><div class="brand"><span class="dot" aria-hidden="true">H</span><span class="brandcopy"><span class="brandname">Hope, Inc. ERP</span><span class="brandtag">TEAM LIQUID PH</span></span></div></div>
+   <header class="pagehead"><h1 id="pt"></h1><p id="ps"></p></header>
+   <main id="view"></main>
+  </div>
+ </div>
+ <div class="scrim" id="scrim"></div>
+</div>
+<dialog id="dlg"></dialog><dialog id="dlg2"></dialog>
+<button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false" title="Switch to dark mode">
+ <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.5A8.5 8.5 0 0 1 8.5 3.5 8.5 8.5 0 1 0 20.5 15.5Z"/></svg>
+ <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true" hidden><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+</button>
+
+<script>
+const CFG = { SUPABASE_URL: "", SUPABASE_ANON_KEY: "" };
+const $ = (selector) => document.querySelector(selector);
+const themeToggle=$('#themeToggle');
+const setTheme = (mode) => {
+  const dark = mode === "dark";
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  themeToggle.setAttribute("aria-pressed", String(dark));
+  themeToggle.setAttribute(
+    "aria-label",
+    dark ? "Switch to light mode" : "Switch to dark mode",
+  );
+  themeToggle.title = dark ? "Switch to light mode" : "Switch to dark mode";
+  themeToggle.querySelector(".moon-icon").hidden = dark;
+  themeToggle.querySelector(".sun-icon").hidden = !dark;
+
+  try {
+    localStorage.setItem("hope_theme", dark ? "dark" : "light");
+  } catch (error) {}
+};
+
+let savedTheme = "light";
+try {
+  savedTheme = localStorage.getItem("hope_theme") || "light";
+} catch (error) {}
+setTheme(savedTheme);
+
+themeToggle.addEventListener("click", () => {
+  const nextTheme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  setTheme(nextTheme);
+});
+
+const esc = (value) =>
+  String(value ?? "").replace(/[&<>"']/g, (character) =>
+    ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    })[character],
+  );
+
+const mem = {};
+const load = (key, fallback) => {
+  try {
+    const value = localStorage.getItem(key);
+    if (value) return JSON.parse(value);
+  } catch (error) {
+    if (mem[key]) return mem[key];
+  }
+  return fallback;
+};
+const save = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {
+    mem[key] = value;
+  }
+};
+const today = () => new Date().toISOString().slice(0, 10);
+const money = (value) =>
+  "$" +
+  Number(value || 0).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+let U = null;
+let V = { mod: "overview", sub: "employees" };
+const isAdm = () => U && ["superadmin", "admin"].includes(U.role);
+const MODS = {
+  customers: "Customers",
+  products: "Products",
+  hr: "Human resources",
+  sales: "Sales",
+  reports: "Reports",
+};
+
+/* ---------- data ---------- */
+const data = (name) => load("hope_v2_" + name, SEED[name] || []);
+const put = (name, value) => save("hope_v2_" + name, value);
+const act = (name) => data(name).filter((record) => !record.del);
+const price = (code, date = today()) => {
+  const current = act("prices")
+    .filter((record) => record.prod == code && record.date <= date)
+    .sort((a, b) => b.date.localeCompare(a.date))[0];
+  return current ? +current.price : 0;
+};
+const sdate = (transaction) =>
+  (data("sales").find((sale) => sale.no == transaction) || {}).date || today();
+const lineAmt = (line) => line.qty * price(line.prod, sdate(line.trans));
+const nm = (name, key, value, field) =>
+  (data(name).find((record) => record[key] == value) || {})[field] || value;
+const opt = (name, key, format) => () =>
+  act(name).map((record) => [record[key], record[key] + " — " + format(record)]);
+const stamp = (action) =>
+  action +
+  " " +
+  U.name.split(" ")[0].toLowerCase() +
+  " " +
+  new Date().toISOString().slice(0, 16).replace("T", " ");
+
+const ENT = {
+  customers: {
+    t: "Customers",
+    f: [
+      { k: "no", l: "Cust no", u: 1 },
+      { k: "name", l: "Name" },
+      { k: "address", l: "Address" },
+      { k: "terms", l: "Pay terms" },
+    ],
+  },
+  products: {
+    t: "Products",
+    f: [
+      { k: "code", l: "Code", u: 1 },
+      { k: "desc", l: "Description" },
+      { k: "unit", l: "Unit" },
+    ],
+    kid: "prices",
+    kk: "code",
+    kl: "Prices",
+    calc: [{ l: "Current price", fn: (record) => money(price(record.code)) }],
+  },
+  prices: {
+    t: "Price history",
+    par: "prod",
+    uk: ["prod", "date"],
+    f: [
+      { k: "prod", l: "Product", h: 1 },
+      { k: "date", l: "Effective date", type: "date" },
+      { k: "price", l: "Unit price", type: "number", m: 1 },
+    ],
+  },
+  employees: {
+    t: "Employees",
+    kid: "jobhist",
+    kk: "no",
+    kl: "History",
+    f: [
+      { k: "no", l: "Emp no", u: 1 },
+      { k: "last", l: "Last name" },
+      { k: "first", l: "First name" },
+      { k: "gender", l: "Gender", o: () => [["M", "Male"], ["F", "Female"], ["O", "Other"]] },
+      { k: "birth", l: "Birth date", type: "date" },
+      { k: "hire", l: "Hire date", type: "date" },
+      { k: "sep", l: "Separation date", type: "date", opt: 1 },
+    ],
+  },
+  jobhist: {
+    t: "Job history",
+    par: "emp",
+    uk: ["emp", "date"],
+    f: [
+      { k: "emp", l: "Employee", h: 1 },
+      { k: "date", l: "Effective date", type: "date" },
+      { k: "job", l: "Job", o: opt("jobs", "code", (record) => record.desc) },
+      { k: "dept", l: "Department", o: opt("depts", "code", (record) => record.name) },
+      { k: "salary", l: "Salary", type: "number", m: 1 },
+    ],
+  },
+  jobs: {
+    t: "Jobs",
+    f: [
+      { k: "code", l: "Job code", u: 1 },
+      { k: "desc", l: "Description" },
+    ],
+  },
+  depts: {
+    t: "Departments",
+    f: [
+      { k: "code", l: "Dept code", u: 1 },
+      { k: "name", l: "Name" },
+    ],
+  },
+  sales: {
+    t: "Sales",
+    kid: "lines",
+    kk: "no",
+    kl: "Lines",
+    f: [
+      { k: "no", l: "Trans no", u: 1 },
+      { k: "date", l: "Sales date", type: "date" },
+      { k: "cust", l: "Customer", o: opt("customers", "no", (record) => record.name) },
+      { k: "emp", l: "Salesperson", o: opt("employees", "no", (record) => record.first + " " + record.last) },
+    ],
+    calc: [
+      {
+        l: "Total",
+        fn: (record) =>
+          money(
+            act("lines")
+              .filter((line) => line.trans == record.no)
+              .reduce((sum, line) => sum + lineAmt(line), 0),
+          ),
+      },
+    ],
+  },
+  lines: {
+    t: "Sale lines",
+    par: "trans",
+    uk: ["trans", "prod"],
+    f: [
+      { k: "trans", l: "Transaction", h: 1 },
+      { k: "prod", l: "Product", o: opt("products", "code", (record) => record.desc) },
+      { k: "qty", l: "Quantity", type: "number" },
+    ],
+    calc: [
+      { l: "Unit price", fn: (record) => money(price(record.prod, sdate(record.trans))) },
+      { l: "Amount", fn: (record) => money(lineAmt(record)) },
+    ],
+  },
+};
+
+const T = (name, rows) =>
+  rows.map((row, index) =>
+    Object.fromEntries([
+      ["id", name + index],
+      ["del", false],
+      ["stamp", "CREATED system 2026-10-01 09:00"],
+      ...ENT[name].f.map((field, fieldIndex) => [field.k, row[fieldIndex]]),
+    ]),
+  );
+
+const SEED = {
+  customers: T("customers", [
+    ["C0001", "Globus Medical, Inc", "2560 Gen Armistead Ave Audubon CA 94031", "30D"],
+    ["C0002", "RF Industries, Inc", "7610 Miramar Rd San Diego, CA 92602", "45D"],
+    ["C0003", "Trisha Macdowell", "7642 Clairemont Mesa Blvd San Diego CA 90321", "COD"],
+    ["C0004", "HMS Holdings, Inc", "1000 So Fremont Ave, Suite 225 Alhambara CA 91303", "45D"],
+    ["C0005", "Christian Andersen", "1120 Lincoln St Suite 809 Sacramento CA 95815", "COD"],
+    ["C0006", "Astronics, Inc", "2 Orion Aliso Viejo, CA 92656", "30D"],
+    ["C0007", "Morgan Alegore", "2 Goodyear Irvine, CA 92618", "COD"],
+    ["C0008", "Abaxis, Inc", "3240 Whipple Rd, Union City, CA 94587", "30D"],
+    ["C0009", "Landec Corp.", "3603 Haven Avenue Menlo Park, CA 94025", "30D"],
+    ["C0010", "SMP Corp.", "3718 Northern Long Island NY 12528", "45D"],
+    ["C0011", "B&G Foods", "4 Gatehall Dr., Ste. 110 Parsippany, NJ 07054", "45D"],
+    ["C0012", "Dexter Santos", "2739 Rebeiro Ave, Santa Clara, CA 95051", "COD"],
+    ["C0013", "Health Stream", "209 10th Ave, South Suite 450 Nashville Tennessee", "45D"],
+    ["C0014", "InSync Training LLC", "P.O. Box 3122 Roanoke, VA 24015", "30D"],
+    ["C0015", "Bespoke Education", "8205 Santa Monica Blvd, Suite 365 W HWood CA 90046", "30D"],
+    ["C0016", "Peri Solutions", "2880 Zanker Road San Jose CA 95101", "30D"],
+    ["C0017", "Janet Lim", "800 N. State College Blvd. Fullerton, CA 92831", "COD"],
+    ["C0018", "Nicole Hutchison", "200 Lincoln Ave, Salinas, CA 93901", "COD"],
+    ["C0019", "Brandon Drucker", "65 West Alisal St., # 101, Salinas, CA 93901", "COD"],
+    ["C0020", "Eugene Whitaker", "45 Fremont Street, Suite 2000 San Frans, CA 9410", "COD"],
+    ["C0021", "Touch Suite", "1081 Holland Dr. Boca Raton, FL 33487", "30D"],
+    ["C0022", "CallFire", "1410 2nd St., Suite 200 Santa Monica, CA 90401", "45D"],
+    ["C0023", "ISBX Corp", "3415 S. Sepulveda Blvd. 1250 Los Angeles, CA 90034", "30D"],
+    ["C0024", "Factual", "1999 Avenue of the Stars Los Angeles, CA 90067", "30D"],
+    ["C0025", "Predixion", "31910 Del Obispo San Juan Capistrano, CA 92675", "45D"],
+    ["C0026", "Datapop", "5762 W Jefferson Blvd, Los Angeles, CA 90016", "45D"],
+    ["C0027", "SA Photonics, Inc", "130 Knowles Dr, Los Gatos, CA 95032", "30D"],
+    ["C0028", "Acumen Bldg Entp", "7770 Pardee Lane, Ste. 200 Oakland, CA 94621", "30D"],
+    ["C0029", "IMCorp", "50 Utopia Road Manchester, CT 06042", "30D"],
+    ["C0030", "Brady and Assoc.", "3710 Ruffin Rd, San Diego, CA 90401", "30D"],
+    ["C0031", "Yello Hammer LLC", "111 W 28th St, New York, NY 10001", "30D"],
+    ["C0032", "Conductor", "2 Park Ave, New York, NY 10016", "30D"],
+    ["C0033", "Quantum Networks", "323 West 39th Street 11th Flr NY 10018", "45D"],
+    ["C0034", "Refinery29", "225 Broadway NY 10007", "45D"],
+    ["C0035", "Gravity Media", "104 W 27th St #11d NY 10001", "30D"],
+    ["C0036", "Regal wings", "244 Fifth Avenue, Suite 200 New York, NY 10001", "45D"],
+    ["C0037", "33Across", "229 W 28th St, New York, NY 10001", "45D"],
+    ["C0038", "RCS Capital", "405 Park Avenue New York, NY 1002", "30D"],
+    ["C0039", "OnDeck", "1400 Broadway, 25th Floor, New York, NY 10001", "45D"],
+    ["C0040", "Optimatic Media, Inc", "54 West 40th St., 7th Floor, New York, NY 10018", "30D"],
+    ["C0041", "James Underwood", "450 West 33rd Street New York, NY 10018", "COD"],
+    ["C0042", "Charles Silverstone", "1335 Ave of the Americas, New York, NY 10019", "COD"],
+    ["C0043", "Nea Sanchez", "371 7th Ave, New York, NY 10001", "COD"],
+    ["C0044", "Tracy Lambert", "234 W 42nd St, New York, NY 10036", "COD"],
+    ["C0045", "Peter Charlestone", "342 W 40th St, New York, NY 10018", "COD"],
+    ["C0046", "Oxford Academy", "5172 Orange Ave, Cypress, CA 90630", "45D"],
+    ["C0047", "Whitney High Sch", "16800 Shoemaker Ave, Cerritos, CA 90703", "30D"],
+    ["C0048", "Pacfic Collegiate", "255 Swift St, Santa Cruz, CA 95060", "45D"],
+    ["C0049", "KIPP San Jose", "1790 Educational Park Dr, San Jose, CA 95133", "30D"],
+    ["C0050", "The Preuss School", "9500 Gilman Dr Mc 0536, La Jolla, CA 92093", "45D"],
+    ["C0051", "American Indian Sch", "3637 Magee Ave, Oakland, CA 94619", "30D"],
+    ["C0052", "Lowell High School", "1101 Eucalyptus Dr, San Francisco, CA 94132", "45D"],
+    ["C0053", "University HSchool", "2611 East Matoian M/S Uh134, Fresno, CA 93740", "30D"],
+    ["C0054", "Hawthorne Academy", "4467 West Broadway, Hawthorne, CA 90250", "30D"],
+    ["C0055", "Lennox Academy", "11036 Hawthorne Blvd, Lennox, CA 90304", "45D"],
+    ["C0056", "Manhasset School", "200 Memorial Place Manhasset, NY 11030", "45D"],
+    ["C0057", "Pittsford High Sch", "55 Sutherland St Pittsford, NY 14534", "30D"],
+    ["C0058", "Jericho High School", "99 Cedar Swamp Rd, Jericho, NY 11753", "45D"],
+    ["C0059", "Stuyvesant High", "345 Chambers St, New York, NY 10282", "45D"],
+    ["C0060", "Rye High School", "Parsons St, Rye, NY 10580", "30D"],
+    ["C0061", "Brooklyn High", "29 Ft Greene Place, Brooklyn, NY 11217", "45D"],
+    ["C0062", "Brooklyn Latin Sch", "325 Bushwick Ave, Brooklyn, NY 11206", "30D"],
+    ["C0063", "Bronx Science High", "75 West 205Th St Bronx, NY 10468", "45D"],
+    ["C0064", "Staten Island High", "485 Clawson St, Staten Island, NY 10306", "30D"],
+    ["C0065", "Yonkers Middle High", "150 Rockland Ave, Yonkers, NY 10705", "45D"],
+    ["C0066", "Helen Strong", "800 S Main StTulelake, CA 96134", "COD"],
+    ["C0067", "Gay Rose Silva", "575 3rd St Napa, CA 94559", "COD"],
+    ["C0068", "William Pichler", "1121 L St #407 Sacramento, CA 95814", "COD"],
+    ["C0069", "Terrance Nitz", "23200 Pacific Coast Hwy Malibu, CA 90265", "COD"],
+    ["C0070", "Errol Atanacio", "300 Capitol Mall #555 Sacramento, CA 95814", "COD"],
+    ["C0071", "Chuck Jones", "163 W 125th St New York, NY 10027", "COD"],
+    ["C0072", "Menchu Palmores", "600 College Ave Montour Falls, NY 14865", "COD"],
+    ["C0073", "Princess Ann White", "109 S Union St #411 Rochester, NY 14607", "COD"],
+    ["C0074", "Florence Black", "450 S Salina St Syracuse, NY 13202", "COD"],
+    ["C0075", "Jeremy Irons", "3357 US Highway 9w Highland, NY 12528", "COD"],
+    ["C0076", "Braddy Banks", "1424 Fulton St Brooklyn, NY 11216", "COD"],
+    ["C0077", "Office NY Tech Serv", "State Capitol Empire State Plaza NY 10027", "45D"],
+    ["C0078", "FDA New York", "158-15 Liberty Ave., Jamaica, NY 12528", "45D"],
+    ["C0079", "Social Sec Admn NY", "123 William St, New York, NY 10038", "45D"],
+    ["C0080", "Social Sec Admn CA", "3836 Wilshire Blvd, Los Angeles, CA 90010", "45D"],
+    ["C0081", "Dept Food and Agri", "220 N Street Sacramento, CA 95814", "45D"],
+    ["C0082", "California Dept Tech", "1325 J St Suite 1600 Sacramento CA 95814", "45D"],
+  ]),
+  products: T("products", [
+    ["AD0001", "Toshiba Canvio 1 TB", "ea"],
+    ["AD0002", "WD Ultra 1TB", "ea"],
+    ["AD0003", "Seagate Bracuda 1TB", "ea"],
+    ["AD0004", "Transcend 1 TB", "ea"],
+    ["AK0001", "HP Pavilion DV6000", "pc"],
+    ["AK0002", "Micro Innovations Kb", "pc"],
+    ["AK0003", "Steel APEX GAMING KB", "pc"],
+    ["AM0001", "MS Wireless Mouse", "pc"],
+    ["AM0002", "LOGITECH 910-002696", "pc"],
+    ["AM0003", "IMICRO KB-IM8911U", "pc"],
+    ["AM0004", "STEEL Rival Mouse", "pc"],
+    ["AM0005", "Logitech M500 USB", "pc"],
+    ["AP0001", "HDMI Pocket Proj", "pc"],
+    ["AP0002", "InFocus IN112 Proj", "pc"],
+    ["AP0003", "ViewSonic Projector", "pc"],
+    ["MD0001", "ASUS VS228H-P 22-In", "ea"],
+    ["MD0002", "ViewSonic VA2446M", "ea"],
+    ["MD0003", "Dell UltrShrp U2412M", "ea"],
+    ["MD0004", "Acer S231HL BBID 23", "ea"],
+    ["MD0005", "Apple Dsplay MC914", "ea"],
+    ["MD0006", "Asus VE228H 21.5", "ea"],
+    ["MP0001", "Apple iPhone 4 16GB", "ea"],
+    ["MP0002", "Apple iPhone 3G", "ea"],
+    ["MP0003", "SAMSUNG GALAXY S4", "ea"],
+    ["MP0004", "SAMSUNG GALAXY S3", "ea"],
+    ["NB0001", "Dell Inspiron Laptop", "ea"],
+    ["NB0002", "ASUS Tformer Book", "ea"],
+    ["NB0003", "Acer C720 Chrome", "ea"],
+    ["NB0004", "HP Chromebook 11", "ea"],
+    ["NB0005", "Apple Mac Pro Laptop", "ea"],
+    ["NH0001", "NETGEAR ProSAFE 5-Port", "pc"],
+    ["NH0002", "TP-LINK  1000Mbps", "pc"],
+    ["NH0003", "Cisco 24-P G Switch", "pc"],
+    ["NT0001", "Apple iPad Retna 16G", "ea"],
+    ["NT0002", "Apple iPad 2 MC769LL", "ea"],
+    ["NT0003", "Apple iPad Mini", "ea"],
+    ["NT0004", "Samsung Galaxy Tab3", "ea"],
+    ["NT0005", "Samsung Glaxy Tab32G", "ea"],
+    ["NT0006", "DrgonTouch 7B 2Core", "ea"],
+    ["PA0001", "MS Ofc Business 2013", "ea"],
+    ["PA0002", "Office Mac Home 2011", "ea"],
+    ["PC0001", "CyberpowerPC Gamer", "ea"],
+    ["PC0002", "Dell 745 Opti Desk", "ea"],
+    ["PC0003", "Dell Inspiron Desk", "ea"],
+    ["PC0004", "Dell Inspiron 660", "ea"],
+    ["PF0001", "Win7 Pro SP1 64bit", "ea"],
+    ["PF0002", "Win7 Home Pre SP1 64", "ea"],
+    ["PF0003", "Mac OS X ver 10.6.3", "ea"],
+    ["PF0004", "Windows 8.1 64-Bit", "ea"],
+    ["PF0005", "Windows 8 Pro", "ea"],
+    ["PF0006", "RED HAT Prof Edition", "ea"],
+    ["PR0001", "Epson Expression", "pc"],
+    ["PR0002", "Canon PIXMA MX922", "pc"],
+    ["PR0003", "HP Envy 4500 Wireles", "pc"],
+    ["PS0001", "VirServ 12Core 128GB", "pc"],
+    ["PS0002", "Ms WinServer 2012", "pc"],
+    ["PS0003", "Cisco Virt Hardware", "pc"],
+  ]),
+  prices: T("prices", [
+    ["AK0001", "2010-05-15", 12],
+    ["AK0002", "2010-05-15", 8.37],
+    ["AK0003", "2010-05-15", 99.99],
+    ["AM0001", "2010-05-15", 36.45],
+    ["AM0002", "2010-05-15", 69.26],
+    ["AM0003", "2010-05-15", 20.43],
+    ["AM0004", "2010-05-15", 88.14],
+    ["AM0005", "2010-05-15", 49.27],
+    ["AP0001", "2010-05-15", 299.99],
+    ["AP0002", "2010-05-15", 304.48],
+    ["AP0003", "2010-05-15", 349.99],
+    ["MD0001", "2010-05-15", 119.68],
+    ["MD0002", "2010-05-15", 149.99],
+    ["MD0003", "2010-05-15", 239.96],
+    ["MD0004", "2010-05-15", 132.21],
+    ["MD0005", "2010-05-15", 825],
+    ["MD0006", "2010-05-15", 124.29],
+    ["NB0001", "2010-05-15", 300],
+    ["NB0002", "2010-05-15", 298],
+    ["NB0003", "2010-05-15", 199],
+    ["NB0004", "2010-05-15", 279],
+    ["PA0001", "2010-05-15", 219],
+    ["PA0002", "2010-05-15", 102.99],
+    ["PC0001", "2010-07-12", 454.54],
+    ["PC0001", "2010-05-15", 499.99],
+    ["PC0002", "2010-07-12", 197.99],
+    ["PC0002", "2010-05-15", 179.99],
+    ["PC0003", "2010-05-15", 390],
+    ["PC0004", "2010-05-15", 538],
+    ["PF0001", "2010-05-15", 123.75],
+    ["PF0002", "2010-05-15", 64.25],
+    ["PF0003", "2010-05-15", 28.87],
+    ["PF0004", "2010-05-15", 92.85],
+    ["PF0005", "2010-05-15", 119],
+    ["PF0006", "2010-05-15", 7.5],
+    ["PR0001", "2010-05-15", 81.72],
+    ["PR0002", "2010-05-15", 99.99],
+    ["PR0003", "2010-05-15", 123],
+    ["MD0001", "2010-08-01", 131.65],
+    ["MD0002", "2010-08-01", 164.99],
+    ["MD0003", "2010-08-01", 263.96],
+    ["MD0004", "2010-08-01", 145.43],
+    ["MD0005", "2010-08-01", 907.5],
+    ["MD0006", "2010-08-01", 136.72],
+    ["PF0001", "2010-08-16", 112.5],
+    ["PF0002", "2010-08-16", 58.41],
+    ["PF0003", "2010-08-16", 26.25],
+    ["PF0004", "2010-08-16", 84.41],
+    ["PF0005", "2010-08-16", 108.18],
+    ["PF0006", "2010-08-16", 6.82],
+    ["AM0001", "2010-08-16", 38.27],
+    ["AM0002", "2010-08-16", 72.72],
+    ["AM0003", "2010-08-16", 21.45],
+    ["AM0004", "2010-08-16", 92.55],
+    ["AM0005", "2010-08-16", 51.73],
+    ["AP0001", "2010-08-16", 314.99],
+    ["AP0002", "2010-08-16", 319.7],
+    ["AP0003", "2010-08-16", 367.49],
+    ["AD0001", "2010-08-16", 58],
+    ["AD0002", "2010-08-16", 69.99],
+    ["AD0003", "2010-08-16", 54.44],
+    ["AD0004", "2010-08-16", 71.99],
+    ["NH0001", "2010-08-16", 21.99],
+    ["NH0002", "2010-08-16", 24.99],
+    ["NH0003", "2010-08-16", 171.69],
+    ["NT0001", "2010-12-01", 412.49],
+    ["NT0002", "2010-12-01", 324.99],
+    ["NT0003", "2010-12-01", 287],
+    ["NT0004", "2010-12-01", 219.89],
+    ["NT0005", "2010-12-01", 499.99],
+    ["NT0006", "2010-12-01", 57.99],
+    ["PS0001", "2010-12-01", 3200],
+    ["PS0002", "2010-12-01", 699.99],
+    ["PS0003", "2010-12-01", 599.99],
+    ["MP0001", "2010-12-01", 199.95],
+    ["MP0002", "2010-12-01", 126.72],
+    ["MP0003", "2010-12-01", 425],
+    ["MP0004", "2010-12-01", 302],
+    ["NB0005", "2011-02-01", 1184.72],
+  ]),
+  employees: T("employees", [
+    ["00001", "Smith", "John", "M", "1985-02-20", "2010-05-11", ""],
+    ["00003", "Smith", "Jane", "F", "1990-05-16", "2010-05-11", ""],
+    ["00005", "King", "Don", "M", "1986-02-14", "2010-06-23", ""],
+    ["00007", "Jenskin", "Floyd", "M", "1990-02-20", "2010-05-30", ""],
+    ["00009", "Cerudo", "Bambie", "F", "1983-06-23", "2010-05-30", ""],
+    ["00011", "Davis", "Tom", "M", "1989-12-16", "2010-06-30", ""],
+    ["00013", "Morris", "Olive", "F", "1991-07-21", "2010-06-30", ""],
+    ["00015", "Zulueta", "Maggie", "F", "1990-08-03", "2010-07-05", "2011-03-30"],
+    ["00017", "Celestino", "Nelia", "F", "1984-10-24", "2010-07-05", ""],
+    ["00019", "Esperanza", "Nehemiah", "M", "1982-02-21", "2010-07-05", "2014-04-28"],
+    ["00021", "Manchester", "Chelie", "F", "1988-12-07", "2010-07-05", ""],
+    ["00023", "Kline", "Nicholas", "M", "1992-01-21", "2010-07-05", "2010-12-23"],
+    ["00025", "Macapagal", "Ivy", "F", "1992-04-30", "2010-07-05", ""],
+    ["00027", "Blanche", "Ernest", "M", "1986-12-21", "2010-07-05", ""],
+    ["00029", "Chua", "Evangeline", "F", "1989-03-10", "2010-07-05", ""],
+    ["00031", "Lancaster", "Greta", "F", "1987-08-17", "2010-07-05", ""],
+    ["00033", "Parks", "Nigel", "M", "1993-06-23", "2010-07-05", ""],
+    ["00035", "Carlston", "Voltaire", "F", "1985-06-12", "2010-07-21", ""],
+    ["00037", "Silva", "Yves", "M", "1988-09-21", "2010-07-21", ""],
+    ["00039", "Geisert", "William", "M", "1980-03-03", "2010-07-21", ""],
+    ["00041", "Darwin", "Helena", "F", "1978-11-08", "2010-09-01", ""],
+    ["00043", "Love", "Queen", "F", "1983-11-29", "2010-09-01", ""],
+    ["00045", "Raven", "Danny", "M", "1984-02-15", "2010-12-03", ""],
+    ["00047", "Devito", "Clint", "M", "1981-06-07", "2010-12-03", ""],
+    ["00049", "Irving", "Nancy", "F", "1987-09-19", "2010-12-03", ""],
+    ["00051", "Baltimore", "Fergie", "F", "1986-10-10", "2011-01-05", ""],
+    ["00053", "Jones", "Veronica", "F", "1983-05-01", "2011-01-05", "2011-03-30"],
+    ["00055", "Travis", "Ursula", "F", "1987-06-07", "2011-01-05", ""],
+    ["00057", "Orleans", "Sylvia", "F", "1987-01-28", "2011-01-05", ""],
+    ["00059", "Sy", "Alice", "F", "1984-08-13", "2011-01-05", "2011-04-20"],
+    ["00061", "De Leon", "Girlie", "F", "1983-07-27", "2011-01-05", ""],
+    ["00063", "Grant", "Albert", "M", "1979-05-05", "2011-01-05", ""],
+  ]),
+  jobhist: T("jobhist", [
+    ["00001", "2010-05-11", "PR1", "IT", 48000],
+    ["00001", "2010-12-01", "PR2", "IT", 50000],
+    ["00003", "2010-05-11", "PR2", "IT", 50000],
+    ["00003", "2010-12-01", "ANYS", "IT", 55000],
+    ["00005", "2010-06-23", "SA1", "BR1", 36000],
+    ["00005", "2011-01-02", "SA2", "BR1", 38000],
+    ["00007", "2010-05-30", "ANYS", "IT", 55000],
+    ["00007", "2011-01-02", "MGR", "IT", 60000],
+    ["00007", "2011-03-31", "VP", "IT", 80000],
+    ["00009", "2010-05-30", "ACCT", "ACT", 50000],
+    ["00009", "2010-12-01", "MGR", "ACT", 60000],
+    ["00011", "2010-06-30", "PRES", "EXC", 100000],
+    ["00013", "2010-06-30", "MGR", "BR1", 60000],
+    ["00013", "2011-01-02", "VP", "BR2", 80000],
+    ["00013", "2011-03-01", "VP", "BR1", 80000],
+    ["00015", "2010-07-05", "SA1", "BR1", 36000],
+    ["00017", "2010-07-05", "SA1", "BR1", 36000],
+    ["00017", "2011-01-12", "SPVR", "BR1", 40000],
+    ["00019", "2010-07-05", "SA1", "BR1", 36000],
+    ["00019", "2011-01-12", "SA2", "BR1", 38000],
+    ["00021", "2010-07-05", "SA1", "BR1", 36000],
+    ["00021", "2011-01-12", "SA2", "BR1", 38000],
+    ["00023", "2010-07-05", "MGR", "HRD", 60000],
+    ["00025", "2010-07-05", "SA1", "BR1", 36000],
+    ["00027", "2010-07-05", "SA1", "BR1", 36000],
+    ["00027", "2011-01-12", "SA2", "BR1", 38000],
+    ["00029", "2010-07-05", "SPVR", "BR1", 40000],
+    ["00029", "2011-01-02", "MGR", "BR1", 60000],
+    ["00031", "2010-07-05", "WMAN", "WHS", 35000],
+    ["00031", "2011-12-01", "WMAN", "WHS", 40000],
+    ["00033", "2010-07-05", "WMAN", "WHS", 35000],
+    ["00035", "2010-07-21", "ACCT", "PAY", 50000],
+    ["00037", "2010-07-21", "CLK1", "PAY", 34000],
+    ["00039", "2010-07-21", "CLK1", "PAY", 34000],
+    ["00039", "2012-06-30", "CLK2", "EXC", 35000],
+    ["00041", "2010-09-01", "SPVR", "WHS", 40000],
+    ["00041", "2011-06-01", "MGR", "WHS", 60000],
+    ["00043", "2010-09-01", "CLK2", "EXC", 35000],
+    ["00043", "2011-06-01", "SPVR", "EXC", 35000],
+    ["00043", "2011-01-12", "SPVR", "HRD", 35000],
+    ["00045", "2010-12-03", "SPVR", "ACT", 40000],
+    ["00047", "2010-12-03", "CLK1", "EXC", 34000],
+    ["00047", "2011-01-12", "CLK2", "HRD", 35000],
+    ["00049", "2010-12-03", "MGR", "BR2", 60000],
+    ["00051", "2011-01-05", "SA1", "BR2", 36000],
+    ["00053", "2011-01-05", "SA1", "BR2", 36000],
+    ["00055", "2011-01-05", "SA1", "BR2", 36000],
+    ["00055", "2011-03-01", "SA2", "BR2", 38000],
+    ["00057", "2011-01-05", "SA1", "BR2", 36000],
+    ["00057", "2011-06-01", "PR1", "BR2", 48000],
+    ["00059", "2011-01-05", "SA1", "BR2", 36000],
+    ["00061", "2011-01-05", "SA1", "BR2", 36000],
+    ["00063", "2011-01-05", "SA2", "BR2", 38000],
+    ["00063", "2011-06-01", "SPVR", "BR2", 40000],
+  ]),
+  jobs: T("jobs", [
+    ["PRES", "President"],
+    ["VP", "Vice president"],
+    ["MGR", "Manager"],
+    ["SA1", "Sales Agent 1"],
+    ["SA2", "Sales Agent 2"],
+    ["SPVR", "Supervisor"],
+    ["CLK1", "Clerk 1"],
+    ["CLK2", "Clerk 2"],
+    ["PR1", "Programmer 1"],
+    ["PR2", "Programmer 2"],
+    ["ANYS", "Analyst"],
+    ["ACCT", "Accountant"],
+    ["WMAN", "Warehouse man"],
+    ["HRS", "HR Specialist"],
+  ]),
+  depts: T("depts", [
+    ["ACT", "Accounting"],
+    ["BR1", "Sales Branch 1"],
+    ["BR2", "Sales Branch 2"],
+    ["EXC", "Executive"],
+    ["HRD", "Human Resource"],
+    ["IT", "Information Tech"],
+    ["PAY", "Payroll"],
+    ["WHS", "Warehouse"],
+  ]),
+  sales: T("sales", [
+    ["TR000001", "2010-06-27", "C0001", "00005"],
+    ["TR000002", "2010-07-05", "C0003", "00005"],
+    ["TR000003", "2010-07-05", "C0002", "00015"],
+    ["TR000004", "2010-07-07", "C0004", "00017"],
+    ["TR000005", "2010-07-09", "C0005", "00019"],
+    ["TR000006", "2010-07-07", "C0001", "00005"],
+    ["TR000007", "2010-07-07", "C0002", "00015"],
+    ["TR000008", "2010-07-10", "C0006", "00021"],
+    ["TR000009", "2010-07-10", "C0007", "00021"],
+    ["TR000010", "2010-07-10", "C0008", "00021"],
+    ["TR000011", "2010-07-10", "C0009", "00005"],
+    ["TR000012", "2010-07-12", "C0004", "00017"],
+    ["TR000013", "2010-07-12", "C0010", "00025"],
+    ["TR000014", "2010-07-12", "C0011", "00021"],
+    ["TR000015", "2010-07-12", "C0012", "00025"],
+    ["TR000016", "2010-07-12", "C0013", "00027"],
+    ["TR000017", "2010-07-12", "C0001", "00005"],
+    ["TR000018", "2010-07-13", "C0006", "00021"],
+    ["TR000019", "2010-08-01", "C0014", "00019"],
+    ["TR000020", "2010-08-05", "C0007", "00021"],
+    ["TR000021", "2010-08-05", "C0015", "00027"],
+    ["TR000022", "2010-08-10", "C0016", "00021"],
+    ["TR000023", "2010-08-10", "C0017", "00027"],
+    ["TR000024", "2010-08-10", "C0018", "00027"],
+    ["TR000025", "2010-08-10", "C0019", "00025"],
+    ["TR000026", "2010-08-12", "C0011", "00021"],
+    ["TR000027", "2010-08-30", "C0009", "00005"],
+    ["TR000028", "2010-08-30", "C0008", "00021"],
+    ["TR000029", "2010-09-05", "C0002", "00015"],
+    ["TR000030", "2010-09-05", "C0010", "00025"],
+    ["TR000031", "2010-09-05", "C0005", "00019"],
+    ["TR000032", "2010-09-05", "C0014", "00019"],
+    ["TR000033", "2010-09-06", "C0012", "00025"],
+    ["TR000034", "2010-09-06", "C0018", "00027"],
+    ["TR000035", "2010-09-10", "C0021", "00027"],
+    ["TR000036", "2010-09-10", "C0022", "00019"],
+    ["TR000037", "2010-09-23", "C0023", "00021"],
+    ["TR000038", "2010-09-23", "C0024", "00005"],
+    ["TR000039", "2010-09-23", "C0025", "00015"],
+    ["TR000040", "2010-10-05", "C0021", "00019"],
+    ["TR000041", "2010-10-05", "C0023", "00025"],
+    ["TR000042", "2020-10-25", "C0026", "00005"],
+    ["TR000043", "2010-10-27", "C0027", "00019"],
+    ["TR000044", "2010-11-09", "C0028", "00027"],
+    ["TR000045", "2010-11-10", "C0029", "00027"],
+    ["TR000046", "2010-11-20", "C0030", "00019"],
+    ["TR000047", "2010-11-20", "C0023", "00025"],
+    ["TR000048", "2010-12-05", "C0026", "00005"],
+    ["TR000049", "2010-12-10", "C0007", "00021"],
+    ["TR000050", "2010-12-10", "C0003", "00005"],
+    ["TR000051", "2010-12-10", "C0011", "00021"],
+    ["TR000052", "2011-01-10", "C0031", "00051"],
+    ["TR000053", "2011-01-10", "C0032", "00051"],
+    ["TR000054", "2011-01-10", "C0033", "00051"],
+    ["TR000055", "2011-01-10", "C0034", "00053"],
+    ["TR000056", "2011-01-10", "C0035", "00055"],
+    ["TR000057", "2011-01-10", "C0036", "00055"],
+    ["TR000058", "2011-01-10", "C0029", "00027"],
+    ["TR000059", "2011-01-10", "C0022", "00019"],
+    ["TR000060", "2011-01-10", "C0026", "00005"],
+    ["TR000061", "2011-01-10", "C0027", "00027"],
+    ["TR000062", "2011-01-10", "C0013", "00027"],
+    ["TR000063", "2011-01-10", "C0016", "00021"],
+    ["TR000064", "2011-01-17", "C0037", "00057"],
+    ["TR000065", "2011-01-17", "C0038", "00059"],
+    ["TR000066", "2011-01-17", "C0039", "00061"],
+    ["TR000067", "2011-01-17", "C0040", "00063"],
+    ["TR000068", "2011-01-20", "C0041", "00059"],
+    ["TR000069", "2011-01-20", "C0042", "00059"],
+    ["TR000070", "2011-01-25", "C0043", "00059"],
+    ["TR000071", "2011-01-25", "C0044", "00059"],
+    ["TR000072", "2011-01-25", "C0045", "00059"],
+    ["TR000073", "2011-02-01", "C0046", "00021"],
+    ["TR000074", "2011-02-01", "C0047", "00005"],
+    ["TR000075", "2011-02-01", "C0048", "00017"],
+    ["TR000076", "2011-02-02", "C0045", "00059"],
+    ["TR000077", "2011-02-02", "C0044", "00059"],
+    ["TR000078", "2011-02-07", "C0035", "00055"],
+    ["TR000079", "2011-02-07", "C0036", "00055"],
+    ["TR000080", "2011-02-07", "C0040", "00063"],
+    ["TR000081", "2011-02-10", "C0049", "00025"],
+    ["TR000082", "2011-02-10", "C0050", "00027"],
+    ["TR000083", "2011-02-12", "C0032", "00051"],
+    ["TR000084", "2011-02-12", "C0033", "00051"],
+    ["TR000085", "2011-02-15", "C0051", "00019"],
+    ["TR000086", "2011-02-15", "C0052", "00019"],
+    ["TR000087", "2011-02-20", "C0053", "00025"],
+    ["TR000088", "2011-02-20", "C0054", "00005"],
+    ["TR000089", "2011-02-20", "C0055", "00021"],
+    ["TR000090", "2011-03-02", "C0056", "00051"],
+    ["TR000091", "2011-03-02", "C0057", "00053"],
+    ["TR000092", "2011-03-02", "C0058", "00053"],
+    ["TR000093", "2011-03-02", "C0059", "00055"],
+    ["TR000094", "2011-03-02", "C0060", "00051"],
+    ["TR000095", "2011-03-05", "C0050", "00027"],
+    ["TR000096", "2011-03-05", "C0051", "00019"],
+    ["TR000097", "2011-03-05", "C0052", "00019"],
+    ["TR000098", "2011-03-05", "C0055", "00021"],
+    ["TR000099", "2011-03-13", "C0061", "00057"],
+    ["TR000100", "2011-03-13", "C0062", "00057"],
+    ["TR000101", "2011-03-13", "C0063", "00059"],
+    ["TR000102", "2011-03-21", "C0064", "00063"],
+    ["TR000103", "2011-03-21", "C0065", "00057"],
+    ["TR000104", "2011-03-30", "C0009", "00005"],
+    ["TR000105", "2011-03-30", "C0010", "00025"],
+    ["TR000106", "2011-03-30", "C0022", "00019"],
+    ["TR000107", "2011-03-30", "C0013", "00027"],
+    ["TR000108", "2011-04-07", "C0066", "00025"],
+    ["TR000109", "2011-04-07", "C0067", "00025"],
+    ["TR000110", "2011-04-07", "C0068", "00025"],
+    ["TR000111", "2011-04-07", "C0069", "00025"],
+    ["TR000112", "2011-04-07", "C0070", "00025"],
+    ["TR000113", "2011-04-07", "C0071", "00059"],
+    ["TR000114", "2011-04-07", "C0072", "00059"],
+    ["TR000115", "2011-04-07", "C0073", "00059"],
+    ["TR000116", "2011-04-07", "C0074", "00059"],
+    ["TR000117", "2011-04-07", "C0075", "00059"],
+    ["TR000118", "2011-04-07", "C0076", "00059"],
+    ["TR000119", "2011-04-10", "C0077", "00063"],
+    ["TR000120", "2011-04-10", "C0078", "00055"],
+    ["TR000121", "2011-04-12", "C0079", "00051"],
+    ["TR000122", "2011-04-12", "C0080", "00025"],
+    ["TR000123", "2011-04-12", "C0081", "00019"],
+    ["TR000124", "2011-04-15", "C0082", "00017"],
+  ]),
+  lines: T("lines", [
+    ["TR000001", "AK0002", 10],
+    ["TR000001", "AM0003", 10],
+    ["TR000001", "MD0001", 10],
+    ["TR000001", "PC0002", 10],
+    ["TR000002", "NB0001", 5],
+    ["TR000002", "PR0001", 1],
+    ["TR000003", "PF0006", 1],
+    ["TR000004", "AK0003", 6],
+    ["TR000004", "AM0004", 6],
+    ["TR000004", "MD0004", 6],
+    ["TR000004", "NB0002", 4],
+    ["TR000004", "PC0003", 6],
+    ["TR000004", "PR0003", 2],
+    ["TR000005", "AK0003", 1],
+    ["TR000005", "MD0005", 1],
+    ["TR000006", "NB0001", 5],
+    ["TR000006", "PF0005", 5],
+    ["TR000007", "PF0003", 2],
+    ["TR000008", "AP0002", 3],
+    ["TR000008", "MD0002", 2],
+    ["TR000008", "NB0004", 1],
+    ["TR000009", "AM0002", 1],
+    ["TR000009", "MD0003", 1],
+    ["TR000010", "AP0001", 2],
+    ["TR000010", "PA0001", 5],
+    ["TR000011", "AK0003", 3],
+    ["TR000011", "AM0004", 3],
+    ["TR000011", "MD0003", 3],
+    ["TR000011", "PC0004", 3],
+    ["TR000011", "PR0002", 2],
+    ["TR000012", "NB0003", 7],
+    ["TR000013", "AM0005", 2],
+    ["TR000013", "AP0002", 1],
+    ["TR000014", "PF0004", 10],
+    ["TR000015", "AK0003", 1],
+    ["TR000015", "AM0001", 1],
+    ["TR000015", "MD0002", 1],
+    ["TR000015", "PC0001", 1],
+    ["TR000016", "AP0002", 2],
+    ["TR000016", "NB0002", 7],
+    ["TR000016", "PF0006", 1],
+    ["TR000016", "PR0002", 1],
+    ["TR000017", "PA0001", 3],
+    ["TR000017", "PA0002", 4],
+    ["TR000018", "MD0001", 9],
+    ["TR000018", "PC0004", 9],
+    ["TR000019", "AP0002", 2],
+    ["TR000020", "MD0005", 1],
+    ["TR000021", "AM0002", 3],
+    ["TR000021", "NB0002", 3],
+    ["TR000022", "MD0006", 5],
+    ["TR000022", "PA0002", 1],
+    ["TR000022", "PC0002", 5],
+    ["TR000023", "NB0001", 1],
+    ["TR000024", "PA0002", 1],
+    ["TR000025", "AP0002", 1],
+    ["TR000026", "AM0005", 1],
+    ["TR000026", "MD0003", 1],
+    ["TR000026", "PC0001", 1],
+    ["TR000027", "NB0003", 3],
+    ["TR000027", "PF0003", 1],
+    ["TR000028", "AM0001", 2],
+    ["TR000028", "PF0004", 5],
+    ["TR000029", "PF0001", 3],
+    ["TR000030", "AM0001", 5],
+    ["TR000030", "PA0001", 5],
+    ["TR000030", "PF0006", 1],
+    ["TR000030", "PR0003", 2],
+    ["TR000031", "AM0003", 20],
+    ["TR000032", "NB0004", 3],
+    ["TR000032", "PA0002", 2],
+    ["TR000033", "NB0001", 3],
+    ["TR000034", "MD0003", 1],
+    ["TR000034", "PC0001", 1],
+    ["TR000035", "NH0003", 3],
+    ["TR000035", "PC0004", 10],
+    ["TR000035", "PR0002", 2],
+    ["TR000036", "MD0005", 5],
+    ["TR000037", "AM0002", 10],
+    ["TR000037", "PC0004", 5],
+    ["TR000038", "AD0003", 1],
+    ["TR000038", "AK0001", 3],
+    ["TR000038", "PA0001", 3],
+    ["TR000038", "PC0003", 3],
+    ["TR000039", "NB0004", 10],
+    ["TR000039", "NH0002", 2],
+    ["TR000039", "PF0001", 1],
+    ["TR000039", "PF0006", 1],
+    ["TR000040", "NB0002", 15],
+    ["TR000041", "NB0001", 5],
+    ["TR000041", "PR0002", 2],
+    ["TR000042", "AM0005", 3],
+    ["TR000042", "AP0003", 1],
+    ["TR000043", "AD0003", 3],
+    ["TR000043", "NB0004", 5],
+    ["TR000043", "NH0003", 2],
+    ["TR000043", "PA0001", 5],
+    ["TR000043", "PF0001", 2],
+    ["TR000044", "AD0002", 2],
+    ["TR000044", "PC0001", 3],
+    ["TR000045", "AM0004", 5],
+    ["TR000045", "MD0003", 5],
+    ["TR000045", "PC0004", 5],
+    ["TR000046", "AP0001", 1],
+    ["TR000046", "NB0002", 10],
+    ["TR000047", "PA0001", 1],
+    ["TR000048", "AM0005", 3],
+    ["TR000048", "MD0001", 5],
+    ["TR000048", "PC0003", 5],
+    ["TR000048", "PF0006", 1],
+    ["TR000048", "PR0003", 2],
+    ["TR000049", "MP0001", 10],
+    ["TR000049", "MP0003", 10],
+    ["TR000050", "NT0005", 1],
+    ["TR000051", "MP0001", 15],
+    ["TR000051", "MP0004", 15],
+    ["TR000051", "NT0001", 15],
+    ["TR000052", "MP0001", 10],
+    ["TR000052", "MP0003", 10],
+    ["TR000052", "NT0001", 10],
+    ["TR000053", "AK0002", 20],
+    ["TR000053", "AM0002", 20],
+    ["TR000053", "AP0002", 2],
+    ["TR000053", "MD0001", 20],
+    ["TR000053", "PC0004", 20],
+    ["TR000054", "AP0001", 1],
+    ["TR000054", "NB0001", 10],
+    ["TR000055", "AD0003", 3],
+    ["TR000055", "NH0003", 2],
+    ["TR000055", "PF0006", 1],
+    ["TR000055", "PR0003", 2],
+    ["TR000055", "PS0001", 1],
+    ["TR000056", "NB0004", 5],
+    ["TR000056", "PA0002", 2],
+    ["TR000056", "PF0005", 1],
+    ["TR000057", "AD0004", 2],
+    ["TR000057", "NH0002", 2],
+    ["TR000057", "PF0006", 1],
+    ["TR000057", "PS0003", 1],
+    ["TR000058", "MD0005", 2],
+    ["TR000058", "PS0001", 1],
+    ["TR000059", "MP0001", 5],
+    ["TR000059", "NT0002", 5],
+    ["TR000060", "AD0004", 2],
+    ["TR000060", "MP0001", 3],
+    ["TR000060", "PS0002", 1],
+    ["TR000060", "PS0003", 1],
+    ["TR000061", "MP0001", 5],
+    ["TR000061", "MP0003", 5],
+    ["TR000062", "AD0002", 2],
+    ["TR000062", "NH0003", 3],
+    ["TR000062", "NT0006", 2],
+    ["TR000062", "PS0003", 1],
+    ["TR000063", "PS0003", 1],
+    ["TR000064", "MD0002", 2],
+    ["TR000064", "PC0004", 5],
+    ["TR000064", "PF0001", 2],
+    ["TR000064", "PF0006", 1],
+    ["TR000064", "PS0001", 1],
+    ["TR000065", "NB0004", 5],
+    ["TR000065", "PA0002", 2],
+    ["TR000066", "AM0002", 15],
+    ["TR000066", "MP0003", 15],
+    ["TR000066", "NB0002", 15],
+    ["TR000067", "NH0002", 3],
+    ["TR000067", "PS0003", 3],
+    ["TR000068", "MP0001", 2],
+    ["TR000069", "MP0003", 1],
+    ["TR000070", "NT0001", 3],
+    ["TR000071", "NT0003", 1],
+    ["TR000072", "NT0005", 1],
+    ["TR000073", "AP0002", 5],
+    ["TR000073", "PC0004", 40],
+    ["TR000073", "PR0001", 1],
+    ["TR000074", "AM0002", 2],
+    ["TR000074", "PC0002", 20],
+    ["TR000074", "PF0001", 1],
+    ["TR000075", "AM0001", 10],
+    ["TR000075", "AP0003", 2],
+    ["TR000075", "NB0001", 10],
+    ["TR000075", "NB0005", 5],
+    ["TR000076", "NB0005", 1],
+    ["TR000077", "NB0005", 2],
+    ["TR000078", "NB0005", 10],
+    ["TR000079", "AD0004", 2],
+    ["TR000079", "PS0001", 1],
+    ["TR000080", "NB0005", 3],
+    ["TR000081", "NB0005", 4],
+    ["TR000081", "PA0002", 4],
+    ["TR000082", "PC0002", 20],
+    ["TR000082", "PF0005", 1],
+    ["TR000083", "NB0005", 5],
+    ["TR000083", "PA0002", 5],
+    ["TR000084", "AM0001", 2],
+    ["TR000084", "NB0005", 4],
+    ["TR000084", "NH0003", 5],
+    ["TR000084", "PS0002", 1],
+    ["TR000085", "AP0002", 2],
+    ["TR000085", "PC0002", 10],
+    ["TR000085", "PF0006", 1],
+    ["TR000086", "AD0003", 3],
+    ["TR000086", "MD0004", 5],
+    ["TR000086", "PC0003", 10],
+    ["TR000087", "AM0001", 10],
+    ["TR000087", "PC0001", 3],
+    ["TR000087", "PC0004", 7],
+    ["TR000087", "PF0004", 2],
+    ["TR000088", "NH0003", 3],
+    ["TR000088", "PR0001", 5],
+    ["TR000088", "PS0001", 5],
+    ["TR000089", "NB0005", 10],
+    ["TR000090", "NB0005", 3],
+    ["TR000090", "NH0001", 1],
+    ["TR000090", "NH0003", 2],
+    ["TR000090", "PS0003", 1],
+    ["TR000091", "AD0003", 2],
+    ["TR000091", "NT0001", 3],
+    ["TR000091", "NT0005", 2],
+    ["TR000091", "PS0002", 1],
+    ["TR000092", "AD0003", 2],
+    ["TR000092", "AM0001", 5],
+    ["TR000092", "NB0004", 2],
+    ["TR000092", "PC0001", 10],
+    ["TR000092", "PF0006", 1],
+    ["TR000093", "MD0002", 10],
+    ["TR000093", "NH0003", 2],
+    ["TR000093", "PC0002", 20],
+    ["TR000094", "PC0002", 9],
+    ["TR000094", "PF0006", 1],
+    ["TR000095", "MD0003", 3],
+    ["TR000095", "NB0003", 4],
+    ["TR000096", "AP0002", 2],
+    ["TR000096", "PA0001", 1],
+    ["TR000097", "NB0003", 3],
+    ["TR000097", "PC0004", 5],
+    ["TR000098", "NB0001", 2],
+    ["TR000098", "NT0001", 2],
+    ["TR000098", "PC0002", 10],
+    ["TR000098", "PF0004", 1],
+    ["TR000099", "NB0005", 3],
+    ["TR000099", "PS0002", 1],
+    ["TR000099", "PS0003", 1],
+    ["TR000100", "NB0005", 5],
+    ["TR000100", "NT0002", 3],
+    ["TR000100", "NT0004", 3],
+    ["TR000100", "PA0002", 5],
+    ["TR000100", "PC0002", 10],
+    ["TR000101", "AD0001", 2],
+    ["TR000101", "NH0003", 1],
+    ["TR000101", "PC0001", 10],
+    ["TR000101", "PF0006", 1],
+    ["TR000102", "MD0001", 10],
+    ["TR000102", "NH0002", 1],
+    ["TR000102", "PC0004", 10],
+    ["TR000102", "PS0003", 1],
+    ["TR000103", "AK0001", 15],
+    ["TR000103", "AM0004", 15],
+    ["TR000103", "MD0006", 15],
+    ["TR000103", "PC0004", 15],
+    ["TR000104", "MP0002", 2],
+    ["TR000104", "MP0003", 3],
+    ["TR000104", "NB0005", 2],
+    ["TR000105", "NB0005", 5],
+    ["TR000106", "NB0005", 4],
+    ["TR000107", "NB0005", 5],
+    ["TR000108", "MP0001", 1],
+    ["TR000108", "NT0005", 1],
+    ["TR000109", "NB0005", 1],
+    ["TR000110", "MP0003", 2],
+    ["TR000111", "NB0005", 2],
+    ["TR000112", "NB0001", 2],
+    ["TR000113", "NB0005", 1],
+    ["TR000114", "AP0003", 1],
+    ["TR000115", "NB0005", 1],
+    ["TR000115", "NT0001", 1],
+    ["TR000116", "MP0003", 1],
+    ["TR000116", "NB0005", 1],
+    ["TR000117", "NT0005", 1],
+    ["TR000118", "NB0005", 1],
+    ["TR000119", "NB0005", 20],
+    ["TR000119", "PC0004", 100],
+    ["TR000120", "AD0003", 10],
+    ["TR000120", "NH0003", 20],
+    ["TR000120", "PC0004", 150],
+    ["TR000120", "PR0003", 10],
+    ["TR000120", "PS0001", 5],
+    ["TR000120", "PS0003", 3],
+    ["TR000121", "NB0005", 5],
+    ["TR000121", "NH0003", 5],
+    ["TR000121", "NT0001", 5],
+    ["TR000121", "PC0002", 20],
+    ["TR000122", "AP0002", 1],
+    ["TR000122", "NB0005", 10],
+    ["TR000122", "NH0003", 5],
+    ["TR000122", "PC0003", 30],
+    ["TR000122", "PF0001", 5],
+    ["TR000122", "PR0002", 5],
+    ["TR000122", "PS0003", 3],
+    ["TR000123", "AD0001", 5],
+    ["TR000123", "NH0003", 3],
+    ["TR000123", "NT0001", 3],
+    ["TR000123", "PC0004", 60],
+    ["TR000123", "PF0005", 5],
+    ["TR000123", "PF0006", 3],
+    ["TR000123", "PR0003", 5],
+    ["TR000123", "PS0001", 2],
+    ["TR000124", "AM0002", 10],
+    ["TR000124", "MD0006", 5],
+    ["TR000124", "NB0005", 3],
+    ["TR000124", "PC0002", 15],
+    ["TR000124", "PF0005", 3],
+    ["TR000124", "PF0006", 2],
+    ["TR000124", "PS0001", 3],
+  ]),
+};
+
+/* ---------- generic table ---------- */
+const F = {};
+const cell = (field, record) => {
+  const value = record[field.k];
+  if (field.o) {
+    const option = field.o().find((item) => item[0] == value);
+    return esc(option ? option[1] : value);
+  }
+  if (field.m) return money(value);
+  return value === "" || value == null ? "—" : esc(value);
+};
+
+function draw(name, element, parentValue) {
+  const entity = ENT[name];
+  const state = F[name] || (F[name] = { f: "active", q: "" });
+  const admin = isAdm();
+  const columns = entity.f.filter((field) => !field.h);
+  const headers = [
+    ...columns.map((field) => field.l),
+    ...(entity.calc || []).map((column) => column.l),
+    ...(admin ? ["Status", "Stamp"] : []),
+    "",
+  ];
+  const filters = admin
+    ? `<div class="seg">${["active", "inactive", "all"]
+        .map(
+          (filter) =>
+            `<button data-a="f" data-v="${filter}" class="${state.f == filter ? "on" : ""}">${filter}</button>`,
+        )
+        .join("")}</div>`
+    : "";
+
+  element.innerHTML = `
+    <div class="head">
+      <h2>${entity.t}</h2>
+      <div class="tools">
+        ${filters}
+        <input type="search" data-s placeholder="Search" aria-label="Search" value="${esc(state.q)}">
+        <button class="btn sm" data-a="add">+ Add new</button>
+      </div>
+    </div>
+    <div class="tw">
+      <table>
+        <thead><tr>${headers.map((header) => `<th>${header}</th>`).join("")}</tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>`;
+
+  const redraw = () => draw(name, element, parentValue);
+  const renderBody = () => {
+    let records = data(name).filter(
+      (record) => parentValue == null || record[entity.par] == parentValue,
+    );
+
+    if (!admin || state.f == "active") {
+      records = records.filter((record) => !record.del);
+    } else if (state.f == "inactive") {
+      records = records.filter((record) => record.del);
+    }
+
+    const query = state.q.toLowerCase();
+    if (query) {
+      records = records.filter((record) =>
+        entity.f.some((field) => String(record[field.k]).toLowerCase().includes(query)),
+      );
+    }
+
+    element.querySelector("tbody").innerHTML = records.length
+      ? records
+          .map((record) => {
+            const actions = record.del
+              ? admin
+                ? `<button class="r" data-a="res" data-id="${record.id}">Restore</button>`
+                : ""
+              : `${entity.kid ? `<button class="k" data-a="kid" data-id="${record.id}">${entity.kl}</button>` : ""}<button data-a="edit" data-id="${record.id}">Edit</button><button class="d" data-a="del" data-id="${record.id}">Delete</button>`;
+
+            return `<tr class="${record.del ? "del" : ""}">
+              ${columns.map((field) => `<td>${cell(field, record)}</td>`).join("")}
+              ${(entity.calc || []).map((column) => `<td>${column.fn(record)}</td>`).join("")}
+              ${admin ? `<td><span class="b ${record.del ? "off" : "on"}">${record.del ? "Inactive" : "Active"}</span></td><td><small>${esc(record.stamp)}</small></td>` : ""}
+              <td><div class="acts">${actions}</div></td>
+            </tr>`;
+          })
+          .join("")
+      : `<tr><td colspan="${headers.length}" class="empty">Nothing here yet. Use Add to create the first record.</td></tr>`;
+  };
+
+  renderBody();
+  element.oninput = (event) => {
+    if (!("s" in event.target.dataset)) return;
+    state.q = event.target.value;
+    renderBody();
+  };
+  element.onclick = (event) => {
+    const button = event.target.closest("[data-a]");
+    if (!button) return;
+
+    const action = button.dataset.a;
+    const id = button.dataset.id;
+    if (action == "f") {
+      state.f = button.dataset.v;
+      redraw();
+    } else if (action == "add") {
+      form(name, null, parentValue, redraw);
+    } else if (action == "edit") {
+      form(name, id, parentValue, redraw);
+    } else if (action == "kid") {
+      kids(name, id);
+    } else if (action == "del") {
+      if (confirm("Mark this record inactive? An admin can restore it.")) {
+        mut(name, id, true, "DELETED");
+        redraw();
+        toast("Marked inactive");
+      }
+    } else if (action == "res") {
+      mut(name, id, false, "RESTORED");
+      redraw();
+      toast("Record restored");
+    }
+  };
+}
+
+function mut(name, id, deleted, action) {
+  const records = data(name);
+  const record = records.find((item) => item.id == id);
+  record.del = deleted;
+  record.stamp = stamp(action);
+  put(name, records);
+}
+
+function kids(name, id) {
+  const entity = ENT[name];
+  const record = data(name).find((item) => item.id == id);
+  const childName = entity.kid;
+  const parentValue = record[entity.kk];
+  const dialog = $("#dlg2");
+
+  dialog.innerHTML = `
+    <div class="head">
+      <div>
+        <h2>${ENT[childName].t}</h2>
+        <p style="margin:0;color:var(--mu)">For <b>${esc(parentValue)}</b></p>
+      </div>
+      <button class="btn ghost sm" data-x>Close</button>
+    </div>
+    <div id="kb"></div>`;
+  draw(childName, $("#kb"), parentValue);
+  dialog.showModal();
+}
+
+function form(name, id, parentValue, done) {
+  const entity = ENT[name];
+  const records = data(name);
+  const record = id ? records.find((item) => item.id == id) : {};
+  const dialog = $("#dlg");
+  dialog.removeAttribute("aria-labelledby");
+  dialog.removeAttribute("aria-describedby");
+
+  const isLocked = (field) => id && (field.u || (entity.uk || []).includes(field.k));
+  const input = (field) => {
+    if (field.h) return "";
+
+    const value = record[field.k] ?? "";
+    const disabled = isLocked(field) ? "disabled" : "";
+    if (field.o) {
+      return `<label>${field.l}<select name="${field.k}" ${disabled}>${field
+        .o()
+        .map(
+          (option) =>
+            `<option value="${esc(option[0])}" ${option[0] == value ? "selected" : ""}>${esc(option[1])}</option>`,
+        )
+        .join("")}</select></label>`;
+    }
+
+    return `<label>${field.l}<input name="${field.k}" type="${field.type || "text"}" ${field.type == "number" ? 'step="0.01" min="0"' : ""} value="${esc(value)}" ${field.opt ? "" : "required"} ${disabled}></label>`;
+  };
+
+  dialog.innerHTML = `
+    <h2>${id ? "Edit" : "Add"}: ${entity.t}</h2>
+    <form>
+      ${entity.f.map(input).join("")}
+      <p class="err" id="ferr"></p>
+      <div class="row">
+        <button class="btn">Save</button>
+        <button type="button" class="btn ghost" data-x>Cancel</button>
+      </div>
+    </form>`;
+
+  const formElement = dialog.querySelector("form");
+  formElement.onsubmit = (event) => {
+    event.preventDefault();
+    const values = {};
+
+    entity.f.forEach((field) => {
+      if (field.h) {
+        values[field.k] = parentValue;
+      } else if (isLocked(field)) {
+        values[field.k] = record[field.k];
+      } else {
+        const value = String(formElement.elements[field.k].value).trim();
+        values[field.k] = field.type == "number" ? parseFloat(value) : value;
+      }
+    });
+
+    const invalid = entity.f.some(
+      (field) =>
+        !field.opt &&
+        (values[field.k] === "" || Number.isNaN(values[field.k]) || values[field.k] == null),
+    );
+    const showError = (message) => {
+      $("#ferr").textContent = message;
+    };
+
+    if (invalid) return showError("Fill in every required field.");
+    if (
+      entity.f.some((field) =>
+        field.u &&
+        records.some(
+          (item) =>
+            item.id != id &&
+            String(item[field.k]).toLowerCase() == String(values[field.k]).toLowerCase(),
+        ),
+      )
+    ) {
+      return showError("That code already exists.");
+    }
+    if (
+      entity.uk &&
+      records.some(
+        (item) =>
+          item.id != id && !item.del && entity.uk.every((key) => item[key] == values[key]),
+      )
+    ) {
+      return showError("That combination already exists. Edit the existing row instead.");
+    }
+
+    if (id) {
+      Object.assign(record, values, { stamp: stamp("EDITED") });
+    } else {
+      records.push({ id: "n" + Date.now(), del: false, stamp: stamp("CREATED"), ...values });
+    }
+
+    put(name, records);
+    dialog.close();
+    done();
+    toast(id ? "Changes saved" : "Record added");
+  };
+  dialog.showModal();
+}
+
+for (const dialog of [$("#dlg"), $("#dlg2")]) {
+  dialog.onclick = (event) => {
+    if (event.target === dialog || event.target.closest("[data-x]")) dialog.close();
+  };
+}
+
+let tt;
+function toast(message) {
+  document.querySelector(".toast")?.remove();
+  const element = document.createElement("div");
+  element.className = "toast";
+  element.setAttribute("role", "status");
+  element.textContent = message;
+  document.body.appendChild(element);
+  clearTimeout(tt);
+  tt = setTimeout(() => element.remove(), 2600);
+}
+
+document.addEventListener("keydown", (event) => {
+  if (event.key == "Escape") document.body.classList.remove("nv");
+});
+$("#dlg2").onclose = () => route();
+
+/* ---------- reports ---------- */
+const R = { r: "cust", from: "", to: "", n: 10 };
+function reports(element) {
+  const definitions = {
+    cust: "Top customers",
+    prod: "Top products",
+    master: "Product master",
+    emp: "Active employees",
+    empall: "All employees",
+  };
+  const ranged = ["cust", "prod"].includes(R.r);
+  const sales = act("sales").filter(
+    (sale) => (!R.from || sale.date >= R.from) && (!R.to || sale.date <= R.to),
+  );
+  const lines = act("lines");
+  let headers = [];
+  let rows = [];
+
+  if (R.r == "cust") {
+    const totals = {};
+    sales.forEach((sale) => {
+      lines
+        .filter((line) => line.trans == sale.no)
+        .forEach((line) => {
+          totals[sale.cust] = (totals[sale.cust] || 0) + lineAmt(line);
+        });
+    });
+    headers = ["Rank", "Customer", "Total sales"];
+    rows = Object.entries(totals)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, R.n)
+      .map(([customer, total], index) => [
+        index + 1,
+        nm("customers", "no", customer, "name"),
+        money(total),
+      ]);
+  } else if (R.r == "prod") {
+    const totals = {};
+    sales.forEach((sale) => {
+      lines
+        .filter((line) => line.trans == sale.no)
+        .forEach((line) => {
+          const product = totals[line.prod] || (totals[line.prod] = { q: 0, a: 0 });
+          product.q += line.qty;
+          product.a += lineAmt(line);
+        });
+    });
+    headers = ["Rank", "Product", "Qty sold", "Amount"];
+    rows = Object.entries(totals)
+      .sort((a, b) => b[1].a - a[1].a)
+      .slice(0, R.n)
+      .map(([code, product], index) => [
+        index + 1,
+        nm("products", "code", code, "desc"),
+        product.q,
+        money(product.a),
+      ]);
+  } else if (R.r == "master") {
+    headers = ["Code", "Description", "Unit", "Current price"];
+    rows = act("products").map((product) => [
+      product.code,
+      product.desc,
+      product.unit,
+      money(price(product.code)),
+    ]);
+  } else {
+    headers = ["Emp no", "Name", "Hired", "Separated"];
+    rows = act("employees")
+      .filter((employee) => R.r == "empall" || !employee.sep)
+      .map((employee) => [
+        employee.no,
+        employee.first + " " + employee.last,
+        employee.hire,
+        employee.sep || "—",
+      ]);
+  }
+
+  element.innerHTML = `
+    <div class="head">
+      <h2>Reports</h2>
+      <button class="btn sm noprint" data-r="print">Print or save as PDF</button>
+    </div>
+    <div class="sub">
+      ${Object.entries(definitions)
+        .map(
+          ([key, label]) =>
+            `<button data-r="${key}" class="${R.r == key ? "on" : ""}">${label}</button>`,
+        )
+        .join("")}
+    </div>
+    ${ranged ? `
+      <div class="tools noprint" style="margin-bottom:14px">
+        <label style="margin:0">From <input type="date" data-f="from" value="${R.from}"></label>
+        <label style="margin:0">To <input type="date" data-f="to" value="${R.to}"></label>
+        <label style="margin:0">Top <input type="number" min="1" max="100" data-f="n" value="${R.n}" style="width:80px"></label>
+      </div>` : ""}
+    <div class="tw">
+      <table>
+        <thead><tr>${headers.map((header) => `<th>${header}</th>`).join("")}</tr></thead>
+        <tbody>
+          ${rows.length
+            ? rows.map((row) => `<tr>${row.map((value) => `<td>${esc(value)}</td>`).join("")}</tr>`).join("")
+            : `<tr><td colspan="${headers.length}" class="empty">No data for this report yet.</td></tr>`}
+        </tbody>
+      </table>
+    </div>`;
+
+  element.onclick = (event) => {
+    const button = event.target.closest("[data-r]");
+    if (!button) return;
+    if (button.dataset.r == "print") return print();
+    R.r = button.dataset.r;
+    reports(element);
+  };
+  element.onchange = (event) => {
+    const key = event.target.dataset.f;
+    if (!key) return;
+    R[key] = key == "n" ? parseInt(event.target.value) || 10 : event.target.value;
+    reports(element);
+  };
+}
+
+/* ---------- users ---------- */
+const SEEDU=[{email:'superadmin@hope.com',name:'Sarah Chen',role:'superadmin',status:'active',mods:[]},{email:'admin@hope.com',name:'Lisa Park',role:'admin',status:'active',mods:[]},{email:'user@hope.com',name:'Alex Rivera',role:'user',status:'active',mods:['customers','products','sales','reports']}];
+const users=()=>load('hope_users',SEEDU),saveUsers=v=>save('hope_users',v);
+let UF={f:'all',q:''};
+function usersView(el){
+ const sup=U.role=='superadmin',vis=users().filter(u=>sup||u.role!='superadmin');
+ const grp=u=>u.status=='blocked'||u.status=='disapproved'?'blocked':u.status;
+ const cnt=k=>k=='all'?vis.length:vis.filter(u=>grp(u)==k).length;
+ const list=vis.filter(u=>UF.f=='all'||grp(u)==UF.f);
+ const ini=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+ const so=(v,opts,dis,cls,labelText)=>`<select class="sel ${cls||''}" aria-label="${esc(labelText)}" ${dis?'disabled':''}>${opts.map(o=>`<option ${o==v?'selected':''}>${o}</option>`).join('')}</select>`;
+ const row=u=>{const me=u.email==U.email,lock=me||(!sup&&u.role!='user'),e=esc(u.email);
+  const rb=u.role=='user'?`<button data-a="rights" data-e="${e}">Rights</button>`:'';
+  const ab=lock?'<span class="muted">—</span>'
+   :rb+(u.status=='pending'?`<button class="k" data-a="active" data-e="${e}">Approve</button><button class="d" data-a="disapproved" data-e="${e}">Reject</button>`
+   :u.status=='active'?`<button class="d" data-a="blocked" data-e="${e}">Block</button>`
+   :`<button class="k" data-a="active" data-e="${e}">Reactivate</button>`);
+  const hid=UF.q&&!(u.name+' '+u.email).toLowerCase().includes(UF.q)?'hidden':'';
+  return `<tr data-e="${e}" ${hid}><td><div class="ucell"><span class="av">${esc(ini(u.name))}</span><div><b>${esc(u.name)}</b><small>${e}</small></div></div></td>
+  <td data-k="role">${so(u.role,['user','admin','superadmin'],!sup||me,'',`Change role for ${u.name}`)}</td>
+  <td data-k="status">${so(u.status,['active','pending','blocked','disapproved'],lock,'s-'+u.status,`Change status for ${u.name}`)}</td>
+  <td>${u.role=='user'?`<span class="rcount">${u.mods.length} of ${Object.keys(MODS).length} modules</span>`:'<span class="allm">All modules</span>'}</td>
+  <td><div class="acts">${ab}</div></td></tr>`};
+ el.innerHTML=`<div class="head"><h2>User management</h2>
+  <div class="seg" role="group" aria-label="Filter by status">${[['all','All'],['pending','Pending'],['active','Active'],['blocked','Blocked']].map(([k,l])=>`<button data-f="${k}" class="${UF.f==k?'on':''}">${l}<i>${cnt(k)}</i></button>`).join('')}</div>
+  <div class="tools"><input type="search" id="uq" placeholder="Search name or email" value="${esc(UF.q)}" aria-label="Search users"></div></div>
+ ${sup?'':'<p class="muted" style="margin:0 0 14px">Superadmin accounts are hidden.</p>'}
+ <div class="tw"><table class="ut"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Modules</th><th style="text-align:right">Actions</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table>${list.length?'':'<div class="empty">No users in this view.</div>'}</div>`;
+ el.onchange=e=>{const tr=e.target.closest('tr[data-e]');if(!tr)return;const all=users(),u=all.find(x=>x.email==tr.dataset.e);
+  const k=e.target.closest('[data-k]');if(!k)return;
+  if(k.dataset.k=='role'&&e.target.value!='user'&&!confirm('Give '+u.name+' the '+e.target.value+' role? They will see every module.'))return usersView(el);
+  u[k.dataset.k]=e.target.value;saveUsers(all);usersView(el);toast('User updated')};
+ el.onclick=e=>{const f=e.target.closest('[data-f]');if(f){UF.f=f.dataset.f;return usersView(el)}
+  const a=e.target.closest('[data-a]');if(a){const all=users(),u=all.find(x=>x.email==a.dataset.e);if(!u)return;
+  if(a.dataset.a=='rights')return rights(u.email);
+  if(['blocked','disapproved'].includes(a.dataset.a)&&!confirm((a.dataset.a=='blocked'?'Block ':'Reject ')+u.name+'? They will not be able to sign in.'))return;
+  u.status=a.dataset.a;saveUsers(all);usersView(el);toast(u.status=='active'?'User approved':'User '+u.status)}};
+ el.oninput=e=>{if(e.target.id!='uq')return;UF.q=e.target.value.toLowerCase();el.querySelectorAll('tbody tr').forEach(tr=>tr.hidden=!!UF.q&&!tr.querySelector('.ucell').textContent.toLowerCase().includes(UF.q))};
+}
+
+
+function rights(email){
+ const all=users(),u=all.find(x=>x.email==email),d=$('#dlg');
+ d.setAttribute('aria-labelledby','rights-title');d.setAttribute('aria-describedby','rights-help');
+ d.innerHTML=`<h2 id="rights-title">Module access: ${esc(u.name)}</h2><p class="muted" id="rights-help" style="margin:0 0 14px">Select the modules this person is allowed to open.</p><form><div class="chips">${Object.entries(MODS).map(([k,l])=>`<label class="chip"><input type="checkbox" value="${k}" ${u.mods.includes(k)?'checked':''}>${l}</label>`).join('')}</div><div class="row"><button class="btn">Save access</button><button type="button" class="btn ghost" data-x>Cancel</button></div></form>`;
+ d.querySelector('form').onsubmit=e=>{e.preventDefault();u.mods=[...d.querySelectorAll('input:checked')].map(x=>x.value);saveUsers(all);d.close();usersView($('#view'));toast('Rights saved')};
+ d.showModal();d.querySelector('input')?.focus();
+}
+/* ---------- overview + nav icons ---------- */
+const svg=p=>`<svg viewBox="0 0 24 24" aria-hidden="true">${p}</svg>`;
+const IC={overview:svg('<path d="M4 4h6v7H4zM14 4h6v4h-6zM14 12h6v8h-6zM4 15h6v5H4z"/>'),
+ customers:svg('<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5.5a3 3 0 010 5.6M18 14.2c1.8.7 3 2.5 3 4.8"/>'),
+ products:svg('<path d="M3 7.5L12 3l9 4.5v9L12 21l-9-4.5zM3 7.5l9 4.5 9-4.5M12 12v9"/>'),
+ hr:svg('<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M3 13h18"/>'),
+ sales:svg('<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2zM9 8h6M9 12h6"/>'),
+ reports:svg('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+ users:svg('<path d="M12 3l8 3v6c0 4.5-3.2 7.6-8 9-4.8-1.4-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>')};
+const LB={overview:'Home',users:'Users'};
+IC.overview=svg('<path d="M3 11.5L12 4l9 7.5M5.5 10v10h13V10M10 20v-5h4v5"/>');
+function overview(el){
+ const can=m=>isAdm()||(U.mods||[]).includes(m),sales=act('sales'),lines=act('lines');
+ const tot=s=>lines.filter(l=>l.trans==s.no).reduce((a,l)=>a+lineAmt(l),0);
+ const t=[['customers','Customers',act('customers').length],['products','Products',act('products').length],['hr','Active employees',act('employees').filter(e=>!e.sep).length],['sales','Sales to date',money(sales.reduce((a,s)=>a+tot(s),0))]].filter(x=>can(x[0]));
+ const rc=can('sales')?sales.slice().sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6):[];
+ const byC={};if(can('sales'))sales.forEach(s=>{byC[s.cust]=(byC[s.cust]||0)+tot(s)});
+ const top=Object.entries(byC).sort((a,b)=>b[1]-a[1]).slice(0,5),mx=top.length?top[0][1]:1;
+ const hr=new Date().getHours(),greet=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening';
+ const first=esc(U.name.split(' ')[0]);
+ const date=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+ const qa=[...Object.keys(MODS).filter(can)].slice(0,4).map(m=>`<button data-m="${m}">${IC[m]||''}<span>${MODS[m]}</span></button>`).join('');
+ const hero=`<section class="hero"><p class="eyebrow">Hope, Inc. ERP</p><h2>${greet}, ${first}.</h2><p>Here is where things stand across customers, products, people and sales.</p><div class="meta"><span class="tag live">${esc(U.role)}</span><span class="tag">${esc(date)}</span></div>${qa?`<div class="qa">${qa}</div>`:''}</section>`;
+ if(!t.length){el.innerHTML=hero+'<div class="empty">No modules assigned yet. Ask an administrator for access.</div>';}
+ else{
+  const recent=rc.length?`<div class="pnl"><h3 class="sec">Recent sales<button data-m="sales">View all</button></h3><div class="tw"><table><thead><tr><th>Trans no</th><th>Date</th><th>Customer</th><th>Total</th></tr></thead><tbody>${rc.map(s=>`<tr><td>${esc(s.no)}</td><td>${esc(s.date)}</td><td>${esc(nm('customers','no',s.cust,'name'))}</td><td>${money(tot(s))}</td></tr>`).join('')}</tbody></table></div></div>`:'';
+  const tops=top.length?`<div class="pnl"><h3 class="sec">Top customers<button data-m="reports">Reports</button></h3><ol class="rank">${top.map(([c,v],i)=>`<li><span class="n">${i+1}</span><span class="nm">${esc(nm('customers','no',c,'name'))}</span><span class="am">${money(v)}</span><span class="bar"><i style="width:${Math.max(4,Math.round(v/mx*100))}%"></i></span></li>`).join('')}</ol></div>`:'';
+  el.innerHTML=hero+`<div class="stats">${t.map(([m,l,v])=>`<button class="stat" data-m="${m}"><i class="si">${IC[m]}</i><span>${l}</span><b>${v}</b></button>`).join('')}</div>`+((recent||tops)?`<div class="hgrid">${recent}${tops}</div>`:'');
+ }
+ el.onclick=e=>{const b=e.target.closest('[data-m]');if(b&&can(b.dataset.m)||b&&b.dataset.m=='reports'&&can('reports')){V.mod=b.dataset.m;route()}};
+}
+
+/* ---------- shell ---------- */
+function route(){
+ const mods=['overview',...Object.keys(MODS).filter(m=>isAdm()||(U.mods||[]).includes(m))];if(isAdm())mods.push('users');
+ if(!mods.includes(V.mod))V.mod=mods[0];
+ const PT={overview:['Home','Where things stand across Hope, Inc.'],customers:['Customers','Accounts and payment terms.'],products:['Products','Catalog, units and price history.'],hr:['Human resources','Employees, jobs and departments.'],sales:['Sales','Transactions and their line items.'],reports:['Reports','Rankings and lists you can print or save as PDF.'],users:['User management','Approve registrations, roles and module access.']};
+ const pt=PT[V.mod]||['',''];$('#pt').textContent=pt[0];$('#ps').textContent=pt[1];
+ $('#tabs').innerHTML='<span class="nl">Menu</span>'+mods.map(m=>(m=='users'?'<span class="nl">Admin</span>':'')+`<button data-m="${m}" class="${V.mod==m?'on':''}">${IC[m]||''}<span>${LB[m]||MODS[m]||'Users'}</span></button>`).join('');
+ document.body.classList.toggle('ishome',V.mod=='overview');
+ const el=$('#view');el.onclick=el.onchange=el.oninput=null;
+ if(!mods.length)el.innerHTML='<div class="empty">No modules assigned yet. Ask an administrator for access.</div>';
+ else if(V.mod=='overview')overview(el);
+ else if(V.mod=='hr'){el.innerHTML=`<div class="sub">${[['employees','Employees'],['jobs','Jobs'],['depts','Departments']].map(([k,l])=>`<button data-sub="${k}" class="${V.sub==k?'on':''}">${l}</button>`).join('')}</div><div id="box"></div>`;draw(V.sub,$('#box'));
+  el.querySelector('.sub').onclick=e=>{const b=e.target.closest('[data-sub]');if(b){V.sub=b.dataset.sub;route()}}}
+ else if(V.mod=='reports')reports(el);else if(V.mod=='users')usersView(el);else draw(V.mod,el);
+}
+$('#tabs').onclick=e=>{const b=e.target.closest('[data-m]');if(b){V.mod=b.dataset.m;document.body.classList.remove('nv');route()}};
+$('#burger').onclick=()=>document.body.classList.add('nv');$('#scrim').onclick=()=>document.body.classList.remove('nv');
+function openApp(u){U=u;$('#land').hidden=true;$('#app').hidden=false;$('#un').textContent=u.name;$('#ur').textContent=u.role;$('#av').textContent=u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();route()}
+$('#out').onclick=async()=>{if(sb)await sb.auth.signOut();U=null;V.mod='overview';document.body.classList.remove('ishome');$('#app').hidden=true;$('#land').hidden=false;say('')};
+
+/* ---------- auth ---------- */
+let sb = null;
+if (CFG.SUPABASE_URL && CFG.SUPABASE_ANON_KEY && window.supabase) {
+  sb = supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
+} else {
+  $("#demo").hidden = false;
+}
+
+const say = (text, kind) => {
+  const message = $("#msg");
+  message.textContent = text || "";
+  message.className = "msg " + (kind || "");
+};
+const FM = {
+  login: "f-login",
+  reg: "f-reg",
+  reset: "f-reset",
+  newpass: "f-newpass",
+};
+
+function show(view) {
+  for (const [key, id] of Object.entries(FM)) {
+    $("#" + id).hidden = key != view;
+  }
+  $("#atabs").hidden = view == "reset" || view == "newpass";
+  document.querySelectorAll("#atabs button").forEach((button) => {
+    button.setAttribute("aria-selected", button.dataset.v == view);
+  });
+
+  const copy = {
+    login: ["Welcome back", "Sign in to your workspace to continue."],
+    reg: ["Create your account", "Register with your work email. An administrator will review your request."],
+    reset: ["Reset your password", "Enter your work email and we will send a secure reset link."],
+    newpass: ["Set a new password", "Choose a new password to finish recovering your account."],
+  }[view];
+  $("#auth-title").textContent = copy[0];
+  $("#auth-subtitle").textContent = copy[1];
+  say("");
+}
+
+document.querySelectorAll("[data-go]").forEach((button) => {
+  button.addEventListener("click", () => {
+    show(button.dataset.go);
+    $("#authcard").scrollIntoView({ behavior: "smooth", block: "center" });
+    $("#authcard input").focus();
+  });
+});
+document.querySelectorAll("[data-v]").forEach((button) => {
+  button.addEventListener("click", () => show(button.dataset.v));
+});
+$("#atabs").onkeydown = (event) => {
+  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+  const tabs = [...$("#atabs").querySelectorAll('[role="tab"]')];
+  const current = tabs.indexOf(document.activeElement);
+  const next =
+    event.key == "Home"
+      ? 0
+      : event.key == "End"
+        ? tabs.length - 1
+        : (current + (event.key == "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+  event.preventDefault();
+  tabs[next].focus();
+  tabs[next].click();
+};
+
+function enter(email, fromSupabase) {
+  const allUsers = users();
+  let user = allUsers.find((item) => item.email == email.toLowerCase());
+  if (!user) {
+    if (!fromSupabase) return say("No account found for that email. Register first.", "err");
+    user = {
+      email: email.toLowerCase(),
+      name: email.split("@")[0],
+      role: "user",
+      status: "pending",
+      mods: [],
+    };
+    allUsers.push(user);
+    saveUsers(allUsers);
+  }
+
+  const blockedMessage = {
+    pending: "Your account is waiting for administrator approval.",
+    blocked: "This account is blocked. Contact an administrator.",
+    disapproved: "This registration was not approved.",
+  }[user.status];
+  if (blockedMessage) return say(blockedMessage, "err");
+  openApp(user);
+}
+
+document.querySelectorAll('input[type="password"]').forEach((input) => {
+  const wrapper = document.createElement("span");
+  wrapper.className = "pw";
+  wrapper.style.display = "block";
+  input.before(wrapper);
+  wrapper.append(input);
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = "Show";
+  button.setAttribute("aria-label", "Show password");
+  button.onclick = () => {
+    const showPassword = input.type == "password";
+    input.type = showPassword ? "text" : "password";
+    button.textContent = showPassword ? "Hide" : "Show";
+    button.setAttribute("aria-label", showPassword ? "Hide password" : "Show password");
+  };
+  wrapper.append(button);
+});
+
+const guard = (handler) => async (event) => {
+  event.preventDefault();
+  const button = event.target.querySelector(".btn");
+  button.disabled = true;
+  say("");
+  try {
+    await handler();
+  } catch (error) {
+    say(error.message || "Something went wrong. Try again.", "err");
+  }
+  button.disabled = false;
+};
+
+$("#f-login").onsubmit = guard(async () => {
+  const email = $("#l-e").value.trim();
+  if (sb) {
+    const { error } = await sb.auth.signInWithPassword({
+      email,
+      password: $("#l-p").value,
+    });
+    if (error) throw error;
+  }
+  enter(email, !!sb);
+});
+
+$("#f-reg").onsubmit = guard(async () => {
+  const email = $("#r-e").value.trim().toLowerCase();
+  const name = $("#r-n").value.trim();
+  if (users().some((user) => user.email == email)) {
+    throw new Error("An account with this email already exists. Sign in instead.");
+  }
+  if (sb) {
+    const { error } = await sb.auth.signUp({
+      email,
+      password: $("#r-p").value,
+      options: {
+        data: { full_name: name },
+        emailRedirectTo: location.href.split("#")[0],
+      },
+    });
+    if (error) throw error;
+  }
+
+  const allUsers = users();
+  allUsers.push({ email, name, role: "user", status: "pending", mods: [] });
+  saveUsers(allUsers);
+  $("#f-reg").reset();
+  show("login");
+  say("Registration received. An administrator must approve your account before you can sign in.", "ok");
+});
+
+$("#f-reset").onsubmit = guard(async () => {
+  const email = $("#p-e").value.trim();
+  if (sb) {
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: location.href.split("#")[0],
+    });
+    if (error) throw error;
+  }
+  say("If that email has an account, a reset link is on its way.", "ok");
+});
+
+$("#f-newpass").onsubmit = guard(async () => {
+  const { error } = await sb.auth.updateUser({ password: $("#n-p").value });
+  if (error) throw error;
+  say("Password updated. Opening the app…", "ok");
+  const { data: sessionData } = await sb.auth.getSession();
+  setTimeout(() => enter(sessionData.session.user.email, true), 700);
+});
+
+if (sb) {
+  let recovery = /type=recovery/.test(location.hash);
+  sb.auth.onAuthStateChange((event) => {
+    if (event == "PASSWORD_RECOVERY") {
+      recovery = true;
+      show("newpass");
+    }
+  });
+  sb.auth.getSession().then(({ data: sessionData }) => {
+    if (recovery) {
+      show("newpass");
+    } else if (sessionData.session) {
+      enter(sessionData.session.user.email, true);
+    }
+  });
+}
+
+</script>
+</body>
+</html>
