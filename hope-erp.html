@@ -1061,39 +1061,39 @@ const SEEDU=[{email:'superadmin@hope.com',name:'Sarah Chen',role:'superadmin',st
 const users=()=>load('hope_users',SEEDU),saveUsers=v=>save('hope_users',v);
 let UF={f:'all',q:''};
 function usersView(el){
- const sup=U.role=='superadmin',vis=users().filter(u=>sup||u.role!='superadmin');
- const grp=u=>u.status=='blocked'||u.status=='disapproved'?'blocked':u.status;
- const cnt=k=>k=='all'?vis.length:vis.filter(u=>grp(u)==k).length;
- const list=vis.filter(u=>UF.f=='all'||grp(u)==UF.f);
- const ini=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
- const so=(v,opts,dis,cls,labelText)=>`<select class="sel ${cls||''}" aria-label="${esc(labelText)}" ${dis?'disabled':''}>${opts.map(o=>`<option ${o==v?'selected':''}>${o}</option>`).join('')}</select>`;
- const row=u=>{const me=u.email==U.email,lock=me||(!sup&&u.role!='user'),e=esc(u.email);
-  const rb=u.role=='user'?`<button data-a="rights" data-e="${e}">Rights</button>`:'';
-  const ab=lock?'<span class="muted">—</span>'
-   :rb+(u.status=='pending'?`<button class="k" data-a="active" data-e="${e}">Approve</button><button class="d" data-a="disapproved" data-e="${e}">Reject</button>`
-   :u.status=='active'?`<button class="d" data-a="blocked" data-e="${e}">Block</button>`
-   :`<button class="k" data-a="active" data-e="${e}">Reactivate</button>`);
-  const hid=UF.q&&!(u.name+' '+u.email).toLowerCase().includes(UF.q)?'hidden':'';
-  return `<tr data-e="${e}" ${hid}><td><div class="ucell"><span class="av">${esc(ini(u.name))}</span><div><b>${esc(u.name)}</b><small>${e}</small></div></div></td>
-  <td data-k="role">${so(u.role,['user','admin','superadmin'],!sup||me,'',`Change role for ${u.name}`)}</td>
-  <td data-k="status">${so(u.status,['active','pending','blocked','disapproved'],lock,'s-'+u.status,`Change status for ${u.name}`)}</td>
-  <td>${u.role=='user'?`<span class="rcount">${u.mods.length} of ${Object.keys(MODS).length} modules</span>`:'<span class="allm">All modules</span>'}</td>
-  <td><div class="acts">${ab}</div></td></tr>`};
- el.innerHTML=`<div class="head"><h2>User management</h2>
-  <div class="seg" role="group" aria-label="Filter by status">${[['all','All'],['pending','Pending'],['active','Active'],['blocked','Blocked']].map(([k,l])=>`<button data-f="${k}" class="${UF.f==k?'on':''}">${l}<i>${cnt(k)}</i></button>`).join('')}</div>
-  <div class="tools"><input type="search" id="uq" placeholder="Search name or email" value="${esc(UF.q)}" aria-label="Search users"></div></div>
- ${sup?'':'<p class="muted" style="margin:0 0 14px">Superadmin accounts are hidden.</p>'}
- <div class="tw"><table class="ut"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Modules</th><th style="text-align:right">Actions</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table>${list.length?'':'<div class="empty">No users in this view.</div>'}</div>`;
- el.onchange=e=>{const tr=e.target.closest('tr[data-e]');if(!tr)return;const all=users(),u=all.find(x=>x.email==tr.dataset.e);
-  const k=e.target.closest('[data-k]');if(!k)return;
-  if(k.dataset.k=='role'&&e.target.value!='user'&&!confirm('Give '+u.name+' the '+e.target.value+' role? They will see every module.'))return usersView(el);
-  u[k.dataset.k]=e.target.value;saveUsers(all);usersView(el);toast('User updated')};
- el.onclick=e=>{const f=e.target.closest('[data-f]');if(f){UF.f=f.dataset.f;return usersView(el)}
-  const a=e.target.closest('[data-a]');if(a){const all=users(),u=all.find(x=>x.email==a.dataset.e);if(!u)return;
-  if(a.dataset.a=='rights')return rights(u.email);
-  if(['blocked','disapproved'].includes(a.dataset.a)&&!confirm((a.dataset.a=='blocked'?'Block ':'Reject ')+u.name+'? They will not be able to sign in.'))return;
-  u.status=a.dataset.a;saveUsers(all);usersView(el);toast(u.status=='active'?'User approved':'User '+u.status)}};
- el.oninput=e=>{if(e.target.id!='uq')return;UF.q=e.target.value.toLowerCase();el.querySelectorAll('tbody tr').forEach(tr=>tr.hidden=!!UF.q&&!tr.querySelector('.ucell').textContent.toLowerCase().includes(UF.q))};
+const sup=U.role=='superadmin',vis=users().filter(u=>sup||u.role!='superadmin');
+const grp=u=>u.status=='blocked'||u.status=='disapproved'?'blocked':u.status;
+const cnt=k=>k=='all'?vis.length:vis.filter(u=>grp(u)==k).length;
+const list=vis.filter(u=>UF.f=='all'||grp(u)==UF.f);
+const ini=n=>n.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+const so=(v,opts,dis,cls,labelText)=>`<select class="sel ${cls||''}" aria-label="${esc(labelText)}" ${dis?'disabled':''}>${opts.map(o=>`<option ${o==v?'selected':''}>${o}</option>`).join('')}</select>`;
+const row=u=>{const me=u.email==U.email,lock=me||(!sup&&u.role!='user'),e=esc(u.email);
+const rb=u.role=='user'?`<button data-a="rights" data-e="${e}">Rights</button>`:'';
+const ab=lock?'<span class="muted">—</span>'
+:rb+(u.status=='pending'?`<button class="k" data-a="active" data-e="${e}">Approve</button><button class="d" data-a="disapproved" data-e="${e}">Reject</button>`
+:u.status=='active'?`<button class="d" data-a="blocked" data-e="${e}">Block</button>`
+:`<button class="k" data-a="active" data-e="${e}">Reactivate</button>`);
+const hid=UF.q&&!(u.name+' '+u.email).toLowerCase().includes(UF.q)?'hidden':'';
+return `<tr data-e="${e}" ${hid}><td><div class="ucell"><span class="av">${esc(ini(u.name))}</span><div><b>${esc(u.name)}</b><small>${e}</small></div></div></td>
+<td data-k="role">${so(u.role,['user','admin','superadmin'],!sup||me,'',`Change role for ${u.name}`)}</td>
+<td data-k="status">${so(u.status,['active','pending','blocked','disapproved'],lock,'s-'+u.status,`Change status for ${u.name}`)}</td>
+<td>${u.role=='user'?`<span class="rcount">${u.mods.length} of ${Object.keys(MODS).length} modules</span>`:'<span class="allm">All modules</span>'}</td>
+<td><div class="acts">${ab}</div></td></tr>`};
+el.innerHTML=`<div class="head"><h2>User management</h2>
+<div class="seg" role="group" aria-label="Filter by status">${[['all','All'],['pending','Pending'],['active','Active'],['blocked','Blocked']].map(([k,l])=>`<button data-f="${k}" class="${UF.f==k?'on':''}">${l}<i>${cnt(k)}</i></button>`).join('')}</div>
+<div class="tools"><input type="search" id="uq" placeholder="Search name or email" value="${esc(UF.q)}" aria-label="Search users"></div></div>
+${sup?'':'<p class="muted" style="margin:0 0 14px">Superadmin accounts are hidden.</p>'}
+<div class="tw"><table class="ut"><thead><tr><th>User</th><th>Role</th><th>Status</th><th>Modules</th><th style="text-align:right">Actions</th></tr></thead><tbody>${list.map(row).join('')}</tbody></table>${list.length?'':'<div class="empty">No users in this view.</div>'}</div>`;
+el.onchange=e=>{const tr=e.target.closest('tr[data-e]');if(!tr)return;const all=users(),u=all.find(x=>x.email==tr.dataset.e);
+const k=e.target.closest('[data-k]');if(!k)return;
+if(k.dataset.k=='role'&&e.target.value!='user'&&!confirm('Give '+u.name+' the '+e.target.value+' role? They will see every module.'))return usersView(el);
+u[k.dataset.k]=e.target.value;saveUsers(all);usersView(el);toast('User updated')};
+el.onclick=e=>{const f=e.target.closest('[data-f]');if(f){UF.f=f.dataset.f;return usersView(el)}
+const a=e.target.closest('[data-a]');if(a){const all=users(),u=all.find(x=>x.email==a.dataset.e);if(!u)return;
+if(a.dataset.a=='rights')return rights(u.email);
+if(['blocked','disapproved'].includes(a.dataset.a)&&!confirm((a.dataset.a=='blocked'?'Block ':'Reject ')+u.name+'? They will not be able to sign in.'))return;
+u.status=a.dataset.a;saveUsers(all);usersView(el);toast(u.status=='active'?'User approved':'User '+u.status)}};
+el.oninput=e=>{if(e.target.id!='uq')return;UF.q=e.target.value.toLowerCase();el.querySelectorAll('tbody tr').forEach(tr=>tr.hidden=!!UF.q&&!tr.querySelector('.ucell').textContent.toLowerCase().includes(UF.q))};
 }
 
 
