@@ -61,6 +61,8 @@ select set_config('app.username', 'someone', true);
 
 `audit_user()` records it in `audit_log`. If it is not set, the database login name is used.
 
+Run `tests/audit_user_test.sql` after applying `002_hope_base.sql` to verify that the configured user is written to `audit_log.action_by`. The test rolls back its changes.
+
 ## Soft delete
 
 Rows are not removed. Set `is_deleted = true`. The `*_active` views show only rows that are not deleted.
