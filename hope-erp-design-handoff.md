@@ -137,7 +137,7 @@ The table can scroll horizontally on small screens. Row actions expose rights, a
 - Auth modes are `login`, `reg`, `reset`, and `newpass`; `show(mode)` updates visible form, heading copy, and tab visibility/selection.
 - The login/register tab controls use `aria-controls` and their forms use `role="tabpanel"`. Recovery screens are not tabs.
 - User role/status controls need person-specific accessible names. The rights dialog is labeled by its title and description and receives initial focus on the first permission.
-- The Users table shows an empty photo placeholder until an image is selected. Images must be image MIME types no larger than 1 MB and are stored as data URLs on the local user record.
+- The Users table uses a two-letter initials avatar beside each user's name and email.
 - Existing role authorization, demo data, Supabase calls, report logic, and local persistence are unchanged by this design pass.
 - For production, connect auth and role checks to the trusted backend/RLS layer; client-side visibility is not an authorization boundary.
 
