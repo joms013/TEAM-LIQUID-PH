@@ -72,3 +72,51 @@ Rows are not removed. Set `is_deleted = true`. The `*_active` views show only ro
 - **`relation "..." already exists`**: that file was already run. Skip it.
 - **`relation "jobHistory" does not exist`**: use **Run without RLS** on the base file, then run `002b_enable_rls.sql`.
 - **Tables show UNRESTRICTED in the Table Editor**: run `002b_enable_rls.sql`.
+
+## Student setup (no Docker)
+
+Every team member sets up their own free Supabase database. Nothing here needs Docker.
+
+### What you need
+- A free [Supabase](https://supabase.com) account
+- `psql` (the PostgreSQL command-line client)
+- Windows only: Git Bash or WSL, to run the `.sh` script
+
+### Steps
+1. **Create a project.** In Supabase, click **New project**. Choose a database password and save it somewhere private. Never put it in the repo.
+2. **Get the connection string.** Click **Connect**, choose **Session pooler**, and copy the URI. Replace `[YOUR-PASSWORD]` with your password.
+3. **Set it in your terminal** (not in a file):
+   ```bash
+   export SUPABASE_DB_URL="postgresql://postgres.xxxx:YOUR-PASSWORD@aws-0-xxxx.pooler.supabase.com:5432/postgres"
+   ```
+4. **Run the migrations and seed** from the repo root:
+   ```bash
+   bash db/migrations/run_migrations.sh --include-seed
+   ```
+   Leave out `--include-seed` to build the tables without the starting data.
+5. **Check it worked.** Run this in the Supabase SQL Editor:
+   ```sql
+   select
+     (select count(*) from role)       as roles,        -- expect 3
+     (select count(*) from module)     as modules,      -- expect 5
+     (select count(*) from app_right)  as rights,       -- expect 36
+     (select count(*) from role_right) as role_rights;  -- expect 72
+   ```
+
+### Running it again
+The script remembers what it has already applied (in `schema_migrations`). Running it a second time prints `Already applied` for each file and changes nothing.
+
+### Rules
+- Never edit a migration that has been applied. Add a new numbered file instead.
+- Never commit passwords, connection strings or keys.
+- Run the script only on a new, empty database.
+- Superadmin accounts are created through Supabase Auth, and each person sets their own password. No passwords are stored in this repo.
+
+### Troubleshooting
+| Message | What to do |
+|---|---|
+| `psql is required` | Install PostgreSQL client tools and reopen the terminal. |
+| `Set SUPABASE_DB_URL in your shell` | Run the `export` command from step 3 in the same terminal. |
+| `ERP tables exist but migration history is missing` | This database was set up by hand. Create a new empty project. |
+| `applied migration changed` | A file that was already applied was edited. Undo the edit and add a new numbered file. |
+| Connection timeout or `could not translate host name` | Use the **Session pooler** string, not the direct connection. |

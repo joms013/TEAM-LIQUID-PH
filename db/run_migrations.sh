@@ -47,9 +47,9 @@ SQL
 fi
 
 files=()
-while IFS= read -r -d '' file; do files+=("$file"); done < <(find "$script_dir" -maxdepth 1 -type f -name '*.sql' -print0 | sort -z)
+while IFS= read -r -d '' file; do files+=("$file"); done < <(find "$script_dir" -maxdepth 1 -type f -name '*.sql' -print0 | LC_ALL=C sort -z)
 if [[ "$include_seed" == true && -d "$seed_dir" ]]; then
-	while IFS= read -r -d '' file; do files+=("$file"); done < <(find "$seed_dir" -maxdepth 1 -type f -name '*.sql' -print0 | sort -z)
+	while IFS= read -r -d '' file; do files+=("$file"); done < <(find "$seed_dir" -maxdepth 1 -type f -name '*.sql' -print0 | LC_ALL=C sort -z)
 fi
 ((${#files[@]})) || { echo "Error: no SQL files found in $script_dir." >&2; exit 1; }
 
@@ -59,7 +59,7 @@ for file in "${files[@]}"; do
 		*) version="$(basename "$file")" ;;
 	esac
 	checksum="$(sha256 "$file")"
-	recorded="$(psql_run -At -v migration_version="$version" -c "SELECT checksum FROM public.schema_migrations WHERE version = :'migration_version';")"
+	recorded="$(psql_run -At -v migration_version="$version" <<< "SELECT checksum FROM public.schema_migrations WHERE version = :'migration_version';")"
 	if [[ -n "$recorded" ]]; then
 		[[ "$recorded" == "$checksum" ]] || { echo "Error: applied migration changed: $version" >&2; exit 1; }
 		printf 'Already applied: %s\n' "$version"
@@ -68,7 +68,6 @@ for file in "${files[@]}"; do
 
 	printf 'Applying: %s\n' "$version"
 	psql_run -f "$file"
-	psql_run -v migration_version="$version" -v migration_checksum="$checksum" \
-		-c "INSERT INTO public.schema_migrations (version, checksum) VALUES (:'migration_version', :'migration_checksum');"
+	psql_run -v migration_version="$version" -v migration_checksum="$checksum" <<< "INSERT INTO public.schema_migrations (version, checksum) VALUES (:'migration_version', :'migration_checksum');"
 	printf 'Applied: %s\n' "$version"
 done
