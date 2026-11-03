@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import {
   ArrowLeft,
@@ -190,6 +191,18 @@ export default function LoginPage() {
                   aria-hidden="true"
                 />
               </button>
+
+              {!isResetMode && (
+                <p className="text-center text-[13px] text-[#59685f]">
+                  Need an account?{" "}
+                  <Link
+                    className="font-semibold text-[#315b48] underline decoration-[#b7c7ba] underline-offset-4 transition hover:text-[#234536]"
+                    href="/register"
+                  >
+                    Request access
+                  </Link>
+                </p>
+              )}
 
               {isResetMode && (
                 <button
