@@ -26,13 +26,15 @@ create table app_right (
 
 create table app_user (
   id bigint generated always as identity primary key,
-  auth_id uuid unique references auth.users(id),   -- Supabase Auth account (password lives there)
-  username text unique not null,
+  auth_id uuid unique references auth.users(id) on delete cascade,  -- Supabase Auth account (password lives there)
+  username text unique,                                             -- optional; login uses email
   first_name text,
   last_name text,
   email text,
-  password_hash text,                              -- unused with Supabase Auth; kept optional
+  password_hash text,                                               -- unused with Supabase Auth; kept optional
   role_id bigint not null references role(id),
+  status text not null default 'pending'
+    check (status in ('pending','active','blocked','disapproved')),
   is_blocked boolean not null default false,
   is_deleted boolean not null default false,
   stamp varchar(80)
