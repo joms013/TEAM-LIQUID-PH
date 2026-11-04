@@ -1,0 +1,17 @@
+Test             Scenario	                                                       Expected Result
+case
+TC01	Register using complete and valid information.	                The account created successfully.
+TC02	Register using an email that is already registered.	        The system show a message that the email is already in use.
+TC03	Register without filling in the required fields.	        The system ask the user to complete the missing fields.
+TC04	Register using an invalid email format.	                        The system show an error message for the invalid email.
+TC05	Register using a password with less than 8 characters.	        The system ask the user to use a longer password.
+TC06	Log in using the correct email and password.	                The user be able to access their account.
+TC07	Log in using an incorrect password.	                        The system show an error message.
+TC08	Log in using an email that is not registered.	                The system inform the user that the login details are incorrect.
+TC09	Log in without entering the required information.	        The system ask the user to fill in the missing fields.
+TC10	Log out from the account.	                                The user be logged out and returned to the sign-in page.
+TC11	Try to access the account again after logging out.	        The system noy allow access to the account without logging in again.
+TC12	Set a password during registration using a valid password.	The password  be accepted.
+TC14	Open the Forgot Password.	                                The system display the page where the user can request a reset link.
+TC15	Enter a registered email and click Send Reset Link.	        The system confirm that a reset link has been sent.
+TC19    Click Back to Sign In.	                                        The user redirected to the Sign In page.
