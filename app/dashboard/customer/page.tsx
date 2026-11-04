@@ -11,13 +11,15 @@ export default async function CustomerPage() {
   const access = await getDashboardAccess();
   if (!hasModuleAccess(access, "customer")) redirect("/dashboard");
 
-  const [permissions, result] = await Promise.all([
-    getCustomerPermissions(access),
-    createSupabaseAdminClient()
-      .from("customer")
-      .select("custno, custname, address, payterm")
-      .order("custno"),
-  ]);
+  const permissions = await getCustomerPermissions(access);
+  const canDelete = permissions.has("customer_delete");
+  let customerQuery = createSupabaseAdminClient()
+    .from("customer")
+    .select("custno, custname, address, payterm, is_deleted")
+    .order("custno");
+  if (!canDelete) customerQuery = customerQuery.eq("is_deleted", false);
+
+  const result = await customerQuery;
   const { data, error } = result;
 
   if (error) throw new Error(`Unable to load customers: ${error.message}`);
@@ -28,6 +30,7 @@ export default async function CustomerPage() {
       <CustomerList
         canAdd={permissions.has("customer_add")}
         canEdit={permissions.has("customer_edit")}
+        canDelete={canDelete}
         customers={(data ?? []) as CustomerRecord[]}
       />
     </main>

@@ -1,10 +1,21 @@
 "use client";
 
-import { ArrowLeft, Check, Pencil, Plus, Search, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  Pencil,
+  Plus,
+  RotateCcw,
+  Search,
+  Trash2,
+  Users,
+} from "lucide-react";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   createCustomer,
+  deleteCustomer,
+  restoreCustomer,
   updateCustomer,
   type CustomerMutationResult,
 } from "@/app/actions/customers";
@@ -14,9 +25,11 @@ export type CustomerRecord = {
   custname: string | null;
   address: string | null;
   payterm: "COD" | "30D" | "45D" | null;
+  is_deleted: boolean;
 };
 
 type PaymentFilter = "all" | NonNullable<CustomerRecord["payterm"]>;
+type CustomerStatusFilter = "active" | "inactive" | "all";
 
 const paymentFilters: { value: PaymentFilter; label: string }[] = [
   { value: "all", label: "All terms" },
@@ -29,16 +42,20 @@ export function CustomerList({
   customers,
   canAdd,
   canEdit,
+  canDelete,
 }: {
   customers: CustomerRecord[];
   canAdd: boolean;
   canEdit: boolean;
+  canDelete: boolean;
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<CustomerStatusFilter>("active");
   const [dialog, setDialog] = useState<"create" | CustomerRecord | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [feedback, setFeedback] = useState<{ message: string; isError: boolean } | null>(null);
   const [isPending, startTransition] = useTransition();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const isCreate = dialog === "create";
@@ -48,7 +65,12 @@ export function CustomerList({
     if (dialog) dialogRef.current?.showModal();
   }, [dialog]);
   const normalizedQuery = query.trim().toLowerCase();
-  const searchedCustomers = customers.filter((customer) =>
+  const statusCustomers = customers.filter((customer) => {
+    if (!canDelete || statusFilter === "active") return !customer.is_deleted;
+    if (statusFilter === "inactive") return customer.is_deleted;
+    return true;
+  });
+  const searchedCustomers = statusCustomers.filter((customer) =>
     `${customer.custno} ${customer.custname ?? ""} ${customer.address ?? ""} ${customer.payterm ?? ""}`
       .toLowerCase()
       .includes(normalizedQuery),
@@ -91,6 +113,30 @@ export function CustomerList({
     setDialog(nextDialog);
   }
 
+  function changeCustomerStatus(customer: CustomerRecord, restore: boolean) {
+    if (
+      !restore &&
+      !window.confirm(
+        `Move ${customer.custname || customer.custno} to inactive customers?`,
+      )
+    ) {
+      return;
+    }
+
+    setFeedback(null);
+    startTransition(async () => {
+      const result: CustomerMutationResult = restore
+        ? await restoreCustomer(customer.custno)
+        : await deleteCustomer(customer.custno);
+      if (result.error) {
+        setFeedback({ message: result.error, isError: true });
+        return;
+      }
+      setFeedback({ message: result.success ?? "", isError: false });
+      router.refresh();
+    });
+  }
+
   return (
     <section className="users-main">
       <a
@@ -114,7 +160,7 @@ export function CustomerList({
           </p>
         </div>
         <p className="text-sm font-semibold text-[#55657d]">
-          {visibleCustomers.length} of {customers.length} customers
+          {visibleCustomers.length} of {statusCustomers.length} customers
         </p>
         {canAdd && (
           <button className="user-primary-button" onClick={() => openDialog("create")} type="button">
@@ -123,6 +169,44 @@ export function CustomerList({
           </button>
         )}
       </header>
+
+      {feedback && (
+        <p
+          aria-live={feedback.isError ? "assertive" : "polite"}
+          className={`mb-4 text-sm ${feedback.isError ? "text-red-700" : "text-[#315b48]"}`}
+          role={feedback.isError ? "alert" : "status"}
+        >
+          {feedback.message}
+        </p>
+      )}
+      {canDelete && (
+        <div
+          aria-label="Filter customers by status"
+          className="user-filter-group mb-4"
+          role="group"
+        >
+          {([
+            ["active", "Active"],
+            ["inactive", "Inactive"],
+            ["all", "All"],
+          ] as const).map(([value, label]) => (
+            <button
+              aria-pressed={statusFilter === value}
+              className={`user-filter ${statusFilter === value ? "user-filter-selected" : ""}`}
+              key={value}
+              onClick={() => setStatusFilter(value)}
+              type="button"
+            >
+              <span>{label}</span>
+              <span className="user-filter-count">
+                {customers.filter((customer) =>
+                  value === "all" ? true : customer.is_deleted === (value === "inactive"),
+                ).length}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <section aria-label="Customer list">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -159,7 +243,7 @@ export function CustomerList({
                 <th scope="col">Customer</th>
                 <th scope="col">Address</th>
                 <th scope="col">Payment terms</th>
-                {canEdit && <th scope="col"><span className="sr-only">Actions</span></th>}
+                {(canEdit || canDelete) && <th scope="col"><span className="sr-only">Actions</span></th>}
               </tr>
             </thead>
             <tbody>
@@ -168,6 +252,9 @@ export function CustomerList({
                   <td>
                     <span className="block font-semibold text-[#172a24]">
                       {customer.custname || "Unnamed customer"}
+                      {customer.is_deleted && (
+                        <span className="ml-2 text-xs font-medium text-[#8c4b35]">Inactive</span>
+                      )}
                     </span>
                     <span className="mt-1 block text-xs text-[#69766f]">{customer.custno}</span>
                   </td>
@@ -175,17 +262,37 @@ export function CustomerList({
                   <td>
                     <span className="user-role">{customer.payterm || "Not set"}</span>
                   </td>
-                  {canEdit && (
+                  {(canEdit || canDelete) && (
                     <td className="text-right">
-                      <button
-                        aria-label={`Edit ${customer.custname || customer.custno}`}
-                        className="user-action-button"
-                        onClick={() => openDialog(customer)}
-                        type="button"
-                      >
-                        <Pencil aria-hidden="true" size={15} />
-                        <span>Edit</span>
-                      </button>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        {canEdit && !customer.is_deleted && (
+                          <button
+                            aria-label={`Edit ${customer.custname || customer.custno}`}
+                            className="user-action-button"
+                            onClick={() => openDialog(customer)}
+                            type="button"
+                          >
+                            <Pencil aria-hidden="true" size={15} />
+                            <span>Edit</span>
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            aria-label={`${customer.is_deleted ? "Restore" : "Delete"} ${customer.custname || customer.custno}`}
+                            className="user-action-button"
+                            disabled={isPending}
+                            onClick={() => changeCustomerStatus(customer, customer.is_deleted)}
+                            type="button"
+                          >
+                            {customer.is_deleted ? (
+                              <RotateCcw aria-hidden="true" size={15} />
+                            ) : (
+                              <Trash2 aria-hidden="true" size={15} />
+                            )}
+                            <span>{customer.is_deleted ? "Restore" : "Delete"}</span>
+                          </button>
+                        )}
+                      </div>
                     </td>
                   )}
                 </tr>
@@ -200,6 +307,9 @@ export function CustomerList({
                   <h2 className="truncate font-semibold text-[#172a24]">
                     {customer.custname || "Unnamed customer"}
                   </h2>
+                  {customer.is_deleted && (
+                    <span className="mt-1 block text-xs font-medium text-[#8c4b35]">Inactive</span>
+                  )}
                   <p className="mt-1 text-xs text-[#69766f]">{customer.custno}</p>
                 </div>
                 <span className="user-role">{customer.payterm || "Not set"}</span>
@@ -207,16 +317,36 @@ export function CustomerList({
               <p className="mt-3 text-sm leading-5 text-[#55657d]">
                 {customer.address || "Address not provided"}
               </p>
-              {canEdit && (
-                <button
-                  aria-label={`Edit ${customer.custname || customer.custno}`}
-                  className="user-action-button mt-3"
-                  onClick={() => openDialog(customer)}
-                  type="button"
-                >
-                  <Pencil aria-hidden="true" size={15} />
-                  <span>Edit</span>
-                </button>
+              {(canEdit || canDelete) && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {canEdit && !customer.is_deleted && (
+                    <button
+                      aria-label={`Edit ${customer.custname || customer.custno}`}
+                      className="user-action-button"
+                      onClick={() => openDialog(customer)}
+                      type="button"
+                    >
+                      <Pencil aria-hidden="true" size={15} />
+                      <span>Edit</span>
+                    </button>
+                  )}
+                  {canDelete && (
+                    <button
+                      aria-label={`${customer.is_deleted ? "Restore" : "Delete"} ${customer.custname || customer.custno}`}
+                      className="user-action-button"
+                      disabled={isPending}
+                      onClick={() => changeCustomerStatus(customer, customer.is_deleted)}
+                      type="button"
+                    >
+                      {customer.is_deleted ? (
+                        <RotateCcw aria-hidden="true" size={15} />
+                      ) : (
+                        <Trash2 aria-hidden="true" size={15} />
+                      )}
+                      <span>{customer.is_deleted ? "Restore" : "Delete"}</span>
+                    </button>
+                  )}
+                </div>
               )}
             </article>
           ))}
