@@ -1,7 +1,13 @@
 "use client";
 
-import { ArrowLeft, Search, Users } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Check, Pencil, Plus, Search, Users } from "lucide-react";
+import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import {
+  createCustomer,
+  updateCustomer,
+  type CustomerMutationResult,
+} from "@/app/actions/customers";
 
 export type CustomerRecord = {
   custno: string;
@@ -19,9 +25,28 @@ const paymentFilters: { value: PaymentFilter; label: string }[] = [
   { value: "45D", label: "45 days" },
 ];
 
-export function CustomerList({ customers }: { customers: CustomerRecord[] }) {
+export function CustomerList({
+  customers,
+  canAdd,
+  canEdit,
+}: {
+  customers: CustomerRecord[];
+  canAdd: boolean;
+  canEdit: boolean;
+}) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
   const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
+  const [dialog, setDialog] = useState<"create" | CustomerRecord | null>(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const isCreate = dialog === "create";
+  const selectedCustomer = dialog !== null && dialog !== "create" ? dialog : null;
+
+  useEffect(() => {
+    if (dialog) dialogRef.current?.showModal();
+  }, [dialog]);
   const normalizedQuery = query.trim().toLowerCase();
   const searchedCustomers = customers.filter((customer) =>
     `${customer.custno} ${customer.custname ?? ""} ${customer.address ?? ""} ${customer.payterm ?? ""}`
@@ -40,6 +65,31 @@ export function CustomerList({ customers }: { customers: CustomerRecord[] }) {
         : searchedCustomers.filter((customer) => customer.payterm === value).length,
     ]),
   ) as Record<PaymentFilter, number>;
+
+  function submitCustomer(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!dialog) return;
+
+    const formData = new FormData(event.currentTarget);
+    setErrorMessage("");
+    startTransition(async () => {
+      const result: CustomerMutationResult =
+        dialog === "create"
+          ? await createCustomer(formData)
+          : await updateCustomer(dialog.custno, formData);
+      if (result.error) {
+        setErrorMessage(result.error);
+        return;
+      }
+      setDialog(null);
+      router.refresh();
+    });
+  }
+
+  function openDialog(nextDialog: "create" | CustomerRecord) {
+    setErrorMessage("");
+    setDialog(nextDialog);
+  }
 
   return (
     <section className="users-main">
@@ -66,6 +116,12 @@ export function CustomerList({ customers }: { customers: CustomerRecord[] }) {
         <p className="text-sm font-semibold text-[#55657d]">
           {visibleCustomers.length} of {customers.length} customers
         </p>
+        {canAdd && (
+          <button className="user-primary-button" onClick={() => openDialog("create")} type="button">
+            <Plus aria-hidden="true" size={17} />
+            Add customer
+          </button>
+        )}
       </header>
 
       <section aria-label="Customer list">
@@ -103,6 +159,7 @@ export function CustomerList({ customers }: { customers: CustomerRecord[] }) {
                 <th scope="col">Customer</th>
                 <th scope="col">Address</th>
                 <th scope="col">Payment terms</th>
+                {canEdit && <th scope="col"><span className="sr-only">Actions</span></th>}
               </tr>
             </thead>
             <tbody>
@@ -118,6 +175,19 @@ export function CustomerList({ customers }: { customers: CustomerRecord[] }) {
                   <td>
                     <span className="user-role">{customer.payterm || "Not set"}</span>
                   </td>
+                  {canEdit && (
+                    <td className="text-right">
+                      <button
+                        aria-label={`Edit ${customer.custname || customer.custno}`}
+                        className="user-action-button"
+                        onClick={() => openDialog(customer)}
+                        type="button"
+                      >
+                        <Pencil aria-hidden="true" size={15} />
+                        <span>Edit</span>
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -137,6 +207,17 @@ export function CustomerList({ customers }: { customers: CustomerRecord[] }) {
               <p className="mt-3 text-sm leading-5 text-[#55657d]">
                 {customer.address || "Address not provided"}
               </p>
+              {canEdit && (
+                <button
+                  aria-label={`Edit ${customer.custname || customer.custno}`}
+                  className="user-action-button mt-3"
+                  onClick={() => openDialog(customer)}
+                  type="button"
+                >
+                  <Pencil aria-hidden="true" size={15} />
+                  <span>Edit</span>
+                </button>
+              )}
             </article>
           ))}
 
@@ -153,6 +234,79 @@ export function CustomerList({ customers }: { customers: CustomerRecord[] }) {
           )}
         </div>
       </section>
+      {dialog && (
+        <dialog
+          aria-labelledby="customer-dialog-title"
+          className="user-dialog"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setDialog(null);
+          }}
+          onClose={() => setDialog(null)}
+          ref={dialogRef}
+        >
+          <div className="user-dialog-content">
+            <div className="flex items-start justify-between gap-4">
+              <h2 className="font-[Newsreader,Georgia,serif] text-3xl text-[#172a24]" id="customer-dialog-title">
+                {isCreate ? "Add customer" : "Edit customer"}
+              </h2>
+              <button
+                aria-label="Close dialog"
+                className="user-icon-button"
+                onClick={() => setDialog(null)}
+                type="button"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+            <form className="mt-5 space-y-4" key={selectedCustomer?.custno ?? "create"} onSubmit={submitCustomer}>
+              <label className="user-field">
+                <span>Customer number</span>
+                <input readOnly value={selectedCustomer?.custno ?? "Assigned automatically"} />
+              </label>
+              <label className="user-field">
+                <span>Name</span>
+                <input
+                  autoFocus
+                  defaultValue={selectedCustomer?.custname ?? ""}
+                  maxLength={20}
+                  name="custname"
+                  required
+                />
+              </label>
+              <label className="user-field">
+                <span>Address</span>
+                <input
+                  defaultValue={selectedCustomer?.address ?? ""}
+                  maxLength={50}
+                  name="address"
+                />
+              </label>
+              <label className="user-field">
+                <span>Payment terms</span>
+                <select defaultValue={selectedCustomer?.payterm ?? "30D"} name="payterm" required>
+                  <option value="30D">30 days</option>
+                  <option value="45D">45 days</option>
+                  <option value="COD">Cash on delivery</option>
+                </select>
+              </label>
+              {errorMessage && <p aria-live="polite" className="user-form-error">{errorMessage}</p>}
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  className="user-secondary-button"
+                  onClick={() => setDialog(null)}
+                  type="button"
+                >
+                  Cancel
+                </button>
+                <button className="user-primary-button" disabled={isPending} type="submit">
+                  {isCreate ? <Plus aria-hidden="true" size={17} /> : <Check aria-hidden="true" size={17} />}
+                  {isPending ? "Saving..." : isCreate ? "Add customer" : "Save changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </dialog>
+      )}
     </section>
   );
 }
