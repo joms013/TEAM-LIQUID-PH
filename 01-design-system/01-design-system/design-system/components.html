@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hope ERP · Design system · Core components</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:wght@500&display=swap" rel="stylesheet">
+<style>
+
+body{margin:0}*{box-sizing:border-box}
+.r{font:400 15px/1.5 "DM Sans",sans-serif;color:#17263d;background:#f3f6fc}
+.r h1,.r h2,.r h3,.r p{margin:0}.s{font-family:"Newsreader",Georgia,serif;font-weight:500}
+.row{display:flex;gap:16px}.col{display:flex;flex-direction:column;gap:12px}
+.lb{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#55657d}
+.m{color:#55657d;font-size:13px}.bt{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:8px;border:0;background:#2463c4;color:#fff;font:600 14px "DM Sans";width:max-content}
+.bt.g{background:#fff;color:#17263d;box-shadow:inset 0 0 0 1px #dbe4f0}.bt.d{background:#a63f39}.bt.sm{min-height:36px;padding:0 14px;font-size:13px}
+.in{height:44px;border:1px solid #dbe4f0;border-radius:8px;background:#fff;padding:0 14px;display:flex;align-items:center;color:#55657d;font-size:15px}
+.lab{font-size:13px;font-weight:600;margin:0 0 6px}.cd{background:#fff;border:1px solid #dbe4f0;border-radius:12px;padding:20px}
+.bd{display:inline-block;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600}
+.ch{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;background:#edf2f8;color:#55657d;border:1px solid transparent}
+.ch.on{background:#eaf1fb;color:#184b9e;border-color:#9bbbe8}.ch i{width:14px;height:14px;border-radius:4px;border:1.6px solid currentColor}.ch.on i{background:#2463c4;border-color:#2463c4}
+.sb{width:240px;flex:none;background:#fff;border-right:1px solid #dbe4f0;padding:20px 14px;display:flex;flex-direction:column;gap:4px}
+.nv{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:8px;font-size:14px;font-weight:600;color:#55657d}.nv i{width:18px;height:18px;border:1.8px solid currentColor;border-radius:5px}.nv.on{background:#2463c4;color:#fff}
+.tb{width:100%;border-collapse:collapse;font-size:14px}.tb th{text-align:left;padding:13px 18px;font-size:12.5px;color:#55657d;background:#f6f8fc;border-bottom:1px solid #dbe4f0}.tb td{padding:13px 18px;border-bottom:1px solid #dbe4f0}
+.pl{display:inline-block;padding:7px 28px 7px 14px;border-radius:8px;font-size:13.5px;font-weight:600;border:1px solid #dbe4f0}
+.wf{background:#fff;border:2px solid #8a94a3;border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px;font:500 13px "DM Sans";color:#4a5565}
+.x{background:#e3e6ea;border:1px dashed #8a94a3;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#4a5565;min-height:34px;padding:0 8px}.x.k{background:#c9ced6}
+.nt{font-size:12px;color:#7a2f1f;background:#fff1e8;border:1px solid #e9b99f;border-radius:4px;padding:3px 8px;width:max-content}
+
+</style>
+</head>
+<body>
+<div class="r" style="min-height:100vh"><div style="padding:40px 48px;display:flex;flex-direction:column;gap:28px;max-width:900px"><div><p class="lb">Hope, Inc. ERP</p><h1 class="s" style="font-size:40px;margin-top:6px">Design system</h1><p class="m" style="margin-top:6px;font-size:14px">Consolidated from the built app. Four stacked CSS override layers collapse into one token set.</p></div><div class="col" style="flex:1"><p class="lb">Core components</p>
+<div class="row" style="align-items:center;flex-wrap:wrap"><button class="bt">Primary</button><button class="bt g">Secondary</button><button class="bt d">Destructive</button><button class="bt sm g">Small action</button></div>
+<div class="row"><div style="flex:1"><p class="lab">Email</p><div class="in">name@hope.com</div></div><div style="flex:1"><p class="lab">Error state</p><div class="in" style="border:2px solid #a63f39">Value</div><p style="font-size:12.5px;font-weight:600;color:#a63f39;margin-top:4px">Enter the work email.</p></div></div>
+<div class="row" style="align-items:center;flex-wrap:wrap"><span class="ch on"><i></i>Customers</span><span class="ch"><i></i>Human resources</span><span class="bd" style="background:#e8f4ef;color:#12684f">Active</span><span class="bd" style="background:#fff4dc;color:#895a0b">Pending</span><span class="bd" style="background:#fbecea;color:#a63f39">Blocked</span></div>
+<div class="row" style="align-items:center"><span class="nv on" style="width:200px"><i></i>Active nav</span><span class="nv" style="width:200px"><i></i>Idle nav</span></div>
+<table class="tb cd" style="padding:0;display:table"><tr><th>Name</th><th>Role</th><th></th></tr><tr><td>Alex Rivera</td><td>User</td><td style="text-align:right"><button class="bt sm g">Rights</button></td></tr></table></div></div></div>
+</body>
+</html>
