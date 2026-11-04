@@ -1,0 +1,22 @@
+TC01 – Add a New User
+Successfully added a new user through registration. The account was given the default User role and a Pending status.
+TC02 – Duplicate Email Registration
+Successfully detected an email that was already registered. A message appeared informing the user that the email was already in use.
+TC03 – Change User Role
+Successfully changed a user's role from User to Admin after confirming the action.
+TC04 – Edit User Information
+Successfully updated the user's information or settings, and the changes were saved.
+TC05 – Block User Account
+Successfully blocked an active user account. A confirmation message appeared before the account status changed to Blocked.
+TC06 – Reactivate User Account
+Successfully reactivated a blocked account. Its status changed back to Active.
+TC07 – Approve User Account
+Successfully approved a pending user account. Its status changed to Active.
+TC08 – Reject User Account
+Successfully rejected a pending user account. Its status changed to Disapproved.
+TC09 – Admin Access to Superadmin Accounts
+Successfully restricted Admin access to Superadmin accounts. These accounts did not appear in the Admin's user list.
+TC10 – Admin Attempts to Edit Superadmin Account
+Successfully prevented an Admin from accessing or changing a Superadmin account.
+TC11 – Last Superadmin Protection
+Successfully prevented the removal or downgrading of the last remaining Superadmin account, keeping at least one Superadmin in the system.
