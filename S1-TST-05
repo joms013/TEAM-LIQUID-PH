@@ -1,0 +1,11 @@
+Login Test Cases
+Test Case	          Test Scenario	                                                                    Result
+TC01	   Log in using a registered email and correct password.	     Login is successful, and the user is redirected to the main page.
+TC02	   Log in using an incorrect email or password.	                 Login is unsuccessful, and an error message appears.
+TC03	   Log in using a pending, blocked, or disapproved account.	     Login is unsuccessful, and a message explains why the account cannot access the system.
+Main Page Test Cases
+TC04	  Check if the main page opens after logging in.	                Main page loads successfully, and the dashboard is displayed.
+TC05	  Check the navigation menu on the main page.	                    Navigation menu displays the available system modules.
+TC06	  Check the summary cards on the dashboard.	                        Dashboard successfully displays the available customer, product, employee, and sales information.
+TC07	  Check the welcome section on the main page.	                    Welcome section successfully displays the user's name, role, and current date.
+TC08	  Check if users can access the modules assigned to their accounts.	Users can successfully view and access only the modules allowed for their accounts.
