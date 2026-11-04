@@ -98,12 +98,66 @@ export async function updateCustomer(
     .from("customer")
     .update(fields)
     .eq("custno", custno)
+    .eq("is_deleted", false)
     .select("custno")
     .maybeSingle();
 
   if (error) return { error: "Unable to save this customer." };
-  if (!data) return { error: "This customer no longer exists." };
+  if (!data) return { error: "This customer is inactive or no longer exists." };
 
   revalidatePath("/dashboard/customer");
   return { success: "Customer changes saved." };
+}
+
+export async function deleteCustomer(
+  custno: string,
+): Promise<CustomerMutationResult> {
+  if (!(await mayManageCustomer("customer_delete"))) {
+    return { error: "You do not have permission to delete customers." };
+  }
+  if (!/^C\d{4}$/.test(custno)) return { error: "Choose a valid customer record." };
+
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin
+    .from("customer")
+    .update({ is_deleted: true })
+    .eq("custno", custno)
+    .eq("is_deleted", false)
+    .select("custno")
+    .maybeSingle();
+
+  if (error) {
+    if (error.code === "P0001") {
+      return { error: "This customer has active sales and cannot be deleted." };
+    }
+    return { error: "Unable to delete this customer." };
+  }
+  if (!data) return { error: "This customer is already inactive or no longer exists." };
+
+  revalidatePath("/dashboard/customer");
+  return { success: `Customer ${custno} moved to inactive.` };
+}
+
+export async function restoreCustomer(
+  custno: string,
+): Promise<CustomerMutationResult> {
+  if (!(await mayManageCustomer("customer_delete"))) {
+    return { error: "You do not have permission to restore customers." };
+  }
+  if (!/^C\d{4}$/.test(custno)) return { error: "Choose a valid customer record." };
+
+  const admin = createSupabaseAdminClient();
+  const { data, error } = await admin
+    .from("customer")
+    .update({ is_deleted: false })
+    .eq("custno", custno)
+    .eq("is_deleted", true)
+    .select("custno")
+    .maybeSingle();
+
+  if (error) return { error: "Unable to restore this customer." };
+  if (!data) return { error: "This customer is already active or no longer exists." };
+
+  revalidatePath("/dashboard/customer");
+  return { success: `Customer ${custno} restored.` };
 }

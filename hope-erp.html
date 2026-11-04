@@ -1717,6 +1717,10 @@ function draw(name, element, parentValue) {
       kids(name, id);
     } else if (action == "del") {
       const record = data(name).find((item) => item.id == id);
+      if (name == "customers" && act("sales").some((sale) => sale.cust == record.no)) {
+        toast("Cannot mark inactive: customer has active sales.");
+        return;
+      }
       askConfirm({
         title: `Mark “${esc(recName(name, record))}” inactive?`,
         body: "It will be hidden from lists. Existing records keep their history. An admin can restore it.",
@@ -1730,7 +1734,7 @@ function draw(name, element, parentValue) {
     } else if (action == "res") {
       mut(name, id, false, "RESTORED");
       redraw();
-      toast("Record restored");
+      toast(name == "customers" ? "Customer restored" : "Record restored");
     }
   };
 }
