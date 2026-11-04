@@ -237,3 +237,39 @@ export async function setManagedUserStatus(
           : "User unblocked.",
   };
 }
+
+export async function saveManagedUserRights(
+  userId: string,
+  permissionCodes: string[],
+): Promise<UserManagementResult> {
+  const manager = await getManager();
+  if (!isManager(manager)) return manager;
+  if (!userId || userId === manager.id) {
+    return { error: "You cannot change your own rights." };
+  }
+  if (
+    !Array.isArray(permissionCodes) ||
+    permissionCodes.length > 36 ||
+    permissionCodes.some((code) => typeof code !== "string") ||
+    new Set(permissionCodes).size !== permissionCodes.length
+  ) {
+    return { error: "Choose valid rights for this user." };
+  }
+
+  const targetAccount = await getTargetAccount(userId);
+  if (!targetAccount || !mayManageRole(manager, targetAccount.role)) {
+    return { error: "You do not have permission to change this user's rights." };
+  }
+
+  const admin = createSupabaseAdminClient();
+  const { error } = await admin.rpc("replace_user_permissions", {
+    p_user_id: userId,
+    p_permission_codes: permissionCodes,
+    p_actor_id: manager.id,
+  });
+
+  if (error) return { error: "Unable to save these rights. Please try again." };
+
+  revalidatePath("/dashboard/users");
+  return { success: "User rights updated." };
+}
