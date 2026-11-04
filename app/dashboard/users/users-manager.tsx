@@ -371,12 +371,10 @@ export function UsersManager({
           </span>
         </a>
         <p className="users-nav-label">Menu</p>
-        {isSuperadmin && (
-          <a className="users-nav-link" href="/dashboard">
-            <ArrowLeft aria-hidden="true" size={18} />
-            Home
-          </a>
-        )}
+        <a className="users-nav-link" href="/dashboard">
+          <ArrowLeft aria-hidden="true" size={18} />
+          Home
+        </a>
         <a aria-current="page" className="users-nav-link users-nav-current" href="/dashboard/users">
           <Users aria-hidden="true" size={18} />
           Users
