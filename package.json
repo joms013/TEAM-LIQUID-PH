@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test:smoke": "playwright test tests/auth-smoke.spec.ts",
+    "test:smoke:ui": "playwright test --ui tests/auth-smoke.spec.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -16,6 +18,7 @@
     "react-dom": "^19.1.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4.1.14",
     "@types/node": "^22.19.1",
     "@types/react": "^19.1.16",
