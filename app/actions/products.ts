@@ -94,3 +94,54 @@ export async function updateProduct(
   revalidatePath("/dashboard/product");
   return { success: "Product changes saved." };
 }
+
+export async function deleteProduct(
+  prodcode: string,
+): Promise<ProductMutationResult> {
+  if (!(await mayManageProduct("product_delete"))) {
+    return { error: "You do not have permission to delete products." };
+  }
+  if (!PRODUCT_CODE.test(prodcode)) return { error: "Choose a valid product record." };
+
+  const { data, error } = await createSupabaseAdminClient()
+    .from("product")
+    .update({ is_deleted: true })
+    .eq("prodcode", prodcode)
+    .eq("is_deleted", false)
+    .select("prodcode")
+    .maybeSingle();
+
+  if (error) {
+    if (error.code === "P0001") {
+      return { error: "This product has active sales or price history and cannot be deleted." };
+    }
+    return { error: "Unable to delete this product." };
+  }
+  if (!data) return { error: "This product is already inactive or no longer exists." };
+
+  revalidatePath("/dashboard/product");
+  return { success: `Product ${prodcode} moved to inactive.` };
+}
+
+export async function restoreProduct(
+  prodcode: string,
+): Promise<ProductMutationResult> {
+  if (!(await mayManageProduct("product_delete"))) {
+    return { error: "You do not have permission to restore products." };
+  }
+  if (!PRODUCT_CODE.test(prodcode)) return { error: "Choose a valid product record." };
+
+  const { data, error } = await createSupabaseAdminClient()
+    .from("product")
+    .update({ is_deleted: false })
+    .eq("prodcode", prodcode)
+    .eq("is_deleted", true)
+    .select("prodcode")
+    .maybeSingle();
+
+  if (error) return { error: "Unable to restore this product." };
+  if (!data) return { error: "This product is already active or no longer exists." };
+
+  revalidatePath("/dashboard/product");
+  return { success: `Product ${prodcode} restored.` };
+}

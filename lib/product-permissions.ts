@@ -3,20 +3,20 @@ import "server-only";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { DashboardAccess } from "@/lib/dashboard-access";
 
-export type ProductPermissionCode = "product_add" | "product_edit";
+export type ProductPermissionCode = "product_add" | "product_edit" | "product_delete";
 
 export async function getProductPermissions(
   access: DashboardAccess,
 ): Promise<Set<ProductPermissionCode>> {
   if (access.role !== "user") {
-    return new Set(["product_add", "product_edit"]);
+    return new Set(["product_add", "product_edit", "product_delete"]);
   }
 
   const admin = createSupabaseAdminClient();
   const { data: actions, error: actionsError } = await admin
     .from("permission_actions")
     .select("id, code")
-    .in("code", ["product_add", "product_edit"]);
+    .in("code", ["product_add", "product_edit", "product_delete"]);
 
   if (actionsError) {
     throw new Error(`Unable to load product permissions: ${actionsError.message}`);
