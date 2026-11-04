@@ -619,7 +619,7 @@ const ENT = {
     uk: ["prod", "date"],
     f: [
       { k: "prod", l: "Product", h: 1 },
-      { k: "date", l: "Effective date", type: "date" },
+      { k: "date", l: "Effective date", type: "date", mutable: true },
       { k: "price", l: "Unit price", type: "number", m: 1, gt0: 1 },
     ],
     ds: { k: "date", d: -1 },
@@ -1792,7 +1792,8 @@ function form(name, id, parentValue, done) {
   dialog.removeAttribute("aria-labelledby");
   dialog.removeAttribute("aria-describedby");
 
-  const isLocked = (field) => id && (field.u || (entity.uk || []).includes(field.k));
+  const isLocked = (field) =>
+    id && (field.u || ((entity.uk || []).includes(field.k) && !field.mutable));
   const nextNo = (field) => {
     let best = null;
     records.forEach((r) => {
