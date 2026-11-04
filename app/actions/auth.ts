@@ -90,6 +90,11 @@ export async function signInAction(
     return { error: "We couldn't verify account access. Contact your administrator." };
   }
 
+  if (profile.status === "pending") {
+    await supabase.auth.signOut();
+    return { error: "Your account is awaiting approval. Contact your administrator." };
+  }
+
   if (profile.status !== "active") {
     await supabase.auth.signOut();
     return { error: "This account is blocked. Contact your administrator." };

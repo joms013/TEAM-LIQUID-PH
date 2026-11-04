@@ -319,6 +319,11 @@ input {
   color: #16745a;
 }
 
+.user-status-pending {
+  background: #fff6df;
+  color: #875c0c;
+}
+
 .user-status-blocked {
   background: #fff0ed;
   color: #a63f39;
