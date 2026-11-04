@@ -12,6 +12,11 @@ type Manager = {
   role: UserRole;
 };
 
+type ManagedAccount = {
+  role: UserRole;
+  status: "pending" | "active" | "blocked";
+};
+
 async function getManager(): Promise<Manager | UserManagementResult> {
   const supabase = await createSupabaseServerClient();
   const {
@@ -52,16 +57,24 @@ function mayManageRole(manager: Manager, targetRole: UserRole) {
   return manager.role === "superadmin" || targetRole === "user";
 }
 
-async function getTargetRole(userId: string): Promise<UserRole | null> {
+async function getTargetAccount(userId: string): Promise<ManagedAccount | null> {
   const admin = createSupabaseAdminClient();
   const { data, error } = await admin
     .from("account_profiles")
-    .select("role")
+    .select("role, status")
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (error) throw new Error("Unable to load the target user's role.");
-  return data?.role === "admin" || data?.role === "superadmin" ? data.role : data ? "user" : null;
+  if (error) throw new Error("Unable to load the target user's account.");
+  if (!data) return null;
+
+  return {
+    role: data.role === "admin" || data.role === "superadmin" ? data.role : "user",
+    status:
+      data.status === "pending" || data.status === "blocked"
+        ? data.status
+        : "active",
+  };
 }
 
 export async function createManagedUser(
@@ -110,7 +123,7 @@ export async function createManagedUser(
 
   const { error: profileError } = await admin
     .from("account_profiles")
-    .update({ role })
+    .update({ role, status: "pending" })
     .eq("user_id", data.user.id);
 
   if (profileError) {
@@ -134,14 +147,14 @@ export async function updateManagedUser(
     return { error: "You cannot edit your own account here." };
   }
 
-  const targetRole = await getTargetRole(userId);
-  if (!targetRole || !mayManageRole(manager, targetRole)) {
+  const targetAccount = await getTargetAccount(userId);
+  if (!targetAccount || !mayManageRole(manager, targetAccount.role)) {
     return { error: "You do not have permission to edit this account." };
   }
 
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
-  const role = String(formData.get("role") ?? targetRole) as UserRole;
+  const role = String(formData.get("role") ?? targetAccount.role) as UserRole;
 
   if (name.length < 2 || name.length > 100) {
     return { error: "Enter a name between 2 and 100 characters." };
@@ -166,6 +179,13 @@ export async function updateManagedUser(
     .update({ role })
     .eq("user_id", userId);
   if (profileError) {
+    if (profileError.code === "23514") {
+      return {
+        error: profileError.message.includes("active superadmin")
+          ? "At least one active superadmin must remain."
+          : "At least one superadmin must remain.",
+      };
+    }
     return {
       error:
         "The profile details were saved, but the role could not be updated. Contact your administrator.",
@@ -189,9 +209,12 @@ export async function setManagedUserStatus(
     return { error: "Choose a valid account status." };
   }
 
-  const role = await getTargetRole(userId);
-  if (!role || !mayManageRole(manager, role)) {
+  const targetAccount = await getTargetAccount(userId);
+  if (!targetAccount || !mayManageRole(manager, targetAccount.role)) {
     return { error: "You do not have permission to change this account." };
+  }
+  if (targetAccount.status === "pending" && status === "active" && manager.role !== "superadmin") {
+    return { error: "Only a superadmin can approve pending users." };
   }
 
   const admin = createSupabaseAdminClient();
@@ -200,7 +223,17 @@ export async function setManagedUserStatus(
     .update({ status })
     .eq("user_id", userId);
 
+  if (error?.code === "23514") {
+    return { error: "At least one active superadmin must remain." };
+  }
   if (error) return { error: "Unable to update this user's status." };
   revalidatePath("/dashboard/users");
-  return { success: status === "blocked" ? "User blocked." : "User unblocked." };
+  return {
+    success:
+      targetAccount.status === "pending"
+        ? "User approved."
+        : status === "blocked"
+          ? "User blocked."
+          : "User unblocked.",
+  };
 }

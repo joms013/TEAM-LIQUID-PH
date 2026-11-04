@@ -34,7 +34,7 @@ export type ManagedUser = {
   email: string;
   name: string;
   role: UserRole;
-  status: "active" | "blocked";
+  status: "pending" | "active" | "blocked";
   createdAt: string;
   mustChangePassword: boolean;
 };
@@ -47,7 +47,7 @@ type Props = {
   onSignOut: () => Promise<void>;
 };
 
-type Filter = "all" | "active" | "blocked";
+type Filter = "all" | "pending" | "active" | "blocked";
 type DialogState =
   | { kind: "edit"; user: ManagedUser }
   | { kind: "status"; user: ManagedUser; nextStatus: "active" | "blocked" }
@@ -136,6 +136,7 @@ export function UsersManager({
       : searchedUsers.filter((user) => user.status === filter);
   const counts = {
     all: searchedUsers.length,
+    pending: searchedUsers.filter((user) => user.status === "pending").length,
     active: searchedUsers.filter((user) => user.status === "active").length,
     blocked: searchedUsers.filter((user) => user.status === "blocked").length,
   };
@@ -177,6 +178,41 @@ export function UsersManager({
   const rowActions = (user: ManagedUser) => {
     if (user.id === actorId) {
       return <span className="text-xs font-semibold text-[#69766f]">You</span>;
+    }
+    if (user.status === "pending") {
+      if (!isSuperadmin) {
+        return (
+          <span
+            className="text-xs text-[#69766f]"
+            title="Only a superadmin can approve pending users."
+          >
+            Awaiting approval
+          </span>
+        );
+      }
+
+      return (
+        <div className="flex flex-wrap justify-end gap-2">
+          <button
+            aria-label={`Edit ${user.name}`}
+            className="user-action-button"
+            onClick={() => openEdit(user)}
+            type="button"
+          >
+            <Pencil aria-hidden="true" size={15} />
+            <span>Edit</span>
+          </button>
+          <button
+            aria-label={`Approve ${user.name}`}
+            className="user-action-button user-success"
+            onClick={() => setDialog({ kind: "status", user, nextStatus: "active" })}
+            type="button"
+          >
+            <Check aria-hidden="true" size={15} />
+            <span>Approve</span>
+          </button>
+        </div>
+      );
     }
     if (!isSuperadmin && user.role !== "user") {
       return (
@@ -320,7 +356,7 @@ export function UsersManager({
         <section aria-label="User list" className="mt-7">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
             <div aria-label="Filter users by status" className="user-filter-group" role="group">
-              {(["all", "active", "blocked"] as const).map((value) => (
+              {(["all", "pending", "active", "blocked"] as const).map((value) => (
                 <button
                   aria-pressed={filter === value}
                   className={`user-filter ${filter === value ? "user-filter-selected" : ""}`}
@@ -398,7 +434,7 @@ export function UsersManager({
                     ? "Try a different name or email."
                     : filter === "all"
                       ? "Add a user to get started."
-                      : `There are no ${filter} accounts.`}
+                      : `There are no ${filter === "pending" ? "pending" : filter} accounts.`}
                 </p>
                 {!query && filter === "all" && (
                   <button className="user-primary-button mt-4" onClick={openCreate} type="button">
@@ -436,7 +472,8 @@ export function UsersManager({
               <input name="role" type="hidden" value="user" />
             )}
             <p className="text-xs leading-5 text-[#69766f]">
-              An invitation email will be sent so the person can set their password.
+              An invitation email will be sent. A superadmin must approve the
+              account before the person can set their password.
             </p>
             {errorMessage && <p aria-live="polite" className="user-form-error">{errorMessage}</p>}
             <div className="flex justify-end gap-2 pt-2">
@@ -491,12 +528,20 @@ export function UsersManager({
       {dialog?.kind === "status" && (
         <Modal
           onClose={() => setDialog(null)}
-          title={dialog.nextStatus === "blocked" ? "Block this user?" : "Unblock this user?"}
+          title={
+            dialog.user.status === "pending"
+              ? "Approve this user?"
+              : dialog.nextStatus === "blocked"
+                ? "Block this user?"
+                : "Unblock this user?"
+          }
         >
           <p className="mt-4 text-sm leading-6 text-[#55657d]">
-            {dialog.nextStatus === "blocked"
-              ? `${dialog.user.name} will no longer be able to sign in.`
-              : `${dialog.user.name} will be able to sign in again.`}
+            {dialog.user.status === "pending"
+              ? `${dialog.user.name} will be able to sign in after approval.`
+              : dialog.nextStatus === "blocked"
+                ? `${dialog.user.name} will no longer be able to sign in.`
+                : `${dialog.user.name} will be able to sign in again.`}
           </p>
           {errorMessage && <p aria-live="polite" className="user-form-error mt-4">{errorMessage}</p>}
           <div className="mt-6 flex justify-end gap-2">
@@ -510,7 +555,13 @@ export function UsersManager({
               type="button"
             >
               {dialog.nextStatus === "blocked" ? <Ban aria-hidden="true" size={17} /> : <Check aria-hidden="true" size={17} />}
-              {isPending ? "Updating…" : dialog.nextStatus === "blocked" ? "Block user" : "Unblock user"}
+              {isPending
+                ? "Updating…"
+                : dialog.user.status === "pending"
+                  ? "Approve user"
+                  : dialog.nextStatus === "blocked"
+                    ? "Block user"
+                    : "Unblock user"}
             </button>
           </div>
         </Modal>

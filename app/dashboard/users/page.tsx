@@ -60,7 +60,7 @@ export default async function UserManagementPage() {
           ? authUser.user_metadata.full_name
           : authUser.email?.split("@")[0] ?? "Unnamed user",
       role: account.role as UserRole,
-      status: account.status as "active" | "blocked",
+      status: account.status as "pending" | "active" | "blocked",
       createdAt: account.created_at,
       mustChangePassword: account.must_change_password,
     }];

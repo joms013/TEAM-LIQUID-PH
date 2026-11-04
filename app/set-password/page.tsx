@@ -21,10 +21,31 @@ export default async function SetPasswordPage({
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (error || !profile || profile.status !== "active") {
+  if (error || !profile || profile.status === "blocked") {
     await supabase.auth.signOut();
     redirect("/");
   }
+
+  if (profile.status === "pending") {
+    return (
+      <main className="flex min-h-screen items-center justify-center px-6 py-12">
+        <section className="w-full max-w-md bg-white p-8 shadow-sm sm:p-10">
+          <p className="text-xs font-bold uppercase text-[#668171]">Account approval</p>
+          <h1 className="mt-3 font-[Newsreader,Georgia,serif] text-4xl text-[#172a24]">
+            Approval pending
+          </h1>
+          <p className="mt-3 text-sm leading-6 text-[#69766f]">
+            A superadmin must approve your account before you can finish setting
+            your password. Refresh this page after approval to continue.
+          </p>
+          <a className="user-primary-button mt-6" href="/set-password">
+            Check approval
+          </a>
+        </section>
+      </main>
+    );
+  }
+
   if (!profile.must_change_password && !isRecovery) redirect("/dashboard");
 
   return (
