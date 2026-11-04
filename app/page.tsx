@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useActionState, useState, type FormEvent } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -11,19 +11,18 @@ import {
   Mail,
   ShieldCheck,
 } from "lucide-react";
+import { signInAction } from "./actions/auth";
 
 export default function LoginPage() {
   const [isResetMode, setIsResetMode] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [notice, setNotice] = useState("");
+  const [authState, loginAction, isSigningIn] = useActionState(signInAction, null);
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    if (!isResetMode) return;
     event.preventDefault();
-    setNotice(
-      isResetMode
-        ? "Password reset is not connected yet. Please contact your administrator."
-        : "Sign-in is not connected yet. Please contact your administrator.",
-    );
+    setNotice("Password reset is not connected yet. Please contact your administrator.");
   }
 
   function switchMode() {
@@ -94,7 +93,11 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <form className="space-y-5" onSubmit={handleSubmit}>
+            <form
+              action={isResetMode ? undefined : loginAction}
+              className="space-y-5"
+              onSubmit={isResetMode ? handleSubmit : undefined}
+            >
               <label className="block">
                 <span className="mb-2 block text-[13px] font-semibold text-[#26382f]">
                   Work email
@@ -173,17 +176,17 @@ export default function LoginPage() {
                 </div>
               )}
 
-              {notice && (
+              {(isResetMode ? notice : authState?.error) && (
                 <p
                   aria-live="polite"
                   className="rounded-[5px] border border-[#ead7c9] bg-[#fff8f2] px-4 py-3 text-[13px] leading-5 text-[#775344]"
                 >
-                  {notice}
+                  {isResetMode ? notice : authState?.error}
                 </p>
               )}
 
-              <button className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-[5px] bg-[#315b48] px-5 text-sm font-semibold text-white transition hover:bg-[#234536] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#315b48]" type="submit">
-                {isResetMode ? "Send reset instructions" : "Sign in to workspace"}
+              <button className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-[5px] bg-[#315b48] px-5 text-sm font-semibold text-white transition hover:bg-[#234536] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#315b48] disabled:cursor-wait disabled:opacity-70" disabled={isSigningIn && !isResetMode} type="submit">
+                {isResetMode ? "Send reset instructions" : isSigningIn ? "Signing in..." : "Sign in to workspace"}
                 <ArrowRight
                   className="transition-transform group-hover:translate-x-0.5"
                   size={17}
