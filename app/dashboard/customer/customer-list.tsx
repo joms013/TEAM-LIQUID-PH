@@ -1,0 +1,158 @@
+"use client";
+
+import { ArrowLeft, Search, Users } from "lucide-react";
+import { useState } from "react";
+
+export type CustomerRecord = {
+  custno: string;
+  custname: string | null;
+  address: string | null;
+  payterm: "COD" | "30D" | "45D" | null;
+};
+
+type PaymentFilter = "all" | NonNullable<CustomerRecord["payterm"]>;
+
+const paymentFilters: { value: PaymentFilter; label: string }[] = [
+  { value: "all", label: "All terms" },
+  { value: "COD", label: "COD" },
+  { value: "30D", label: "30 days" },
+  { value: "45D", label: "45 days" },
+];
+
+export function CustomerList({ customers }: { customers: CustomerRecord[] }) {
+  const [query, setQuery] = useState("");
+  const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
+  const normalizedQuery = query.trim().toLowerCase();
+  const searchedCustomers = customers.filter((customer) =>
+    `${customer.custno} ${customer.custname ?? ""} ${customer.address ?? ""} ${customer.payterm ?? ""}`
+      .toLowerCase()
+      .includes(normalizedQuery),
+  );
+  const visibleCustomers =
+    paymentFilter === "all"
+      ? searchedCustomers
+      : searchedCustomers.filter((customer) => customer.payterm === paymentFilter);
+  const counts = Object.fromEntries(
+    paymentFilters.map(({ value }) => [
+      value,
+      value === "all"
+        ? searchedCustomers.length
+        : searchedCustomers.filter((customer) => customer.payterm === value).length,
+    ]),
+  ) as Record<PaymentFilter, number>;
+
+  return (
+    <section className="users-main">
+      <a
+        className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-[#315b48] no-underline hover:underline"
+        href="/dashboard"
+      >
+        <ArrowLeft aria-hidden="true" size={16} />
+        All modules
+      </a>
+
+      <header className="mb-7 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.12em] text-[#668171]">
+            Customer management
+          </p>
+          <h1 className="font-[Newsreader,Georgia,serif] text-4xl leading-tight text-[#172a24]">
+            Customers
+          </h1>
+          <p className="mt-2 text-sm text-[#69766f]">
+            Browse customer accounts and payment terms.
+          </p>
+        </div>
+        <p className="text-sm font-semibold text-[#55657d]">
+          {visibleCustomers.length} of {customers.length} customers
+        </p>
+      </header>
+
+      <section aria-label="Customer list">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+          <div aria-label="Filter customers by payment terms" className="user-filter-group" role="group">
+            {paymentFilters.map(({ value, label }) => (
+              <button
+                aria-pressed={paymentFilter === value}
+                className={`user-filter ${paymentFilter === value ? "user-filter-selected" : ""}`}
+                key={value}
+                onClick={() => setPaymentFilter(value)}
+                type="button"
+              >
+                <span>{label}</span>
+                <span className="user-filter-count">{counts[value]}</span>
+              </button>
+            ))}
+          </div>
+          <label className="user-search">
+            <Search aria-hidden="true" className="text-[#829087]" size={18} />
+            <span className="sr-only">Search customers by number, name, address, or payment terms</span>
+            <input
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search customers"
+              type="search"
+              value={query}
+            />
+          </label>
+        </div>
+
+        <div className="user-table-shell">
+          <table className="user-table">
+            <thead>
+              <tr>
+                <th scope="col">Customer</th>
+                <th scope="col">Address</th>
+                <th scope="col">Payment terms</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleCustomers.map((customer) => (
+                <tr key={customer.custno}>
+                  <td>
+                    <span className="block font-semibold text-[#172a24]">
+                      {customer.custname || "Unnamed customer"}
+                    </span>
+                    <span className="mt-1 block text-xs text-[#69766f]">{customer.custno}</span>
+                  </td>
+                  <td className="text-[#55657d]">{customer.address || "Not provided"}</td>
+                  <td>
+                    <span className="user-role">{customer.payterm || "Not set"}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {visibleCustomers.map((customer) => (
+            <article className="user-mobile-card" key={`mobile-${customer.custno}`}>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <h2 className="truncate font-semibold text-[#172a24]">
+                    {customer.custname || "Unnamed customer"}
+                  </h2>
+                  <p className="mt-1 text-xs text-[#69766f]">{customer.custno}</p>
+                </div>
+                <span className="user-role">{customer.payterm || "Not set"}</span>
+              </div>
+              <p className="mt-3 text-sm leading-5 text-[#55657d]">
+                {customer.address || "Address not provided"}
+              </p>
+            </article>
+          ))}
+
+          {visibleCustomers.length === 0 && (
+            <div className="user-empty-state">
+              <Users aria-hidden="true" className="mx-auto text-[#8fa59a]" size={30} />
+              <h2 className="mt-3 font-semibold text-[#172a24]">No customers found</h2>
+              <p className="mt-1 text-sm text-[#69766f]">
+                {normalizedQuery || paymentFilter !== "all"
+                  ? "Try a different search or payment-term filter."
+                  : "Customer records will appear here when available."}
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+    </section>
+  );
+}
