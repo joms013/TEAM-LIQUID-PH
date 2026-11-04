@@ -4,7 +4,7 @@
 
 1. Copy `.env.example` to `.env.local` and set the Supabase project URL, anon key, and canonical app URL (`NEXT_PUBLIC_SITE_URL`).
 2. Set `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` from the Supabase project's API settings. Keep this key server-only; never expose or commit it.
-3. Apply the migrations in order: `20261104000000_account_profiles.sql`, `20261104100000_user_management.sql`, and `20261104110000_superadmin_approvals.sql` (or use the Supabase CLI).
+3. Apply the migrations in order: `20261104000000_account_profiles.sql`, `20261104100000_user_management.sql`, `20261104110000_superadmin_approvals.sql`, and `20261104120000_user_rights.sql` (or use the Supabase CLI).
 4. Existing Auth users keep their current status. New invited accounts start as pending and cannot sign in until a superadmin approves them.
 
 To grant initial administrator access, run this once as a trusted database owner and replace the email:
@@ -19,6 +19,8 @@ where profile.user_id = auth_user.id
 ```
 
 Admins can manage standard user accounts only; superadmin records are filtered on the server and never sent to admin screens. Superadmins can approve pending accounts and assign or change roles, including designating admins. The database prevents removing, demoting, or blocking the last active superadmin. Users can be invited by email, and Supabase Auth sends the invitation so each person can set their own password after approval.
+
+Admins and superadmins can assign standard users individual action rights across Customer, Product, Human Resources, Sales, and Reports. Rights changes are saved transactionally and recorded in `public.audit_log`.
 
 Supabase Auth stores and hashes passwords. The app does not store password hashes. Session cookies are refreshed by Next.js middleware. Sign-in checks the profile status, and both authenticated routes check it again on every request.
 

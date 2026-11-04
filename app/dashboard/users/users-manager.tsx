@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import {
   createManagedUser,
+  saveManagedUserRights,
   setManagedUserStatus,
   updateManagedUser,
   type UserManagementResult,
@@ -37,6 +38,13 @@ export type ManagedUser = {
   status: "pending" | "active" | "blocked";
   createdAt: string;
   mustChangePassword: boolean;
+  permissionCodes: string[];
+};
+
+export type PermissionModule = {
+  key: string;
+  name: string;
+  actions: { code: string; label: string }[];
 };
 
 type Props = {
@@ -44,12 +52,14 @@ type Props = {
   actorRole: UserRole;
   currentEmail: string;
   users: ManagedUser[];
+  permissionModules: PermissionModule[];
   onSignOut: () => Promise<void>;
 };
 
 type Filter = "all" | "pending" | "active" | "blocked";
 type DialogState =
   | { kind: "edit"; user: ManagedUser }
+  | { kind: "rights"; user: ManagedUser }
   | { kind: "status"; user: ManagedUser; nextStatus: "active" | "blocked" }
   | { kind: "create" };
 
@@ -65,10 +75,14 @@ function initials(name: string) {
 
 function Modal({
   title,
+  description,
+  wide = false,
   onClose,
   children,
 }: {
   title: string;
+  description?: string;
+  wide?: boolean;
   onClose: () => void;
   children: ReactNode;
 }) {
@@ -84,8 +98,9 @@ function Modal({
 
   return (
     <dialog
+      aria-describedby={description ? "user-dialog-description" : undefined}
       aria-labelledby="user-dialog-title"
-      className="user-dialog"
+      className={`user-dialog ${wide ? "user-dialog-wide" : ""}`}
       onClick={(event) => {
         if (event.target === event.currentTarget) onClose();
       }}
@@ -106,6 +121,11 @@ function Modal({
             <span aria-hidden="true">×</span>
           </button>
         </div>
+        {description && (
+          <p className="mt-2 text-sm leading-6 text-[#69766f]" id="user-dialog-description">
+            {description}
+          </p>
+        )}
         {children}
       </div>
     </dialog>
@@ -117,6 +137,7 @@ export function UsersManager({
   actorRole,
   currentEmail,
   users,
+  permissionModules,
   onSignOut,
 }: Props) {
   const router = useRouter();
@@ -124,6 +145,7 @@ export function UsersManager({
   const [query, setQuery] = useState("");
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [selectedRights, setSelectedRights] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
   const isSuperadmin = actorRole === "superadmin";
 
@@ -175,24 +197,78 @@ export function UsersManager({
     setDialog({ kind: "create" });
   };
 
+  const openRights = (user: ManagedUser) => {
+    setErrorMessage("");
+    setSelectedRights(user.permissionCodes);
+    setDialog({ kind: "rights", user });
+  };
+
+  const allPermissionCodes = permissionModules.flatMap((module) =>
+    module.actions.map((action) => action.code),
+  );
+  const allRightsSelected =
+    allPermissionCodes.length > 0 &&
+    allPermissionCodes.every((code) => selectedRights.includes(code));
+
+  function setModuleRights(module: PermissionModule, grant: boolean) {
+    const moduleCodes = module.actions.map((action) => action.code);
+    setSelectedRights((current) => {
+      const retained = current.filter((code) => !moduleCodes.includes(code));
+      return grant ? [...retained, ...moduleCodes] : retained;
+    });
+  }
+
+  function setActionRight(code: string, grant: boolean) {
+    setSelectedRights((current) =>
+      grant
+        ? current.includes(code) ? current : [...current, code]
+        : current.filter((selectedCode) => selectedCode !== code),
+    );
+  }
+
+  const accessSummary = (user: ManagedUser) => {
+    if (user.role !== "user") return "All modules";
+    const moduleCount = permissionModules.filter((module) =>
+      module.actions.some((action) => user.permissionCodes.includes(action.code)),
+    ).length;
+    return user.permissionCodes.length === 0
+      ? "No access"
+      : `${user.permissionCodes.length} rights · ${moduleCount}/${permissionModules.length} modules`;
+  };
+
   const rowActions = (user: ManagedUser) => {
     if (user.id === actorId) {
       return <span className="text-xs font-semibold text-[#69766f]">You</span>;
     }
+    const rightsAction = user.role === "user" && (
+      <button
+        aria-label={`Manage rights for ${user.name}`}
+        className="user-action-button"
+        onClick={() => openRights(user)}
+        type="button"
+      >
+        <ShieldCheck aria-hidden="true" size={15} />
+        <span>Rights</span>
+      </button>
+    );
     if (user.status === "pending") {
       if (!isSuperadmin) {
         return (
-          <span
-            className="text-xs text-[#69766f]"
-            title="Only a superadmin can approve pending users."
-          >
-            Awaiting approval
-          </span>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {rightsAction}
+            <span
+              className="text-xs text-[#69766f]"
+              title="Only a superadmin can approve pending users."
+            >
+              Awaiting approval
+            </span>
+          </div>
         );
       }
 
       return (
         <div className="flex flex-wrap justify-end gap-2">
+          {rightsAction}
           <button
             aria-label={`Edit ${user.name}`}
             className="user-action-button"
@@ -227,6 +303,7 @@ export function UsersManager({
 
     return (
       <div className="flex flex-wrap justify-end gap-2">
+        {rightsAction}
         <button
           aria-label={`Edit ${user.name}`}
           className="user-action-button"
@@ -400,7 +477,7 @@ export function UsersManager({
                     <td>{statusPill(user.status)}</td>
                     <td>
                       <span className="text-xs text-[#55657d]">
-                        {user.role === "user" ? "Standard access" : "All modules"}
+                        {accessSummary(user)}
                       </span>
                     </td>
                     <td className="text-right">{rowActions(user)}</td>
@@ -418,7 +495,7 @@ export function UsersManager({
                 <div className="mt-4 flex items-center justify-between gap-3">
                   {rolePill(user.role)}
                   <span className="text-xs text-[#55657d]">
-                    {user.role === "user" ? "Standard access" : "All modules"}
+                    {accessSummary(user)}
                   </span>
                 </div>
                 <div className="mt-4 border-t border-[#e7ecf1] pt-3">{rowActions(user)}</div>
@@ -564,6 +641,124 @@ export function UsersManager({
                     : "Unblock user"}
             </button>
           </div>
+        </Modal>
+      )}
+
+      {dialog?.kind === "rights" && (
+        <Modal
+          description="Choose the actions this person can perform in each module."
+          onClose={() => setDialog(null)}
+          title={`Module rights: ${dialog.user.name}`}
+          wide
+        >
+          <form
+            className="rights-form mt-5"
+            onSubmit={(event) => {
+              event.preventDefault();
+              runAction(() =>
+                saveManagedUserRights(dialog.user.id, selectedRights),
+              );
+            }}
+          >
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm font-semibold text-[#315b48]">
+                {selectedRights.length} of {allPermissionCodes.length} rights selected
+              </p>
+              <div aria-label="Select all or no rights" className="flex gap-2" role="group">
+                <button
+                  className="user-secondary-button rights-bulk-button"
+                  disabled={isPending || allRightsSelected}
+                  onClick={() => setSelectedRights(allPermissionCodes)}
+                  type="button"
+                >
+                  All
+                </button>
+                <button
+                  className="user-secondary-button rights-bulk-button"
+                  disabled={isPending || selectedRights.length === 0}
+                  onClick={() => setSelectedRights([])}
+                  type="button"
+                >
+                  None
+                </button>
+              </div>
+            </div>
+
+            <div className="rights-module-grid">
+              {permissionModules.map((module) => {
+                const selectedCount = module.actions.filter((action) =>
+                  selectedRights.includes(action.code),
+                ).length;
+                const allModuleRightsSelected =
+                  module.actions.length > 0 &&
+                  selectedCount === module.actions.length;
+                const partiallySelected =
+                  selectedCount > 0 && selectedCount < module.actions.length;
+
+                return (
+                  <fieldset className="rights-module" key={module.key}>
+                    <legend className="sr-only">{module.name} rights</legend>
+                    <label className="rights-module-heading">
+                      <input
+                        checked={allModuleRightsSelected}
+                        disabled={isPending}
+                        onChange={(event) =>
+                          setModuleRights(module, event.currentTarget.checked)
+                        }
+                        ref={(input) => {
+                          if (input) input.indeterminate = partiallySelected;
+                        }}
+                        type="checkbox"
+                      />
+                      <span className="font-semibold">{module.name}</span>
+                      <span className="ml-auto text-xs font-medium text-[#69766f]">
+                        {selectedCount}/{module.actions.length}
+                      </span>
+                    </label>
+                    <div className="rights-action-list">
+                      {module.actions.map((action) => (
+                        <label className="rights-action" key={action.code}>
+                          <input
+                            autoFocus={
+                              module.key === permissionModules[0]?.key &&
+                              action.code === permissionModules[0]?.actions[0]?.code
+                            }
+                            checked={selectedRights.includes(action.code)}
+                            disabled={isPending}
+                            onChange={(event) =>
+                              setActionRight(action.code, event.currentTarget.checked)
+                            }
+                            type="checkbox"
+                          />
+                          <span>{action.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                );
+              })}
+            </div>
+
+            {errorMessage && (
+              <p aria-live="polite" className="user-form-error mt-4">
+                {errorMessage}
+              </p>
+            )}
+            <div className="mt-6 flex justify-end gap-2">
+              <button
+                className="user-secondary-button"
+                disabled={isPending}
+                onClick={() => setDialog(null)}
+                type="button"
+              >
+                Cancel
+              </button>
+              <button className="user-primary-button" disabled={isPending} type="submit">
+                <Check aria-hidden="true" size={17} />
+                {isPending ? "Saving…" : "Save rights"}
+              </button>
+            </div>
+          </form>
         </Modal>
       )}
     </main>
