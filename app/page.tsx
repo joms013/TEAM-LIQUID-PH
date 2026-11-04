@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState, type FormEvent } from "react";
+import { useActionState, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -11,23 +11,18 @@ import {
   Mail,
   ShieldCheck,
 } from "lucide-react";
-import { signInAction } from "./actions/auth";
+import {
+  requestPasswordResetAction,
+  signInAction,
+} from "./actions/auth";
 
 export default function LoginPage() {
   const [isResetMode, setIsResetMode] = useState(false);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [notice, setNotice] = useState("");
   const [authState, loginAction, isSigningIn] = useActionState(signInAction, null);
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    if (!isResetMode) return;
-    event.preventDefault();
-    setNotice("Password reset is not connected yet. Please contact your administrator.");
-  }
 
   function switchMode() {
     setIsResetMode((current) => !current);
-    setNotice("");
   }
 
   return (
@@ -93,11 +88,10 @@ export default function LoginPage() {
               </p>
             </div>
 
-            <form
-              action={isResetMode ? undefined : loginAction}
-              className="space-y-5"
-              onSubmit={isResetMode ? handleSubmit : undefined}
-            >
+            {isResetMode ? (
+              <ResetPasswordForm onBack={switchMode} />
+            ) : (
+            <form action={loginAction} className="space-y-5">
               <label className="block">
                 <span className="mb-2 block text-[13px] font-semibold text-[#26382f]">
                   Work email
@@ -120,8 +114,7 @@ export default function LoginPage() {
                 </span>
               </label>
 
-              {!isResetMode && (
-                <label className="block">
+              <label className="block">
                   <span className="mb-2 block text-[13px] font-semibold text-[#26382f]">
                     Password
                   </span>
@@ -154,9 +147,7 @@ export default function LoginPage() {
                     </button>
                   </span>
                 </label>
-              )}
 
-              {!isResetMode && (
                 <div className="flex items-center justify-between gap-4 pt-0.5">
                   <label className="flex cursor-pointer items-center gap-2.5 text-[13px] text-[#59685f]">
                     <input
@@ -174,36 +165,26 @@ export default function LoginPage() {
                     Forgot password?
                   </button>
                 </div>
-              )}
 
-              {(isResetMode ? notice : authState?.error) && (
+              {authState?.error && (
                 <p
                   aria-live="polite"
                   className="rounded-[5px] border border-[#ead7c9] bg-[#fff8f2] px-4 py-3 text-[13px] leading-5 text-[#775344]"
                 >
-                  {isResetMode ? notice : authState?.error}
+                  {authState.error}
                 </p>
               )}
 
-              <button className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-[5px] bg-[#315b48] px-5 text-sm font-semibold text-white transition hover:bg-[#234536] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#315b48] disabled:cursor-wait disabled:opacity-70" disabled={isSigningIn && !isResetMode} type="submit">
-                {isResetMode ? "Send reset instructions" : isSigningIn ? "Signing in..." : "Sign in to workspace"}
+              <button className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-[5px] bg-[#315b48] px-5 text-sm font-semibold text-white transition hover:bg-[#234536] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#315b48] disabled:cursor-wait disabled:opacity-70" disabled={isSigningIn} type="submit">
+                {isSigningIn ? "Signing in..." : "Sign in to workspace"}
                 <ArrowRight
                   className="transition-transform group-hover:translate-x-0.5"
                   size={17}
                   aria-hidden="true"
                 />
               </button>
-
-              {isResetMode && (
-                <button
-                  className="flex w-full items-center justify-center gap-2 py-1 text-[13px] font-semibold text-[#52645a] transition hover:text-[#234536]"
-                  onClick={switchMode}
-                  type="button"
-                >
-                  <ArrowLeft size={15} aria-hidden="true" /> Back to sign in
-                </button>
-              )}
             </form>
+            )}
 
             <div className="mt-9 flex items-start gap-3 border-t border-[#e6e9e3] pt-5">
               <ShieldCheck
@@ -226,5 +207,72 @@ export default function LoginPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+function ResetPasswordForm({ onBack }: { onBack: () => void }) {
+  const [state, formAction, isPending] = useActionState(
+    requestPasswordResetAction,
+    null,
+  );
+
+  return (
+    <form action={formAction} className="space-y-5">
+      <label className="block">
+        <span className="mb-2 block text-[13px] font-semibold text-[#26382f]">
+          Work email
+        </span>
+        <span className="relative block">
+          <Mail
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-[#829087]"
+            size={18}
+            strokeWidth={1.8}
+            aria-hidden="true"
+          />
+          <input
+            autoComplete="email"
+            className="h-[52px] w-full rounded-[5px] border border-[#dce3dc] bg-white pl-11 pr-4 text-sm text-[#172a24] outline-none transition placeholder:text-[#a0aaa2] hover:border-[#a9b9ac] focus:border-[#668171] focus:ring-2 focus:ring-[#668171]/15"
+            name="email"
+            placeholder="you@hope.org"
+            required
+            type="email"
+          />
+        </span>
+      </label>
+
+      {state && (
+        <p
+          aria-live={state.error ? "assertive" : "polite"}
+          className={`rounded-[5px] border px-4 py-3 text-[13px] leading-5 ${
+            state.success
+              ? "border-[#cfe2d4] bg-[#f1f8f2] text-[#315b48]"
+              : "border-[#ead7c9] bg-[#fff8f2] text-[#775344]"
+          }`}
+        >
+          {state.error ?? state.message}
+        </p>
+      )}
+
+      <button
+        className="group flex h-[52px] w-full items-center justify-center gap-2 rounded-[5px] bg-[#315b48] px-5 text-sm font-semibold text-white transition hover:bg-[#234536] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#315b48] disabled:cursor-wait disabled:opacity-70"
+        disabled={isPending}
+        type="submit"
+      >
+        {isPending ? "Sending instructions..." : "Send reset instructions"}
+        <ArrowRight
+          className="transition-transform group-hover:translate-x-0.5"
+          size={17}
+          aria-hidden="true"
+        />
+      </button>
+
+      <button
+        className="flex w-full items-center justify-center gap-2 py-1 text-[13px] font-semibold text-[#52645a] transition hover:text-[#234536]"
+        onClick={onBack}
+        type="button"
+      >
+        <ArrowLeft size={15} aria-hidden="true" /> Back to sign in
+      </button>
+    </form>
   );
 }
