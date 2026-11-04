@@ -1571,9 +1571,14 @@ const PER = 25;
 function draw(name, element, parentValue) {
   const entity = ENT[name];
   const state = F[name] || (F[name] = { f: "active", q: "", p: 0, s: entity.ds || null });
+  if (name == "products" && !("unit" in state)) state.unit = "all";
   const admin = isAdm();
   const columns = entity.f.filter((field) => !field.h);
   const noun = entity.t.toLowerCase();
+  const productUnitField = name == "products" && entity.f.find((field) => field.k == "unit");
+  const unitFilter = productUnitField
+    ? `<select class="sel" data-unit aria-label="Filter products by unit"><option value="all" ${state.unit == "all" ? "selected" : ""}>All units</option>${productUnitField.o().map(([value, label]) => `<option value="${value}" ${state.unit == value ? "selected" : ""}>${label}</option>`).join("")}</select>`
+    : "";
   const sortTh = (field) => {
     const on = state.s && state.s.k == field.k;
     return `<th aria-sort="${on ? (state.s.d > 0 ? "ascending" : "descending") : "none"}"><button type="button" class="sortb" data-a="sort" data-k="${field.k}">${field.l}<i aria-hidden="true">${on ? (state.s.d > 0 ? "▲" : "▼") : ""}</i></button></th>`;
@@ -1596,6 +1601,7 @@ function draw(name, element, parentValue) {
       <h2>${entity.t}</h2>
       <div class="tools">
         ${filters}
+        ${unitFilter}
         <div class="sbox"><input type="search" data-s placeholder="Search ${noun}" aria-label="Search ${noun}" value="${esc(state.q)}"><button type="button" class="sx" data-a="clr" aria-label="Clear search" ${state.q ? "" : "hidden"}>&times;</button></div>
         <button class="btn sm" data-a="add">+ Add new</button>
       </div>
@@ -1632,6 +1638,10 @@ function draw(name, element, parentValue) {
       records = records.filter((record) => !record.del);
     } else if (state.f == "inactive") {
       records = records.filter((record) => record.del);
+    }
+
+    if (name == "products" && state.unit != "all") {
+      records = records.filter((record) => record.unit == state.unit);
     }
 
     const query = state.q.toLowerCase();
@@ -1684,6 +1694,12 @@ function draw(name, element, parentValue) {
     state.q = event.target.value;
     state.p = 0;
     element.querySelector(".sx").hidden = !state.q;
+    renderBody();
+  };
+  element.onchange = (event) => {
+    if (!("unit" in event.target.dataset)) return;
+    state.unit = event.target.value;
+    state.p = 0;
     renderBody();
   };
   element.onclick = (event) => {
