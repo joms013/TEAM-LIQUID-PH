@@ -1,10 +1,21 @@
 "use client";
 
-import { ArrowLeft, Check, Pencil, Plus, Search, ShoppingBag } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  Pencil,
+  Plus,
+  RotateCcw,
+  Search,
+  ShoppingBag,
+  Trash2,
+} from "lucide-react";
 import { useEffect, useRef, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import {
   createProduct,
+  deleteProduct,
+  restoreProduct,
   updateProduct,
   type ProductMutationResult,
 } from "@/app/actions/products";
@@ -15,6 +26,8 @@ export type ProductRecord = {
   unit: "pc" | "ea" | "mtr" | "pkg" | "ltr" | null;
   is_deleted: boolean;
 };
+
+type ProductStatusFilter = "active" | "inactive" | "all";
 
 const unitLabels: Record<NonNullable<ProductRecord["unit"]>, string> = {
   pc: "Piece",
@@ -28,16 +41,20 @@ export function ProductList({
   products,
   canAdd,
   canEdit,
+  canDelete,
 }: {
   products: ProductRecord[];
   canAdd: boolean;
   canEdit: boolean;
+  canDelete: boolean;
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [unitFilter, setUnitFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState<ProductStatusFilter>("active");
   const [dialog, setDialog] = useState<"create" | ProductRecord | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [feedback, setFeedback] = useState<{ message: string; isError: boolean } | null>(null);
   const [isPending, startTransition] = useTransition();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const isCreate = dialog === "create";
@@ -48,11 +65,15 @@ export function ProductList({
   }, [dialog]);
 
   const normalizedQuery = query.trim().toLowerCase();
-  const visibleProducts = products.filter((product) => {
-    const matchesQuery =
-      `${product.prodcode} ${product.description ?? ""} ${product.unit ?? ""}`
-        .toLowerCase()
-        .includes(normalizedQuery);
+  const statusProducts = products.filter((product) => {
+    if (!canDelete || statusFilter === "active") return !product.is_deleted;
+    if (statusFilter === "inactive") return product.is_deleted;
+    return true;
+  });
+  const visibleProducts = statusProducts.filter((product) => {
+    const matchesQuery = `${product.prodcode} ${product.description ?? ""} ${product.unit ?? ""}`
+      .toLowerCase()
+      .includes(normalizedQuery);
     return matchesQuery && (unitFilter === "all" || product.unit === unitFilter);
   });
 
@@ -81,6 +102,28 @@ export function ProductList({
     setDialog(nextDialog);
   }
 
+  function changeProductStatus(product: ProductRecord, restore: boolean) {
+    if (
+      !restore &&
+      !window.confirm(`Move ${product.description || product.prodcode} to inactive products?`)
+    ) {
+      return;
+    }
+
+    setFeedback(null);
+    startTransition(async () => {
+      const result: ProductMutationResult = restore
+        ? await restoreProduct(product.prodcode)
+        : await deleteProduct(product.prodcode);
+      if (result.error) {
+        setFeedback({ message: result.error, isError: true });
+        return;
+      }
+      setFeedback({ message: result.success ?? "", isError: false });
+      router.refresh();
+    });
+  }
+
   return (
     <section className="users-main">
       <a
@@ -104,7 +147,7 @@ export function ProductList({
           </p>
         </div>
         <p className="text-sm font-semibold text-[#55657d]">
-          {visibleProducts.length} of {products.length} products
+          {visibleProducts.length} of {statusProducts.length} products
         </p>
         {canAdd && (
           <button className="user-primary-button" onClick={() => openDialog("create")} type="button">
@@ -113,6 +156,44 @@ export function ProductList({
           </button>
         )}
       </header>
+
+      {feedback && (
+        <p
+          aria-live={feedback.isError ? "assertive" : "polite"}
+          className={`mb-4 text-sm ${feedback.isError ? "text-red-700" : "text-[#315b48]"}`}
+          role={feedback.isError ? "alert" : "status"}
+        >
+          {feedback.message}
+        </p>
+      )}
+      {canDelete && (
+        <div
+          aria-label="Filter products by status"
+          className="user-filter-group mb-4"
+          role="group"
+        >
+          {([
+            ["active", "Active"],
+            ["inactive", "Inactive"],
+            ["all", "All"],
+          ] as const).map(([value, label]) => (
+            <button
+              aria-pressed={statusFilter === value}
+              className={`user-filter ${statusFilter === value ? "user-filter-selected" : ""}`}
+              key={value}
+              onClick={() => setStatusFilter(value)}
+              type="button"
+            >
+              <span>{label}</span>
+              <span className="user-filter-count">
+                {products.filter((product) =>
+                  value === "all" ? true : product.is_deleted === (value === "inactive"),
+                ).length}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <section aria-label="Product list">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
@@ -150,7 +231,7 @@ export function ProductList({
               <tr>
                 <th scope="col">Product</th>
                 <th scope="col">Unit</th>
-                {canEdit && <th scope="col"><span className="sr-only">Actions</span></th>}
+                {(canEdit || canDelete) && <th scope="col"><span className="sr-only">Actions</span></th>}
               </tr>
             </thead>
             <tbody>
@@ -159,6 +240,9 @@ export function ProductList({
                   <td>
                     <span className="block font-semibold text-[#172a24]">
                       {product.description || "Unnamed product"}
+                      {product.is_deleted && (
+                        <span className="ml-2 text-xs font-medium text-[#8c4b35]">Inactive</span>
+                      )}
                     </span>
                     <span className="mt-1 block text-xs text-[#69766f]">{product.prodcode}</span>
                   </td>
@@ -167,17 +251,37 @@ export function ProductList({
                       {product.unit ? `${product.unit} · ${unitLabels[product.unit]}` : "Not set"}
                     </span>
                   </td>
-                  {canEdit && (
+                  {(canEdit || canDelete) && (
                     <td className="text-right">
-                      <button
-                        aria-label={`Edit ${product.description || product.prodcode}`}
-                        className="user-action-button"
-                        onClick={() => openDialog(product)}
-                        type="button"
-                      >
-                        <Pencil aria-hidden="true" size={15} />
-                        <span>Edit</span>
-                      </button>
+                      <div className="flex flex-wrap justify-end gap-2">
+                        {canEdit && !product.is_deleted && (
+                          <button
+                            aria-label={`Edit ${product.description || product.prodcode}`}
+                            className="user-action-button"
+                            onClick={() => openDialog(product)}
+                            type="button"
+                          >
+                            <Pencil aria-hidden="true" size={15} />
+                            <span>Edit</span>
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            aria-label={`${product.is_deleted ? "Restore" : "Delete"} ${product.description || product.prodcode}`}
+                            className="user-action-button"
+                            disabled={isPending}
+                            onClick={() => changeProductStatus(product, product.is_deleted)}
+                            type="button"
+                          >
+                            {product.is_deleted ? (
+                              <RotateCcw aria-hidden="true" size={15} />
+                            ) : (
+                              <Trash2 aria-hidden="true" size={15} />
+                            )}
+                            <span>{product.is_deleted ? "Restore" : "Delete"}</span>
+                          </button>
+                        )}
+                      </div>
                     </td>
                   )}
                 </tr>
@@ -191,7 +295,8 @@ export function ProductList({
               <h2 className="mt-3 font-semibold text-[#172a24]">No products found</h2>
               <p className="mt-1 text-sm text-[#69766f]">
                 {normalizedQuery || unitFilter !== "all"
-                  ? "Try a different search or unit filter."
+                  || statusFilter !== "active"
+                  ? "Try a different search, unit, or status filter."
                   : "Product records will appear here when available."}
               </p>
             </div>

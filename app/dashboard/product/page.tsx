@@ -12,11 +12,13 @@ export default async function ProductPage() {
   if (!hasModuleAccess(access, "product")) redirect("/dashboard");
 
   const permissions = await getProductPermissions(access);
-  const { data, error } = await createSupabaseAdminClient()
+  const canDelete = permissions.has("product_delete");
+  let productQuery = createSupabaseAdminClient()
     .from("product")
     .select("prodcode, description, unit, is_deleted")
-    .eq("is_deleted", false)
     .order("prodcode");
+  if (!canDelete) productQuery = productQuery.eq("is_deleted", false);
+  const { data, error } = await productQuery;
 
   if (error) throw new Error(`Unable to load products: ${error.message}`);
 
@@ -26,6 +28,7 @@ export default async function ProductPage() {
       <ProductList
         canAdd={permissions.has("product_add")}
         canEdit={permissions.has("product_edit")}
+        canDelete={canDelete}
         products={(data ?? []) as ProductRecord[]}
       />
     </main>
