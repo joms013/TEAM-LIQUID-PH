@@ -1,10 +1,20 @@
 "use client";
 
 import { useActionState } from "react";
-import { setFirstPasswordAction } from "@/app/actions/auth";
+import {
+  setFirstPasswordAction,
+  setRecoveredPasswordAction,
+} from "@/app/actions/auth";
 
-export default function PasswordForm() {
-  const [state, formAction, isPending] = useActionState(setFirstPasswordAction, null);
+export default function PasswordForm({
+  isRecovery = false,
+}: {
+  isRecovery?: boolean;
+}) {
+  const action = isRecovery
+    ? setRecoveredPasswordAction
+    : setFirstPasswordAction;
+  const [state, formAction, isPending] = useActionState(action, null);
 
   return (
     <form action={formAction} className="mt-7 space-y-5">
@@ -40,7 +50,11 @@ export default function PasswordForm() {
         disabled={isPending}
         type="submit"
       >
-        {isPending ? "Saving password..." : "Set password and continue"}
+        {isPending
+          ? "Saving password..."
+          : isRecovery
+            ? "Reset password"
+            : "Set password and continue"}
       </button>
     </form>
   );
