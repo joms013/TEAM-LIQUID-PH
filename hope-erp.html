@@ -140,7 +140,6 @@ td select{padding:6px 12px;width:auto;border-radius:999px}
 .sel.s-pending{color:var(--wn);background-color:color-mix(in srgb,var(--wn) 12%,var(--pn))}
 .sel.s-blocked,.sel.s-disapproved{color:var(--wr);background-color:color-mix(in srgb,var(--wr) 10%,var(--pn))}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.right-table{overflow-x:auto;margin-top:14px}.right-table table{min-width:420px}.right-table th,.right-table td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--ln)}.right-table th{font-weight:600}.right-table label{display:flex;align-items:center;gap:7px;margin:0;font-size:13px;font-weight:500;white-space:nowrap}.right-table input[type=checkbox]{width:16px;height:16px;padding:0;accent-color:var(--ac)}
 .chip{position:relative;display:inline-flex;align-items:center;gap:7px;margin:0;padding:6px 13px 6px 10px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--mu);background:var(--seg);border:1px solid transparent;cursor:pointer;transition:background .15s,color .15s}
 .chip:hover{color:var(--ink)}
 .chip input{position:absolute;opacity:0;width:0;height:0;padding:0;border:0;pointer-events:none}
@@ -567,24 +566,17 @@ const MODS = {
   sales: "Sales",
   reports: "Reports",
 };
-const ACTION_RIGHTS = ["add", "edit", "delete"];
-const canAction = (module, action) => {
-  if (!U) return false;
-  if (isAdm()) return true;
-  if (!(U.mods || []).includes(module)) return false;
-  const moduleRights = U.rights && U.rights[module];
-  return moduleRights ? moduleRights[action] === true : true;
-};
 
 /* ---------- data ---------- */
 const data = (name) => load("hope_v2_" + name, SEED[name] || []);
 const put = (name, value) => save("hope_v2_" + name, value);
 const act = (name) => data(name).filter((record) => !record.del);
-const currentPriceRecord = (code, date = today()) =>
-  act("prices")
+const price = (code, date = today()) => {
+  const current = act("prices")
     .filter((record) => record.prod == code && record.date <= date)
     .sort((a, b) => b.date.localeCompare(a.date))[0];
-const price = (code, date = today()) => +(currentPriceRecord(code, date) || {}).price || 0;
+  return current ? +current.price : 0;
+};
 const sdate = (transaction) =>
   (data("sales").find((sale) => sale.no == transaction) || {}).date || today();
 const lineAmt = (line) => line.qty * price(line.prod, sdate(line.trans));
@@ -619,13 +611,7 @@ const ENT = {
     kid: "prices",
     kk: "code",
     kl: "Prices",
-    calc: [{
-      l: "Current price",
-      fn: (record) => {
-        const current = currentPriceRecord(record.code);
-        return current ? money(current.price) : '<span class="muted">No price yet</span>';
-      },
-    }],
+    calc: [{ l: "Current price", fn: (record) => money(price(record.code)) }],
   },
   prices: {
     t: "Price history",
@@ -1584,9 +1570,6 @@ function askConfirm({ title, body, ok = "Confirm" }) {
 const PER = 25;
 function draw(name, element, parentValue) {
   const entity = ENT[name];
-  const permissionModule = name == "prices" ? "products" : name;
-  const hasActionRights = ["customers", "products"].includes(permissionModule);
-  const allowed = (action) => !hasActionRights || canAction(permissionModule, action);
   const state = F[name] || (F[name] = { f: "active", q: "", p: 0, s: entity.ds || null });
   if (name == "products" && !("unit" in state)) state.unit = "all";
   const admin = isAdm();
@@ -1620,7 +1603,7 @@ function draw(name, element, parentValue) {
         ${filters}
         ${unitFilter}
         <div class="sbox"><input type="search" data-s placeholder="Search ${noun}" aria-label="Search ${noun}" value="${esc(state.q)}"><button type="button" class="sx" data-a="clr" aria-label="Clear search" ${state.q ? "" : "hidden"}>&times;</button></div>
-        ${allowed("add") ? '<button class="btn sm" data-a="add">+ Add new</button>' : ""}
+        <button class="btn sm" data-a="add">+ Add new</button>
       </div>
     </div>
     <div class="tw">
@@ -1644,7 +1627,7 @@ function draw(name, element, parentValue) {
     } else {
       t = `No ${noun} yet`;
       b = `${entity.t} you add will appear here.`;
-      btn = allowed("add") ? `<button class="btn sm" data-a="add">+ Add new</button>` : "";
+      btn = `<button class="btn sm" data-a="add">+ Add new</button>`;
     }
     return `<tr><td colspan="${headers.length}" class="empty"><b>${t}</b><p>${b}</p>${btn}</td></tr>`;
   };
@@ -1688,7 +1671,7 @@ function draw(name, element, parentValue) {
               ? admin
                 ? `<button class="r" data-a="res" data-id="${record.id}">Restore</button>`
                 : ""
-              : `${entity.kid ? `<button class="k" data-a="kid" data-id="${record.id}">${entity.kl}</button>` : ""}${allowed("edit") ? `<button data-a="edit" data-id="${record.id}">Edit</button>` : ""}${allowed("delete") ? `<button class="d" data-a="del" data-id="${record.id}">Delete</button>` : ""}`;
+              : `${entity.kid ? `<button class="k" data-a="kid" data-id="${record.id}">${entity.kl}</button>` : ""}<button data-a="edit" data-id="${record.id}">Edit</button><button class="d" data-a="del" data-id="${record.id}">Delete</button>`;
 
             return `<tr class="${record.del ? "del" : ""}">
               ${columns.map((field) => `<td>${cell(field, record)}</td>`).join("")}
@@ -1725,18 +1708,6 @@ function draw(name, element, parentValue) {
 
     const action = button.dataset.a;
     const id = button.dataset.id;
-    if (action == "res" && !admin) {
-      toast("Only an administrator can restore records.");
-      return;
-    }
-    if (
-      (action == "add" && !allowed("add")) ||
-      (action == "edit" && !allowed("edit")) ||
-      (action == "del" && !allowed("delete"))
-    ) {
-      toast("You do not have permission to perform this action.");
-      return;
-    }
     if (action == "f") {
       state.f = button.dataset.v;
       state.p = 0;
@@ -1772,10 +1743,6 @@ function draw(name, element, parentValue) {
         ok: "Mark inactive",
       }).then((yes) => {
         if (!yes) return;
-        if (!allowed("delete")) {
-          toast("You do not have permission to perform this action.");
-          return;
-        }
         mut(name, id, true, "DELETED");
         redraw();
         toast("Marked inactive");
@@ -1819,12 +1786,6 @@ function kids(name, id) {
 
 function form(name, id, parentValue, done) {
   const entity = ENT[name];
-  const permissionModule = name == "prices" ? "products" : name;
-  const action = id ? "edit" : "add";
-  if (["customers", "products"].includes(permissionModule) && !canAction(permissionModule, action)) {
-    toast("You do not have permission to perform this action.");
-    return;
-  }
   const records = data(name);
   const record = id ? records.find((item) => item.id == id) : {};
   const dialog = $("#dlg");
@@ -1887,10 +1848,6 @@ function form(name, id, parentValue, done) {
   };
   formElement.onsubmit = (event) => {
     event.preventDefault();
-    if (["customers", "products"].includes(permissionModule) && !canAction(permissionModule, action)) {
-      toast("You do not have permission to perform this action.");
-      return;
-    }
     const values = {};
 
     entity.f.forEach((field) => {
@@ -2144,31 +2101,9 @@ function usersView(el){
 
 function rights(email){
  const all=users(),u=all.find(x=>x.email==email),d=$('#dlg');
- const actionModules=['customers','products'];
- const actionRows=actionModules.map(module=>{
-  const moduleRights=u.rights&&u.rights[module];
-  return `<tr><th scope="row">${MODS[module]}</th>${ACTION_RIGHTS.map(action=>{
-   const checked=moduleRights?moduleRights[action]===true:u.mods.includes(module);
-   return `<td><label><input type="checkbox" data-action-module="${module}" data-action-name="${action}" ${checked?'checked':''} ${u.mods.includes(module)?'':'disabled'}>${action[0].toUpperCase()+action.slice(1)}</label></td>`;
-  }).join('')}</tr>`;
- }).join('');
  d.setAttribute('aria-labelledby','rights-title');d.setAttribute('aria-describedby','rights-help');
- d.innerHTML=`<h2 id="rights-title">Access and action rights: ${esc(u.name)}</h2><p class="muted" id="rights-help" style="margin:0 0 14px">Choose module access and which actions this person can perform in Customers and Products.</p><form><div class="chips">${Object.entries(MODS).map(([k,l])=>`<label class="chip"><input type="checkbox" data-module-access value="${k}" ${u.mods.includes(k)?'checked':''}>${l}</label>`).join('')}</div><div class="right-table"><table><thead><tr><th scope="col">Module</th>${ACTION_RIGHTS.map(action=>`<th scope="col">${action[0].toUpperCase()+action.slice(1)}</th>`).join('')}</tr></thead><tbody>${actionRows}</tbody></table></div><div class="row"><button class="btn">Save rights</button><button type="button" class="btn ghost" data-x>Cancel</button></div></form>`;
- d.querySelectorAll('[data-module-access]').forEach(input=>input.onchange=()=>{
-  d.querySelectorAll(`[data-action-module="${input.value}"]`).forEach(control=>control.disabled=!input.checked);
- });
- d.querySelector('form').onsubmit=e=>{
-  e.preventDefault();
-  u.mods=[...d.querySelectorAll('[data-module-access]:checked')].map(x=>x.value);
-  u.rights=Object.fromEntries(actionModules.map(module=>[
-   module,
-   Object.fromEntries(ACTION_RIGHTS.map(action=>[
-    action,
-    d.querySelector(`[data-action-module="${module}"][data-action-name="${action}"]`).checked
-   ]))
-  ]));
-  saveUsers(all);d.close();usersView($('#view'));toast('Rights saved')
- };
+ d.innerHTML=`<h2 id="rights-title">Module access: ${esc(u.name)}</h2><p class="muted" id="rights-help" style="margin:0 0 14px">Select the modules this person is allowed to open.</p><form><div class="chips">${Object.entries(MODS).map(([k,l])=>`<label class="chip"><input type="checkbox" value="${k}" ${u.mods.includes(k)?'checked':''}>${l}</label>`).join('')}</div><div class="row"><button class="btn">Save access</button><button type="button" class="btn ghost" data-x>Cancel</button></div></form>`;
+ d.querySelector('form').onsubmit=e=>{e.preventDefault();u.mods=[...d.querySelectorAll('input:checked')].map(x=>x.value);saveUsers(all);d.close();usersView($('#view'));toast('Rights saved')};
  d.showModal();d.querySelector('input')?.focus();
 }
 /* ---------- overview + nav icons ---------- */
