@@ -459,10 +459,10 @@ td small{font-size:12.5px}
     <div class="tabs" id="atabs" role="tablist" aria-label="Account access"><button id="tab-login" role="tab" aria-controls="f-login" data-v="login" aria-selected="true">Sign in</button><button id="tab-register" role="tab" aria-controls="f-reg" data-v="reg" aria-selected="false">Register</button></div>
     <form id="f-login" role="tabpanel" aria-labelledby="tab-login"><label>Email<input id="l-e" type="email" required autocomplete="email"></label><label>Password<input id="l-p" type="password" required autocomplete="current-password"></label><button class="btn full">Sign in</button><button type="button" class="lnk" data-v="reset">Forgot your password?</button></form>
     <form id="f-reg" role="tabpanel" aria-labelledby="tab-register" hidden><label>Full name<input id="r-n" required autocomplete="name"></label><label>Work email<input id="r-e" type="email" required autocomplete="email"></label><label>Password<input id="r-p" type="password" minlength="8" required autocomplete="new-password"></label><p class="hint">Use at least 8 characters.</p><button class="btn full">Create account</button></form>
-    <form id="f-reset" hidden><label>Account email<input id="p-e" type="email" required></label><button class="btn full">Send reset link</button><button type="button" class="lnk" data-v="login">Back to sign in</button></form>
-    <form id="f-newpass" hidden><label>New password (8+ characters)<input id="n-p" type="password" minlength="8" required autocomplete="new-password"></label><button class="btn full">Save new password</button></form>
+    <form id="f-reset" hidden><label>Account email<input id="p-e" type="email" required></label><button class="btn full">Send reset link</button><button type="button" class="lnk" data-v="login">Back to sign in</button><div class="note" id="p-demo" hidden>Demo mode: no email can be sent, so use this link instead. <button type="button" class="lnk" id="p-open">Open reset link</button></div></form>
+    <form id="f-newpass" hidden><label>New password (8+ characters)<input id="n-p" type="password" minlength="8" required autocomplete="new-password"></label><label>Confirm new password<input id="n-p2" type="password" minlength="8" required autocomplete="new-password"></label><button class="btn full">Save new password</button><button type="button" class="lnk" id="n-back">Back to sign in</button></form>
     <div class="msg" id="msg" role="status" aria-live="polite"></div>
-    <div class="note" id="demo" hidden>Demo mode: add your Supabase keys in CFG to use real sign in. Try admin@hope.com, superadmin@hope.com or user@hope.com with any password.</div>
+    <div class="note" id="demo" hidden>Demo mode: add your Supabase keys in CFG to use real sign in. Try admin@hope.com, superadmin@hope.com or user@hope.com with any password until you reset or set one. Password reset works here too, locally in this browser.</div>
    </div>
   </section>
  </div>
@@ -2221,7 +2221,7 @@ function route(){
 $('#tabs').onclick=e=>{const b=e.target.closest('[data-m]');if(b){V.mod=b.dataset.m;document.body.classList.remove('nv');route()}};
 $('#burger').onclick=()=>document.body.classList.add('nv');$('#scrim').onclick=()=>document.body.classList.remove('nv');
 function openApp(u){U=u;$('#land').hidden=true;$('#app').hidden=false;$('#un').textContent=u.name;$('#ur').textContent=u.role;$('#av').textContent=u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();route()}
-$('#out').onclick=async()=>{if(sb)await sb.auth.signOut();U=null;V.mod='overview';document.body.classList.remove('ishome');$('#app').hidden=true;$('#land').hidden=false;say('')};
+$('#out').onclick=async()=>{if(sb)await sb.auth.signOut();U=null;V.mod='overview';document.body.classList.remove('ishome');$('#app').hidden=true;$('#land').hidden=false;show('login')};
 
 /* ---------- auth ---------- */
 let sb = null;
@@ -2248,6 +2248,7 @@ function show(view) {
     $("#" + id).hidden = key != view;
   }
   $("#atabs").hidden = view == "reset" || view == "newpass";
+  $("#p-demo").hidden = true;
   document.querySelectorAll("#atabs button").forEach((button) => {
     button.setAttribute("aria-selected", button.dataset.v == view);
   });
@@ -2333,6 +2334,44 @@ document.querySelectorAll('input[type="password"]').forEach((input) => {
   wrapper.append(button);
 });
 
+/* demo-mode password store (used only when Supabase is not configured) */
+const PW_KEY = "hope_demo_pw";
+const TOK_KEY = "hope_demo_reset";
+let demoToken = null;
+const demoGet = (key) => {
+  try {
+    return JSON.parse(localStorage.getItem(key)) || {};
+  } catch (error) {
+    return {};
+  }
+};
+const demoSet = (key, value) => {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (error) {}
+};
+async function hashPw(email, password) {
+  const text = email.toLowerCase() + "\u0000" + password;
+  if (window.crypto && crypto.subtle) {
+    const buffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return [...new Uint8Array(buffer)].map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+  let hash = 5381;
+  for (const ch of text) hash = ((hash << 5) + hash + ch.charCodeAt(0)) >>> 0;
+  return "x" + hash.toString(16);
+}
+async function demoSetPassword(email, password) {
+  const store = demoGet(PW_KEY);
+  store[email.toLowerCase()] = await hashPw(email, password);
+  demoSet(PW_KEY, store);
+}
+async function demoCheckPassword(email, password) {
+  const saved = demoGet(PW_KEY)[email.toLowerCase()];
+  if (saved && saved !== (await hashPw(email, password))) {
+    throw new Error("Incorrect email or password.");
+  }
+}
+
 const guard = (handler) => async (event) => {
   event.preventDefault();
   const button = event.target.querySelector(".btn");
@@ -2354,6 +2393,8 @@ $("#f-login").onsubmit = guard(async () => {
       password: $("#l-p").value,
     });
     if (error) throw error;
+  } else {
+    await demoCheckPassword(email, $("#l-p").value);
   }
   enter(email, !!sb);
 });
@@ -2374,6 +2415,8 @@ $("#f-reg").onsubmit = guard(async () => {
       },
     });
     if (error) throw error;
+  } else {
+    await demoSetPassword(email, $("#r-p").value);
   }
 
   const allUsers = users();
@@ -2391,29 +2434,88 @@ $("#f-reset").onsubmit = guard(async () => {
       redirectTo: location.href.split("#")[0],
     });
     if (error) throw error;
+    say("If that email has an account, a reset link is on its way. Check your inbox and spam folder.", "ok");
+    return;
   }
-  say("If that email has an account, a reset link is on its way.", "ok");
+  // Demo mode: no mail server, so issue a local, short-lived reset link.
+  const user = users().find((item) => item.email == email.toLowerCase());
+  if (!user) throw new Error("No account found for that email. Register first.");
+  demoToken = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  demoSet(TOK_KEY, { token: demoToken, email: user.email, exp: Date.now() + 15 * 60 * 1000 });
+  $("#p-demo").hidden = false;
+  say("Reset link created. It works for 15 minutes.", "ok");
 });
 
+$("#p-open").onclick = () => {
+  const saved = demoGet(TOK_KEY);
+  if (!saved.token || saved.token !== demoToken || Date.now() > saved.exp) {
+    $("#p-demo").hidden = true;
+    return say("This reset link has expired. Request a new one.", "err");
+  }
+  show("newpass");
+  $("#n-p").focus();
+};
+
+$("#n-back").onclick = async () => {
+  demoToken = null;
+  if (sb) await sb.auth.signOut();
+  show("login");
+};
+
 $("#f-newpass").onsubmit = guard(async () => {
-  const { error } = await sb.auth.updateUser({ password: $("#n-p").value });
+  const password = $("#n-p").value;
+  if (password.length < 8) throw new Error("Use at least 8 characters.");
+  if (password !== $("#n-p2").value) throw new Error("The two passwords do not match.");
+
+  if (!sb) {
+    const saved = demoGet(TOK_KEY);
+    if (!saved.token || saved.token !== demoToken || Date.now() > saved.exp) {
+      show("reset");
+      throw new Error("This reset link has expired. Request a new one.");
+    }
+    await demoSetPassword(saved.email, password);
+    localStorage.removeItem(TOK_KEY);
+    demoToken = null;
+    $("#f-newpass").reset();
+    say("Password updated. Opening the app\u2026", "ok");
+    setTimeout(() => enter(saved.email, false), 700);
+    return;
+  }
+
+  const { data: current } = await sb.auth.getSession();
+  if (!current.session) {
+    show("reset");
+    throw new Error("This reset link has expired. Request a new one.");
+  }
+  const { error } = await sb.auth.updateUser({ password });
   if (error) throw error;
-  say("Password updated. Opening the app…", "ok");
-  const { data: sessionData } = await sb.auth.getSession();
-  setTimeout(() => enter(sessionData.session.user.email, true), 700);
+  $("#f-newpass").reset();
+  say("Password updated. Opening the app\u2026", "ok");
+  setTimeout(() => enter(current.session.user.email, true), 700);
 });
 
 if (sb) {
-  let recovery = /type=recovery/.test(location.hash);
+  const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+  const linkError = params.get("error_description");
+  let recovery = params.get("type") == "recovery";
+
   sb.auth.onAuthStateChange((event) => {
     if (event == "PASSWORD_RECOVERY") {
       recovery = true;
       show("newpass");
     }
   });
+
   sb.auth.getSession().then(({ data: sessionData }) => {
-    if (recovery) {
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+    if (linkError) {
+      show("reset");
+      say("That reset link is invalid or has expired. Request a new one.", "err");
+    } else if (recovery && sessionData.session) {
       show("newpass");
+    } else if (recovery) {
+      show("reset");
+      say("That reset link is invalid or has expired. Request a new one.", "err");
     } else if (sessionData.session) {
       enter(sessionData.session.user.email, true);
     }
